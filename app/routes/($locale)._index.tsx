@@ -2,6 +2,7 @@ import {Link, redirect, useLoaderData} from 'react-router';
 import {useEffect, useRef} from 'react';
 import type {Route} from './+types/($locale)._index';
 import {InteractiveTowel} from '~/components/InteractiveTowel';
+import {HomeReviews} from '~/components/HomeReviews';
 import {pagePath} from '~/lib/editorial-content';
 import {isStorefrontLocale} from '~/lib/i18n';
 
@@ -701,7 +702,93 @@ export default function Homepage() {
       </div>
     </section>
 
-    <section className="home-final"><img src="/images/rudimenterre/home-table.webp" alt="Table dressée avec le Cuicui" loading="lazy"/><div><h2>{fr?'Un Cuicui pour demain':'A Cuicui for tomorrow'}</h2><Link className="button button--orange" to={pagePath(locale,'adopt')}>{fr?'Adoptez':'Adopt'}</Link></div></section>
+    <HomeReviews locale={locale} />
+
+    <section className="home-material-banner" aria-labelledby="home-material-banner-title">
+      <img
+        src="/images/rudimenterre/home-material-banner.webp"
+        alt={fr ? 'Cuicui et aliments disposés dans une cuisine' : 'Cuicui and ingredients arranged in a kitchen'}
+        loading="lazy"
+      />
+      <div className="home-material-banner__content">
+        <h2 id="home-material-banner-title">
+          {fr ? 'Matière' : 'Material'}
+        </h2>
+        <Link
+          className="button button--light home-material-banner__cta"
+          to={pagePath(locale, 'making')}
+        >
+          {fr ? 'Fabrication et entretien' : 'Making and care'}
+        </Link>
+      </div>
+    </section>
+
+    <section className="home-workshops-banner" aria-labelledby="home-workshops-banner-title">
+      <img
+        src="/images/rudimenterre/home-workshops-banner.webp"
+        alt={fr ? 'Cuicui entouré de légumes et de paniers' : 'Cuicui surrounded by vegetables and baskets'}
+        loading="lazy"
+      />
+      <div className="home-workshops-banner__content">
+        <h2 id="home-workshops-banner-title">
+          {fr ? 'Pour apprendre la méthode' : 'To learn the method'}
+        </h2>
+        <Link
+          className="button button--light home-workshops-banner__cta"
+          to={`/${locale}/pages/ateliers-cuissons-rudimenterre`}
+        >
+          {fr ? 'Ateliers cuissons Rudimenterre' : 'Rudimenterre cooking workshops'}
+        </Link>
+      </div>
+    </section>
+
+    <section className="home-professional-banner" aria-labelledby="home-professional-banner-title">
+      <img
+        src="/images/rudimenterre/home-professional-banner.webp"
+        alt={fr ? 'Nombreux récipients Cuicui empilés dans un atelier' : 'Many Cuicui vessels stacked in a workshop'}
+        loading="lazy"
+      />
+      <div className="home-professional-banner__content">
+        <h2 id="home-professional-banner-title">
+          {fr ? 'Pour les chefs du futur' : 'For the chefs of the future'}
+        </h2>
+        <Link
+          className="button button--light home-professional-banner__cta"
+          to={`/${locale}/pages/service-decouverte-pro`}
+        >
+          {fr ? 'Service découverte pro' : 'Professional discovery service'}
+        </Link>
+      </div>
+    </section>
+
+    <div className="home-future-divider">
+      <h2>{fr ? 'Un Cuicui pour demain' : 'A Cuicui for tomorrow'}</h2>
+    </div>
+
+    <section className="home-newsletter-banner" aria-labelledby="home-newsletter-banner-title">
+      <img
+        src="/images/rudimenterre/home-newsletter-banner.webp"
+        alt={fr ? 'Table garnie de Cuicui, de pain, de légumes et de plantes' : 'Table filled with Cuicui vessels, bread, vegetables and plants'}
+        loading="lazy"
+      />
+      <div className="home-newsletter-banner__content">
+        <h2 id="home-newsletter-banner-title">
+          {fr ? 'Restons en contact' : 'Let’s stay in touch'}
+        </h2>
+        <p>
+          {fr
+            ? 'Recevez des nouvelles du Cuicui selon vos goûts !'
+            : 'Receive Cuicui news tailored to your interests!'}
+        </p>
+        <Link
+          className="button button--light home-newsletter-banner__cta"
+          to={`/${locale}/pages/newsletter`}
+        >
+          <span aria-hidden="true">✉</span>
+          {fr ? 'Inscrivez-vous' : 'Sign up'}
+        </Link>
+      </div>
+    </section>
   </div>;
 }
 
