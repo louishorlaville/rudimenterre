@@ -11,6 +11,10 @@ const CANVAS_WIDTH = TEXTURE_WIDTH + LEFT_PADDING + RIGHT_PADDING;
 const CANVAS_HEIGHT = TEXTURE_HEIGHT + TOP_PADDING + BOTTOM_PADDING;
 const COLUMN_COUNT = 5;
 const ROW_COUNT = 9;
+const GRAVITY = 0.46;
+const AIR_RESISTANCE = 0.972;
+const MAX_FALL_SPEED = 15;
+const CONSTRAINT_ITERATIONS = 8;
 
 type ClothPoint = {
   x: number;
@@ -208,7 +212,11 @@ export function InteractiveTowel() {
     };
 
     const constrainMesh = () => {
-      for (let iteration = 0; iteration < 6; iteration += 1) {
+      for (
+        let iteration = 0;
+        iteration < CONSTRAINT_ITERATIONS;
+        iteration += 1
+      ) {
         for (const constraint of constraints) {
           const pointA = points[constraint.first];
           const pointB = points[constraint.second];
@@ -248,12 +256,17 @@ export function InteractiveTowel() {
       for (let index = 0; index < points.length; index += 1) {
         const point = points[index];
         if (point.pinned || index === draggedPoint) continue;
-        const velocityX = (point.x - point.previousX) * 0.945;
-        const velocityY = (point.y - point.previousY) * 0.945;
+        const velocityX =
+          (point.x - point.previousX) * AIR_RESISTANCE;
+        const velocityY = Math.min(
+          MAX_FALL_SPEED,
+          (point.y - point.previousY) * AIR_RESISTANCE +
+            GRAVITY * delta * delta,
+        );
         point.previousX = point.x;
         point.previousY = point.y;
         point.x += velocityX;
-        point.y += velocityY + 0.24 * delta * delta;
+        point.y += velocityY;
       }
       constrainMesh();
       let totalMotion = 0;
@@ -306,14 +319,56 @@ export function InteractiveTowel() {
     const pointerPosition = (event: PointerEvent) => {
       const bounds = canvas.getBoundingClientRect();
       return {
-        x: ((event.clientX - bounds.left) / bounds.width) * TEXTURE_WIDTH,
-        y: ((event.clientY - bounds.top) / bounds.height) * TEXTURE_HEIGHT,
+        x: ((event.clientX - bounds.left) / bounds.width) * CANVAS_WIDTH,
+        y: ((event.clientY - bounds.top) / bounds.height) * CANVAS_HEIGHT,
       };
+    };
+
+    const pointIsInsideTriangle = (
+      pointer: {x: number; y: number},
+      pointA: ClothPoint,
+      pointB: ClothPoint,
+      pointC: ClothPoint,
+    ) => {
+      const crossProduct = (
+        first: ClothPoint,
+        second: ClothPoint,
+      ) =>
+        (pointer.x - second.x) * (first.y - second.y) -
+        (first.x - second.x) * (pointer.y - second.y);
+      const sideA = crossProduct(pointA, pointB);
+      const sideB = crossProduct(pointB, pointC);
+      const sideC = crossProduct(pointC, pointA);
+      const hasNegativeSide = sideA < 0 || sideB < 0 || sideC < 0;
+      const hasPositiveSide = sideA > 0 || sideB > 0 || sideC > 0;
+
+      return !(hasNegativeSide && hasPositiveSide);
+    };
+
+    const pointerTouchesTowel = (pointer: {x: number; y: number}) => {
+      for (let row = 0; row < ROW_COUNT - 1; row += 1) {
+        for (let column = 0; column < COLUMN_COUNT - 1; column += 1) {
+          const topLeft = points[pointIndex(column, row)];
+          const topRight = points[pointIndex(column + 1, row)];
+          const bottomLeft = points[pointIndex(column, row + 1)];
+          const bottomRight = points[pointIndex(column + 1, row + 1)];
+
+          if (
+            pointIsInsideTriangle(pointer, topLeft, topRight, bottomRight) ||
+            pointIsInsideTriangle(pointer, topLeft, bottomRight, bottomLeft)
+          ) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     };
 
     const onPointerDown = (event: PointerEvent) => {
       if (!initialized) return;
       const pointer = pointerPosition(event);
+      if (!pointerTouchesTowel(pointer)) return;
       let nearestPoint = -1;
       let nearestDistance = Number.POSITIVE_INFINITY;
 
@@ -363,21 +418,12 @@ export function InteractiveTowel() {
         return;
       }
 
-      const bounds = canvas.getBoundingClientRect();
-      const horizontalProximity = Math.max(50, bounds.width * 0.8);
-      const verticalProximity = Math.max(30, bounds.height * 0.15);
-      const nearTowel =
-        event.clientX >= bounds.left - horizontalProximity &&
-        event.clientX <= bounds.right + horizontalProximity &&
-        event.clientY >= bounds.top - verticalProximity &&
-        event.clientY <= bounds.bottom + verticalProximity;
-
-      if (!nearTowel) {
+      const pointer = pointerPosition(event);
+      if (!pointerTouchesTowel(pointer)) {
         hoverPointer = null;
         return;
       }
 
-      const pointer = pointerPosition(event);
       if (!hoverPointer) {
         hoverPointer = pointer;
         return;
