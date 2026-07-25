@@ -15,7 +15,9 @@ import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
+import editorialStyles from '~/styles/editorial-page.css?url';
 import {PageLayout} from './components/PageLayout';
+import {localeFromPathname} from './lib/i18n';
 
 export type RootLoader = typeof loader;
 
@@ -62,6 +64,7 @@ export function links() {
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'stylesheet', href: editorialStyles},
   ];
 }
 
@@ -78,6 +81,7 @@ export async function loader(args: Route.LoaderArgs) {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    locale: localeFromPathname(new URL(args.request.url).pathname),
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -85,7 +89,7 @@ export async function loader(args: Route.LoaderArgs) {
     consent: {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: false,
+      withPrivacyBanner: true,
       // localize the privacy banner
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
@@ -143,9 +147,10 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  const rootData = useRouteLoaderData<RootLoader>('root');
 
   return (
-    <html lang="en">
+    <html lang={rootData?.locale ?? 'fr'}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -185,7 +190,7 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  let errorMessage = 'Unknown error';
+  let errorMessage = 'Une erreur inattendue est survenue.';
   let errorStatus = 500;
 
   if (isRouteErrorResponse(error)) {
@@ -196,8 +201,9 @@ export function ErrorBoundary() {
   }
 
   return (
-    <div className="route-error">
-      <h1>Oops</h1>
+    <div className="route-error" role="alert">
+      <p className="eyebrow">Rudimenterre</p>
+      <h1>{errorStatus === 404 ? 'Page introuvable' : 'Quelque chose a changé.'}</h1>
       <h2>{errorStatus}</h2>
       {errorMessage && (
         <fieldset>

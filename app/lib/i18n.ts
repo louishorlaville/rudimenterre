@@ -4,19 +4,26 @@ export interface I18nLocale extends I18nBase {
   pathPrefix: string;
 }
 
+export type StorefrontLocale = 'fr' | 'en';
+
+export const DEFAULT_LOCALE: StorefrontLocale = 'fr';
+
+export function isStorefrontLocale(value?: string): value is StorefrontLocale {
+  return value === 'fr' || value === 'en';
+}
+
+export function localeFromPathname(pathname: string): StorefrontLocale {
+  const locale = pathname.split('/')[1]?.toLowerCase();
+  return isStorefrontLocale(locale) ? locale : DEFAULT_LOCALE;
+}
+
 export function getLocaleFromRequest(request: Request): I18nLocale {
   const url = new URL(request.url);
-  const firstPathPart = url.pathname.split('/')[1]?.toUpperCase() ?? '';
-
-  type I18nFromUrl = [I18nLocale['language'], I18nLocale['country']];
-
-  let pathPrefix = '';
-  let [language, country]: I18nFromUrl = ['EN', 'US'];
-
-  if (/^[A-Z]{2}-[A-Z]{2}$/i.test(firstPathPart)) {
-    pathPrefix = '/' + firstPathPart;
-    [language, country] = firstPathPart.split('-') as I18nFromUrl;
-  }
-
-  return {language, country, pathPrefix};
+  const locale = localeFromPathname(url.pathname);
+  const country = url.hostname === 'rudimenterre.fr' || url.hostname.endsWith('.rudimenterre.fr') ? 'FR' : 'CA';
+  return {
+    language: locale === 'fr' ? 'FR' : 'EN',
+    country,
+    pathPrefix: `/${locale}`,
+  };
 }

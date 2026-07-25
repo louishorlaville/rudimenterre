@@ -1,5 +1,5 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import {Link, useLocation} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
@@ -93,16 +93,14 @@ function CartEmpty({
   layout?: CartMainProps['layout'];
 }) {
   const {close} = useAside();
+  const locale = useLocation().pathname.split('/')[1] === 'en' ? 'en' : 'fr';
   return (
     <div hidden={hidden}>
       <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
-      </p>
+      <p>{locale === 'fr' ? 'Votre panier est encore vide.' : 'Your cart is still empty.'}</p>
       <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
+      <Link to={`/${locale}/collections/all`} onClick={close} prefetch="viewport">
+        {locale === 'fr' ? 'Découvrir Rudimenterre →' : 'Discover Rudimenterre →'}
       </Link>
     </div>
   );

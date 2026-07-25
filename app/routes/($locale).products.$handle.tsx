@@ -1,5 +1,5 @@
-import {redirect, useLoaderData} from 'react-router';
-import type {Route} from './+types/products.$handle';
+﻿import {redirect, useLoaderData} from 'react-router';
+import type {Route} from './+types/($locale).products.$handle';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -14,11 +14,13 @@ import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const locale = data?.locale ?? 'fr';
   return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
+    {title: `${data?.product.seo?.title || data?.product.title || 'Rudimenterre'} — Rudimenterre`},
+    {name: 'description', content: data?.product.seo?.description || data?.product.description || ''},
     {
       rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
+      href: `/${locale}/products/${data?.product.handle}`,
     },
   ];
 };
@@ -59,9 +61,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  return {
-    product,
-  };
+  return {product, locale: params.locale === 'en' ? 'en' : 'fr'};
 }
 
 /**
@@ -77,7 +77,7 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product} = useLoaderData<typeof loader>();
+  const {product, locale} = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -101,6 +101,7 @@ export default function Product() {
     <div className="product">
       <ProductImage image={selectedVariant?.image} />
       <div className="product-main">
+        <p className="eyebrow">{locale === 'fr' ? 'Adoptez' : 'Adopt'}</p>
         <h1>{title}</h1>
         <ProductPrice
           price={selectedVariant?.price}
@@ -111,15 +112,22 @@ export default function Product() {
           productOptions={productOptions}
           selectedVariant={selectedVariant}
         />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
+        <div className="product-description" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
       </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.title,
+        description: product.description,
+        image: selectedVariant?.image?.url,
+        sku: selectedVariant?.sku,
+        offers: selectedVariant ? {
+          '@type': 'Offer',
+          price: selectedVariant.price.amount,
+          priceCurrency: selectedVariant.price.currencyCode,
+          availability: selectedVariant.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        } : undefined,
+      })}} />
       <Analytics.ProductView
         data={{
           products: [

@@ -1,4 +1,4 @@
-import type {CustomerFragment} from 'customer-accountapi.generated';
+﻿import type {CustomerFragment} from 'customer-accountapi.generated';
 import type {CustomerUpdateInput} from '@shopify/hydrogen/customer-account-api-types';
 import {CUSTOMER_UPDATE_MUTATION} from '~/graphql/customer-account/CustomerUpdateMutation';
 import {
@@ -8,7 +8,7 @@ import {
   useNavigation,
   useOutletContext,
 } from 'react-router';
-import type {Route} from './+types/account.profile';
+import type {Route} from './+types/($locale).account.profile';
 
 export type ActionResponse = {
   error: string | null;

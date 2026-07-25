@@ -1,12 +1,10 @@
 import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
-import {
-  type CartViewPayload,
-  useAnalytics,
-  useOptimisticCart,
-} from '@shopify/hydrogen';
+import {Await, Link, NavLink, useAsyncValue, useLocation} from 'react-router';
+import {useOptimisticCart} from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
+import {useAside} from './Aside';
+import {localizedPath, pagePath, UI_COPY} from '~/lib/editorial-content';
+import {localeFromPathname} from '~/lib/i18n';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -15,217 +13,49 @@ interface HeaderProps {
   publicStoreDomain: string;
 }
 
-type Viewport = 'desktop' | 'mobile';
-
-export function Header({
-  header,
-  isLoggedIn,
-  cart,
-  publicStoreDomain,
-}: HeaderProps) {
-  const {shop, menu} = header;
+export function Header({header, isLoggedIn, cart}: HeaderProps) {
+  const {pathname} = useLocation();
+  const locale = localeFromPathname(pathname);
+  const copy = UI_COPY[locale];
+  const {open} = useAside();
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+    <header className="site-header">
+      <Link className="brand" prefetch="intent" to={`/${locale}`}>
+        <span>RUDIMENTERRE</span>
+      </Link>
+      <HeaderMenu viewport="desktop" />
+      <nav className="header-actions" aria-label={locale === 'fr' ? 'Outils' : 'Utilities'}>
+        <Link className="locale-switch" to={localizedPath(pathname, locale === 'fr' ? 'en' : 'fr')} hrefLang={locale === 'fr' ? 'en-CA' : 'fr-CA'}>{locale === 'fr' ? 'EN' : 'FR'}</Link>
+        <NavLink prefetch="intent" to={`/${locale}/account`}><Suspense fallback={copy.signIn}><Await resolve={isLoggedIn} errorElement={copy.signIn}>{(loggedIn) => loggedIn ? copy.account : copy.signIn}</Await></Suspense></NavLink>
+        <CartToggle cart={cart} label={copy.cart} locale={locale} />
+        <button className="menu-toggle" onClick={() => open('mobile')} aria-label={copy.menu}><span /><span /></button>
+      </nav>
     </header>
   );
 }
 
-export function HeaderMenu({
-  menu,
-  primaryDomainUrl,
-  viewport,
-  publicStoreDomain,
-}: {
-  menu: HeaderProps['header']['menu'];
-  primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
-  viewport: Viewport;
-  publicStoreDomain: HeaderProps['publicStoreDomain'];
-}) {
-  const className = `header-menu-${viewport}`;
+export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: HeaderQuery['menu']; primaryDomainUrl?: string; publicStoreDomain?: string}) {
+  const {pathname} = useLocation();
+  const locale = localeFromPathname(pathname);
+  const copy = UI_COPY[locale];
   const {close} = useAside();
-
-  return (
-    <nav className={className} role="navigation">
-      {viewport === 'mobile' && (
-        <NavLink
-          end
-          onClick={close}
-          prefetch="intent"
-          style={activeLinkStyle}
-          to="/"
-        >
-          Home
-        </NavLink>
-      )}
-      {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
-        if (!item.url) return null;
-
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        return (
-          <NavLink
-            className="header-menu-item"
-            end
-            key={item.id}
-            onClick={close}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
+  const links = [
+    {label: copy.project, to: pagePath(locale, 'project')},
+    {label: copy.explore, to: pagePath(locale, 'steam')},
+    {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
+    {label: copy.adopt, to: pagePath(locale, 'adopt')},
+  ];
+  return <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>{links.map((item) => <NavLink key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}</nav>;
 }
 
-function HeaderCtas({
-  isLoggedIn,
-  cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
-  return (
-    <nav className="header-ctas" role="navigation">
-      <HeaderMenuMobileToggle />
-      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
-        <Suspense fallback="Sign in">
-          <Await resolve={isLoggedIn} errorElement="Sign in">
-            {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
-          </Await>
-        </Suspense>
-      </NavLink>
-      <SearchToggle />
-      <CartToggle cart={cart} />
-    </nav>
-  );
+function CartToggle({cart, label, locale}: {cart: HeaderProps['cart']; label: string; locale: string}) {
+  return <Suspense fallback={<Link to={`/${locale}/cart`}>{label} <span>0</span></Link>}><Await resolve={cart}><CartCount label={label} locale={locale} /></Await></Suspense>;
 }
 
-function HeaderMenuMobileToggle() {
-  const {open} = useAside();
-  return (
-    <button
-      className="header-menu-mobile-toggle reset"
-      onClick={() => open('mobile')}
-    >
-      <h3>☰</h3>
-    </button>
-  );
-}
-
-function SearchToggle() {
-  const {open} = useAside();
-  return (
-    <button className="reset" onClick={() => open('search')}>
-      Search
-    </button>
-  );
-}
-
-function CartBadge({count}: {count: number}) {
-  const {open} = useAside();
-  const {publish, shop, cart, prevCart} = useAnalytics();
-
-  return (
-    <a
-      href="/cart"
-      onClick={(e) => {
-        e.preventDefault();
-        open('cart');
-        publish('cart_viewed', {
-          cart,
-          prevCart,
-          shop,
-          url: window.location.href || '',
-        } as CartViewPayload);
-      }}
-    >
-      Cart <span aria-label={`(items: ${count})`}>{count}</span>
-    </a>
-  );
-}
-
-function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
-  return (
-    <Suspense fallback={<CartBadge count={0} />}>
-      <Await resolve={cart}>
-        <CartBanner />
-      </Await>
-    </Suspense>
-  );
-}
-
-function CartBanner() {
+function CartCount({label, locale}: {label: string; locale: string}) {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
-}
-
-const FALLBACK_HEADER_MENU = {
-  id: 'gid://shopify/Menu/199655587896',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461609500728',
-      resourceId: null,
-      tags: [],
-      title: 'Collections',
-      type: 'HTTP',
-      url: '/collections',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609533496',
-      resourceId: null,
-      tags: [],
-      title: 'Blog',
-      type: 'HTTP',
-      url: '/blogs/journal',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609566264',
-      resourceId: null,
-      tags: [],
-      title: 'Policies',
-      type: 'HTTP',
-      url: '/policies',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609599032',
-      resourceId: 'gid://shopify/Page/92591030328',
-      tags: [],
-      title: 'About',
-      type: 'PAGE',
-      url: '/pages/about',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'black',
-  };
+  const {open} = useAside();
+  const count = cart?.totalQuantity ?? 0;
+  return <a href={`/${locale}/cart`} onClick={(event) => {event.preventDefault(); open('cart');}}>{label} <span aria-label={`${count} items`}>{count}</span></a>;
 }

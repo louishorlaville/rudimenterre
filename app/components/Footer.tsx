@@ -1,129 +1,19 @@
-import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
+import {Link, useLocation} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import {pagePath} from '~/lib/editorial-content';
+import {localeFromPathname} from '~/lib/i18n';
 
-interface FooterProps {
-  footer: Promise<FooterQuery | null>;
-  header: HeaderQuery;
-  publicStoreDomain: string;
-}
-
-export function Footer({
-  footer: footerPromise,
-  header,
-  publicStoreDomain,
-}: FooterProps) {
-  return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            {footer?.menu && header.shop.primaryDomain?.url && (
-              <FooterMenu
-                menu={footer.menu}
-                primaryDomainUrl={header.shop.primaryDomain.url}
-                publicStoreDomain={publicStoreDomain}
-              />
-            )}
-          </footer>
-        )}
-      </Await>
-    </Suspense>
-  );
-}
-
-function FooterMenu({
-  menu,
-  primaryDomainUrl,
-  publicStoreDomain,
-}: {
-  menu: FooterQuery['menu'];
-  primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
-  publicStoreDomain: string;
-}) {
-  return (
-    <nav className="footer-menu" role="navigation">
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
-}
-
-const FALLBACK_FOOTER_MENU = {
-  id: 'gid://shopify/Menu/199655620664',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461633060920',
-      resourceId: 'gid://shopify/ShopPolicy/23358046264',
-      tags: [],
-      title: 'Privacy Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/privacy-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633093688',
-      resourceId: 'gid://shopify/ShopPolicy/23358013496',
-      tags: [],
-      title: 'Refund Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/refund-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633126456',
-      resourceId: 'gid://shopify/ShopPolicy/23358111800',
-      tags: [],
-      title: 'Shipping Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/shipping-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633159224',
-      resourceId: 'gid://shopify/ShopPolicy/23358079032',
-      tags: [],
-      title: 'Terms of Service',
-      type: 'SHOP_POLICY',
-      url: '/policies/terms-of-service',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
+export function Footer(_props:{footer:Promise<FooterQuery|null>;header:HeaderQuery;publicStoreDomain:string}) {
+  const locale=localeFromPathname(useLocation().pathname); const fr=locale==='fr';
+  const pages = [
+    ['project',fr?'Le projet':'The project'],['steam',fr?'En cuisine':'In the kitchen'],
+    ['thermal',fr?'Les expériences':'Experiments'],['making',fr?'Fabrication et entretien':'Making and care'],
+    ['creator',fr?'La recette':'The recipe'],['jury',fr?'Prix et jury':'Awards'],
+    ['shipping',fr?'Tarifs, livraison, garanties':'Pricing, shipping, warranty'],['adopt',fr?'Adoptez':'Adopt'],
+  ] as const;
+  return <footer className="site-footer">
+    <div className="footer-brand"><p>RUDIMENTERRE</p><h2>{fr?'Un Cuicui pour demain.':'A Cuicui for tomorrow.'}</h2></div>
+    <nav aria-label={fr?'Plan du site':'Sitemap'}>{pages.map(([id,label])=><Link key={id} to={pagePath(locale,id)}>{label}</Link>)}</nav>
+    <div className="footer-meta"><span>© {new Date().getFullYear()} Rudimenterre</span><Link to={`/${locale}/policies/privacy-policy`}>{fr?'Confidentialité':'Privacy'}</Link><Link to={`/${locale}/policies/terms-of-service`}>{fr?'Conditions':'Terms'}</Link></div>
+  </footer>;
 }

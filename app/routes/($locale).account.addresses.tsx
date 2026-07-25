@@ -1,4 +1,4 @@
-import type {CustomerAddressInput} from '@shopify/hydrogen/customer-account-api-types';
+﻿import type {CustomerAddressInput} from '@shopify/hydrogen/customer-account-api-types';
 import type {
   AddressFragment,
   CustomerFragment,
@@ -11,7 +11,7 @@ import {
   useOutletContext,
   type Fetcher,
 } from 'react-router';
-import type {Route} from './+types/account.addresses';
+import type {Route} from './+types/($locale).account.addresses';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,

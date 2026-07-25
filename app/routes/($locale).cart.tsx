@@ -1,11 +1,11 @@
-import {useLoaderData, data, type HeadersFunction} from 'react-router';
-import type {Route} from './+types/cart';
+﻿import {useLoaderData, data, type HeadersFunction} from 'react-router';
+import type {Route} from './+types/($locale).cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Cart`}];
+export const meta: Route.MetaFunction = ({params}) => {
+  return [{title: `${params.locale === 'en' ? 'Cart' : 'Panier'} — Rudimenterre`}];
 };
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
@@ -101,12 +101,13 @@ export async function loader({context}: Route.LoaderArgs) {
   return await cart.get();
 }
 
-export default function Cart() {
+export default function Cart({params}: Route.ComponentProps) {
   const cart = useLoaderData<typeof loader>();
 
   return (
     <div className="cart">
-      <h1>Cart</h1>
+      <p className="eyebrow">Rudimenterre</p>
+      <h1>{params.locale === 'en' ? 'Your cart' : 'Votre panier'}</h1>
       <CartMain layout="page" cart={cart} />
     </div>
   );
