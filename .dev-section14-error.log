@@ -1,0 +1,23 @@
+[33mThe `envFile` option is deprecated, please use `envDir: false` instead.[39m
+[33mThe `envFile` option is deprecated, please use `envDir: false` instead.[39m
+[33mThe `envFile` option is deprecated, please use `envDir: false` instead.[39m
+
+Environment variables injected into MiniOxygen:
+
+SESSION_SECRET   from local .env
+╭─ success ────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│  View Hydrogen app: http://localhost:3007/                                   │
+│                                                                              │
+│  View GraphiQL API browser:                                                  │
+│  http://localhost:3007/graphiql                                              │
+│                                                                              │
+│  View server network requests:                                               │
+│  http://localhost:3007/subrequest-profiler                                   │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+MiniflareCoreError [ERR_RUNTIME_FAILURE]: The Workers runtime failed to start. There is likely additional logging output above.
+    at Miniflare2.#assembleAndUpdateConfig (C:\Users\LouisHorlaville\Documents\Website\node_modules\.pnpm\miniflare@3.20250310.1\node_modules\miniflare\src\index.ts:1437:10)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at Mutex.runWith (C:\Users\LouisHorlaville\Documents\Website\node_modules\.pnpm\miniflare@3.20250310.1\node_modules\miniflare\src\workers\shared\sync.ts:66:45)

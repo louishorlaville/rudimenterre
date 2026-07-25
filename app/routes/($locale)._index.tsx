@@ -574,6 +574,133 @@ export default function Homepage() {
       </div>
     </section>
 
+    <section className="home-award" aria-labelledby="home-award-title">
+      <div className="home-award__banner">
+        <div className="home-award__side-label" aria-hidden="true">
+          <div>
+            <span>{fr ? 'Produit' : 'Product'}</span>
+          </div>
+        </div>
+        <img
+          className="home-award__background"
+          src="/images/rudimenterre/home-award-banner.jpeg"
+          alt=""
+          loading="lazy"
+        />
+        <div className="home-award__content">
+          <h2 id="home-award-title">
+            {fr ? 'Le Cuicui récompensé' : 'Award-winning Cuicui'}
+          </h2>
+          <svg
+            className="home-award__crown"
+            viewBox="0 0 96 64"
+            aria-hidden="true"
+          >
+            <path d="M15 17 33 36 48 8l15 28 18-19-7 37H22Z" />
+            <circle cx="15" cy="17" r="3" />
+            <circle cx="48" cy="8" r="3" />
+            <circle cx="81" cy="17" r="3" />
+          </svg>
+          <p>
+            <span>{fr ? '17e Grand Prix International du Design - 2024' : '17th International Grand Prix du Design - 2024'}</span>
+            <span>{fr ? 'Lauréat Platine, Prix International' : 'Platinum Laureate, International Prize'}</span>
+            <span>{fr ? 'catégorie produit et conception durable' : 'product and sustainable design category'}</span>
+          </p>
+          <Link className="button button--orange home-award__cta" to={pagePath(locale, 'jury')}>
+            {fr ? 'Mention du jury' : 'Jury mention'}
+          </Link>
+        </div>
+      </div>
+    </section>
+
+    <section className="home-on-tour" aria-labelledby="home-on-tour-title">
+      <h2 id="home-on-tour-title">
+        {fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}
+      </h2>
+
+      <div className="home-on-tour__list">
+        <article>
+          <h3>
+            {fr
+              ? 'Sorties Lowbjethèque, bibliothèque d’objets à emprunter à La Garde :'
+              : 'Lowbjethèque outings, La Garde’s lending library of objects:'}
+          </h3>
+          <p>
+            <span>{fr ? 'Écolieu du Plan du Pont, Hyères, avril 2025' : 'Écolieu du Plan du Pont, Hyères, April 2025'}</span>
+            <span>{fr ? 'Restaurant Le Presage, Marseille, oct 2024' : 'Restaurant Le Presage, Marseille, Oct 2024'}</span>
+            <span>{fr ? 'Rencontres de l’Éco-Habitat, Cannet-de-Maures, oct 2024' : 'Rencontres de l’Éco-Habitat, Cannet-de-Maures, Oct 2024'}</span>
+            <span>{fr ? 'Fiesta des Associations, Toulon, sept 2024' : 'Fiesta des Associations, Toulon, Sept 2024'}</span>
+            <span>{fr ? 'Forum des Associations, La Garde, sept 2024' : 'Forum des Associations, La Garde, Sept 2024'}</span>
+            <span>{fr ? 'Maison Pépin boutique, rue Saint-Paul, Vieux Montréal, 2021' : 'Maison Pépin boutique, rue Saint-Paul, Old Montreal, 2021'}</span>
+          </p>
+        </article>
+
+        <article>
+          <h3>{fr ? 'Sorties TV avec Lowbjethèque' : 'Television appearances with Lowbjethèque'}</h3>
+          <p>
+            <span>{fr ? 'JT13h France Télévisions - Une idée pour la France - mai 2026' : 'JT13h France Télévisions - Une idée pour la France - May 2026'}</span>
+            <span>{fr ? '19/20 France 3 Provence Alpes Côtes d’Azur - sept 2024' : '19/20 France 3 Provence Alpes Côte d’Azur - Sept 2024'}</span>
+          </p>
+        </article>
+
+        <article>
+          <h3>{fr ? 'Évènement Écotable Chaud Devant' : 'Écotable Chaud Devant event'}</h3>
+          <p>
+            <span>{fr ? 'Thématique La cuisine sous 50C - Marseille, 2025' : 'Theme: Cooking below 50C - Marseille, 2025'}</span>
+            <span>{fr ? 'Tables rondes et démonstration du Cuicui' : 'Round tables and a Cuicui demonstration'}</span>
+          </p>
+        </article>
+
+        <article>
+          <h3>
+            {fr
+              ? 'Salon Biosphère avec Un Bocal à la Mer, épicerie vrac à Plérin'
+              : 'Salon Biosphère with Un Bocal à la Mer, a zero-waste shop in Plérin'}
+          </h3>
+          <p><span>{fr ? 'Mur de Bretagne - été 2025' : 'Mur de Bretagne - Summer 2025'}</span></p>
+        </article>
+
+        <article>
+          <h3>{fr ? 'Un Bocal à la Mer, épicerie vrac' : 'Un Bocal à la Mer, zero-waste shop'}</h3>
+          <p><span>{fr ? 'Plérin - 2025' : 'Plérin - 2025'}</span></p>
+        </article>
+
+        <article>
+          <h3>{fr ? '17e Grand Prix du Design' : '17th Grand Prix du Design'}</h3>
+          <p><span>{fr ? 'Montréal automne 2024' : 'Montreal, Fall 2024'}</span></p>
+        </article>
+
+        <article>
+          <h3>{fr ? 'Vu dans la Presse :' : 'In the press:'}</h3>
+          <p>
+            <span>{fr ? 'Magazine Reporterre, avril 2026' : 'Reporterre magazine, April 2026'}</span>
+            <span>{fr ? 'Magazine Regain, n26, automne 2024' : 'Regain magazine, no. 26, Fall 2024'}</span>
+            <span>{fr ? 'Magazine La Relève de La Peste, sept 2024' : 'La Relève de La Peste magazine, Sept 2024'}</span>
+            <span>{fr ? 'Journal de Hyères, le Lavendou, Toulon, août 2024' : 'Journal de Hyères, Le Lavandou, Toulon, Aug 2024'}</span>
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section className="home-project-banner" aria-labelledby="home-project-banner-title">
+      <img
+        src="/images/rudimenterre/project.webp"
+        alt={fr ? 'Village français en noir et blanc' : 'French village in black and white'}
+        loading="lazy"
+      />
+      <div className="home-project-banner__content">
+        <h2 id="home-project-banner-title">
+          {fr ? 'Le projet Rudimenterre' : 'The Rudimenterre project'}
+        </h2>
+        <Link
+          className="button button--light home-project-banner__cta"
+          to={pagePath(locale, 'project')}
+        >
+          {fr ? 'Un Cuicui 100% français' : 'A 100% French Cuicui'}
+        </Link>
+      </div>
+    </section>
+
     <section className="home-final"><img src="/images/rudimenterre/home-table.webp" alt="Table dressée avec le Cuicui" loading="lazy"/><div><h2>{fr?'Un Cuicui pour demain':'A Cuicui for tomorrow'}</h2><Link className="button button--orange" to={pagePath(locale,'adopt')}>{fr?'Adoptez':'Adopt'}</Link></div></section>
   </div>;
 }
