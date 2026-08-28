@@ -59,38 +59,51 @@ export default function Homepage() {
     const updateBanner = () => {
       const header = document.querySelector<HTMLElement>('.site-header');
       const hero = track.querySelector<HTMLElement>('.home-hero');
-      const callToAction = track.querySelector<HTMLElement>('.home-hero__copy .button');
+      const details = track.querySelector<HTMLElement>('.home-hero__details');
       const headerHeight = header?.getBoundingClientRect().height ?? 0;
       const viewportHeight = window.innerHeight;
-      const heroHeight = Math.max(0, viewportHeight - headerHeight);
+      const sectionPreviewHeight = window.innerWidth <= 760
+        ? 72
+        : Math.min(180, viewportHeight * .2);
+      const heroHeight = Math.max(
+        512,
+        viewportHeight - headerHeight - sectionPreviewHeight,
+      );
       const heroTop = hero?.getBoundingClientRect().top ?? headerHeight;
-      const callToActionTop = callToAction?.getBoundingClientRect().top;
-      const targetBannerHeight = callToActionTop == null
-        ? viewportHeight * .48
-        : callToActionTop - heroTop - 24;
+      const detailsBottom = details?.getBoundingClientRect().bottom;
+      const targetBannerHeight = detailsBottom == null
+        ? viewportHeight * .62
+        : detailsBottom - heroTop + 24;
+      const introLift = window.innerWidth <= 760
+        ? Math.max(72, Math.min(96, viewportHeight * .1))
+        : Math.max(96, Math.min(144, viewportHeight * .14));
       const bannerHeight = Math.min(
         heroHeight,
-        Math.max(160, targetBannerHeight),
+        Math.max(160, targetBannerHeight, heroHeight - introLift),
       );
-      const dockedVisibleRatio = .6;
-      const visibleBannerHeight = bannerHeight * dockedVisibleRatio;
-      const travel = Math.max(0, heroHeight - visibleBannerHeight);
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
-      const scrollProgress = Math.min(
-        travel,
-        Math.max(0, window.scrollY - (trackTop - headerHeight)),
+      const travel = Math.max(
+        0,
+        viewportHeight - headerHeight - bannerHeight,
+        heroHeight - introLift,
       );
-      const dockedTop = headerHeight + scrollProgress;
-      const releasedTop = opening.getBoundingClientRect().bottom - visibleBannerHeight;
-
+      // Keep the banner moving after the reserved hero travel so it exits
+      // naturally instead of disappearing underneath the next section.
+      const scrollProgress = Math.max(
+        0,
+        window.scrollY - (trackTop - headerHeight),
+      );
+      const contentHold = Math.min(travel, scrollProgress);
       track.style.setProperty('--hero-height', `${heroHeight}px`);
       track.style.setProperty('--banner-travel', `${travel}px`);
-      opening.style.setProperty('--banner-visible-height', `${visibleBannerHeight}px`);
+      opening.style.setProperty('--banner-travel', `${travel}px`);
+      opening.style.setProperty('--banner-height', `${bannerHeight}px`);
+      opening.style.setProperty('--intro-lift', `${introLift}px`);
+      opening.style.setProperty('--content-hold', `${contentHold}px`);
+      opening.style.setProperty('--banner-visible-height', `${bannerHeight * .6}px`);
       banner.style.setProperty('--banner-height', `${bannerHeight}px`);
-      banner.style.setProperty(
-        '--banner-top',
-        `${Math.min(dockedTop, releasedTop)}px`,
-      );
+      banner.style.setProperty('--banner-top', `${headerHeight}px`);
+      banner.style.setProperty('--banner-shift', `${scrollProgress}px`);
     };
     const scheduleBannerUpdate = () => {
       cancelAnimationFrame(frame);
@@ -129,12 +142,10 @@ export default function Homepage() {
     <div className="home-opening" ref={openingRef}>
       <div className="home-hero-track" ref={heroTrackRef}>
         <section className="home-hero">
-          <img src="/images/rudimenterre/home-hero.webp" alt="Le Cuicui Rudimenterre entouré de légumes" />
           <div className="home-hero__copy">
             <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
-            <p className="home-hero__lead">{fr?'Un relais mobile de cuissons saines et durables':'A mobile relay for healthy, sustainable cooking'}</p>
-            <p className="home-hero__details">{fr?'Modulable, robuste, polyvalent, distingué, déconnecté, compatible tous feux. Plus qu’une cocotte, le Cuicui est un relais de cuissons durables et nomades.':'Modular, robust, versatile, distinctive, technology-free and compatible with every hob. More than a casserole, Cuicui is a mobile relay for sustainable cooking.'}</p>
-            <Link className="button button--light" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
+            <p className="home-hero__lead">{fr ? <>un relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
+            <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br />déconnecté, compatible <strong>tous feux</strong>.<br />Plus qu’une cocotte, le Cuicui est un relais<br />de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br />technology-free and compatible <strong>every hob</strong>.<br />More than a casserole, Cuicui is a mobile relay<br />for sustainable cooking.</>}</p>
           </div>
           <div className="home-banner" ref={bannerRef} aria-hidden="true">
             <img src="/images/rudimenterre/home-banner.jpg" alt="" />
@@ -142,24 +153,30 @@ export default function Homepage() {
         </section>
       </div>
 
-      <section className="home-intro">
-        <img src="/images/rudimenterre/home-life.webp" alt="Le Cuicui utilisé dans une cuisine" loading="lazy" />
-        <div className="home-intro__copy">
-          <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
-          <h2>{fr?'Une autre approche de l’organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
-          {fr ? <p><strong>La cuisine du quotidien</strong> n’est pas une performance du dimanche : c’est <strong>s’organiser avec bon sens.</strong> C’est l’art de <strong>relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br/><strong>On n’exécute pas, on réfléchit pour nous libérer</strong> des contraintes du quotidien qui nous rendent créatifs.</p>
-            : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
-        </div>
-      </section>
+      <div className="home-opening__content">
+        <img className="home-intro__product" src="/images/rudimenterre/home-hero.webp" alt="Le Cuicui Rudimenterre entouré de légumes" />
+        <section className="home-intro">
+          <div className="home-intro__media">
+            <Link className="button button--light home-intro__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
+            <img src="/images/rudimenterre/home-life.webp" alt="Le Cuicui utilisé dans une cuisine" loading="lazy" />
+          </div>
+          <div className="home-intro__copy">
+            <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
+            <h2>{fr?'Une autre approche de l’organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
+            {fr ? <p><strong>La cuisine du quotidien</strong> n’est pas une performance du dimanche : c’est <strong>s’organiser avec bon sens.</strong> C’est l’art de <strong>relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br/><strong>On n’exécute pas, on réfléchit pour nous libérer</strong> des contraintes du quotidien qui nous rendent créatifs.</p>
+              : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
+          </div>
+        </section>
 
-      <section className="home-banner-feature" aria-label={fr?'Atouts du Cuicui':'Cuicui benefits'}>
-        <div className="home-icon-strip">
-          {iconBenefits.map((benefit, index) => <article key={benefit}>
-            <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-            <p>{benefit}</p>
-          </article>)}
-        </div>
-      </section>
+        <section className="home-banner-feature" aria-label={fr?'Atouts du Cuicui':'Cuicui benefits'}>
+          <div className="home-icon-strip">
+            {iconBenefits.map((benefit, index) => <article key={benefit}>
+              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <p>{benefit}</p>
+            </article>)}
+          </div>
+        </section>
+      </div>
     </div>
 
     <div className="home-section-divider" aria-hidden="true">
@@ -784,7 +801,14 @@ export default function Homepage() {
           className="button button--light home-newsletter-banner__cta"
           to={`/${locale}/pages/newsletter`}
         >
-          <span aria-hidden="true">✉</span>
+          <svg
+            className="home-newsletter-banner__icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path d="M3.75 5.75h16.5v12.5H3.75z" />
+            <path d="m4.5 6.5 7.5 6 7.5-6" />
+          </svg>
           {fr ? 'Inscrivez-vous' : 'Sign up'}
         </Link>
       </div>
