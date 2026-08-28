@@ -276,7 +276,12 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 /* Mockup-derived homepage */
-.home-opening { position: relative; }
+.home-opening {
+  position: relative;
+  /* The fixed banner hands off to the next section during this block.
+     Prevent browser scroll anchoring from nudging that handoff. */
+  overflow-anchor: none;
+}
 .home-hero-track {
   position: relative;
   height: calc(var(--hero-height, 32rem) + var(--banner-travel, 100svh));
@@ -405,13 +410,12 @@ html:has(.overlay.expanded) { overflow: hidden; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
+  justify-content: flex-start;
+  gap: .55rem;
   padding: 1.5rem 1rem;
   text-align: center;
-  border-right: 1px solid rgba(34, 34, 34, .12);
+  border-right: 0;
 }
-.home-icon-strip article:last-child { border-right: 0; }
 .home-icon-strip span {
   width: 3.75rem;
   aspect-ratio: 1;
@@ -423,7 +427,12 @@ html:has(.overlay.expanded) { overflow: hidden; }
   font-size: .72rem;
   letter-spacing: .12em;
 }
+.home-icon-strip article > img { width: clamp(3.5rem, 6vw, 5rem); height: 4.15rem; object-fit: contain; }
 .home-icon-strip p { max-width: 13ch; font-size: .9rem; font-weight: 700; line-height: 1.25; }
+.home-icon-strip--benefits article { gap: .45rem; }
+.home-icon-strip--benefits article > div { display: grid; gap: .2rem; justify-items: center; align-content: start; min-height: 5.2rem; }
+.home-icon-strip--benefits h3 { min-height: 2.25em; margin: 0; font-size: clamp(.85rem, 1.1vw, 1.05rem); line-height: 1.05; white-space: pre-line; }
+.home-icon-strip--benefits p { max-width: 15ch; margin: 0; white-space: pre-line; color: #555; font-size: clamp(.72rem, .9vw, .88rem); font-weight: 400; line-height: 1.25; }
 .home-section-divider {
   position: relative;
   z-index: 4;
@@ -445,7 +454,14 @@ html:has(.overlay.expanded) { overflow: hidden; }
   height: 1px;
   background: currentColor;
 }
-.benefit-grid { position: relative; z-index: 4; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--cream); }
+.benefit-grid {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--cream);
+  overflow-anchor: none;
+}
 .benefit-grid > article { min-height: clamp(42rem, 57vw, 58rem); }
 .benefit-panel { display: flex; flex-direction: column; align-items: flex-start; padding: clamp(3rem, 5.4vw, 6rem) clamp(2rem, 5.8vw, 6.5rem); background: var(--cream); color: #414141; }
 .benefit-panel__number { color: #e96713; font-size: clamp(1.9rem, 2.6vw, 3rem); font-weight: 700; line-height: 1; }
@@ -502,9 +518,9 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .home-section-divider--practice { padding-top: clamp(2.5rem, 4vw, 4rem); padding-bottom: clamp(4rem, 7vw, 7rem); }
 .home-section-divider--practice span { max-width: 50rem; font-size: clamp(.9rem, 1.5vw, 1.35rem); }
 .home-icon-strip--food { z-index: 4; min-height: clamp(12rem, 18vw, 16rem); border-top: 0; }
-.home-icon-strip--food article { min-height: clamp(12rem, 18vw, 16rem); gap: 1rem; }
-.home-icon-strip--food article > div { display: grid; gap: .35rem; justify-items: center; }
-.home-icon-strip--food h3 { font-size: clamp(.95rem, 1.35vw, 1.25rem); line-height: 1.05; }
+.home-icon-strip--food article { min-height: clamp(12rem, 18vw, 16rem); gap: .45rem; }
+.home-icon-strip--food article > div { display: grid; gap: .2rem; justify-items: center; align-content: start; min-height: 5.2rem; }
+.home-icon-strip--food h3 { min-height: 2.25em; margin: 0; font-size: clamp(.95rem, 1.35vw, 1.25rem); line-height: 1.05; }
 .home-icon-strip--food p { max-width: 14ch; margin: 0; white-space: pre-line; color: #555; font-size: clamp(.8rem, 1.05vw, 1rem); font-weight: 400; line-height: 1.4; }
 .practice-grid { position: relative; z-index: 4; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--cream); }
 .practice-grid > article { min-height: clamp(40rem, 50vw, 55rem); }
@@ -1532,8 +1548,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home-banner img { object-position: 54% 58%; }
   .home-intro { grid-template-columns:1fr; padding-top: clamp(5.5rem, 18vw, 7rem); }
   .home-icon-strip { grid-template-columns: repeat(2, 1fr); }
-  .home-icon-strip article { min-height: 10rem; border-bottom: 1px solid rgba(34, 34, 34, .12); }
-  .home-icon-strip article:nth-child(2n) { border-right: 0; }
+  .home-icon-strip article { min-height: 10rem; border-bottom: 0; }
   .home-banner-feature {
     --icon-strip-height: 30rem;
     --banner-icon-overlap: 1rem;

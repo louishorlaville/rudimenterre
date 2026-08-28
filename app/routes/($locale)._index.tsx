@@ -30,20 +30,20 @@ export default function Homepage() {
   const fr = locale === 'fr';
   const productUrl = product ? `/${locale}/products/${product.handle}` : pagePath(locale,'adopt');
   const iconBenefits = [
-    fr ? 'Max 95 °C, cuisson douce' : 'Max 95 °C, gentle cooking',
-    fr ? 'Multi-cuissons modulables' : 'Modular multi-cooking',
-    fr ? 'Cuisson indirecte, tous feux' : 'Indirect cooking, every hob',
-    fr ? 'Avec ou sans eau potable' : 'With or without drinking water',
-    fr ? '72 °C après 50 minutes' : '72 °C after 50 minutes',
-    fr ? 'Inclusif, un seul feu' : 'Inclusive, one heat source',
+    {icon: '/images/rudimenterre/home-benefit-icon-1.png', title: fr ? 'max 95C doux' : 'max 95C gentle', detail: fr ? 'équilibré' : 'balanced'},
+    {icon: '/images/rudimenterre/home-benefit-icon-2.png', title: fr ? 'multi cuisson modulables' : 'modular multi-cooking', detail: fr ? 'vapeur-étuvée\nbain-marie - four' : 'steam-stewing\nbain-marie - oven'},
+    {icon: '/images/rudimenterre/home-benefit-icon-3.png', title: fr ? 'cuisson indirecte :\ntous feux' : 'indirect cooking:\nevery hob', detail: fr ? 'Gaz - Bois - Vitro -\nInduction' : 'Gas - Wood - Ceramic -\nInduction'},
+    {icon: '/images/rudimenterre/home-benefit-icon-4.png', title: fr ? 'avec ou sans\neau potable' : 'with or without\ndrinking water', detail: fr ? 'distille l’eau non potable' : 'distils non-drinking water'},
+    {icon: '/images/rudimenterre/home-benefit-icon-5.png', title: fr ? '72C\naprès 50min' : '72C\nafter 50min', detail: fr ? 'feu éteint\nfin de cuisson passive' : 'heat off\npassive cooking finish'},
+    {icon: '/images/rudimenterre/home-benefit-icon-6.png', title: fr ? 'inclusif\n1 seul feu' : 'inclusive\n1 heat source', detail: fr ? 'plusieurs régimes' : 'multiple diets'},
   ];
   const foodGroups = [
-    {title: fr?'Légumes':'Vegetables', detail: fr?'et fruits':'and fruit'},
-    {title: fr?'Légumineuses':'Legumes', detail: fr?'lentilles, haricots\npois chiches':'lentils, beans\nand chickpeas'},
-    {title: fr?'Céréales':'Grains', detail: fr?'riz, semoule\nmillet, quinoa…':'rice, semolina\nmillet, quinoa…'},
-    {title: fr?'Protéines végétales':'Plant proteins', detail: fr?'texturées':'textured'},
-    {title: fr?'Poissons':'Fish', detail: fr?'et crustacés':'and shellfish'},
-    {title: fr?'Viandes':'Meat', detail: fr?'et volailles':'and poultry'},
+    {icon: '/images/rudimenterre/home-food-icon-1.png', title: fr?'légumes':'Vegetables', detail: fr?'et fruits':'and fruit'},
+    {icon: '/images/rudimenterre/home-food-icon-2.png', title: fr?'légumineuses':'Legumes', detail: fr?'lentilles, haricots\npois chiches':'lentils, beans\nand chickpeas'},
+    {icon: '/images/rudimenterre/home-food-icon-3.png', title: fr?'céréales':'Grains', detail: fr?'riz, semoule\nmillet, quinoa…':'rice, semolina\nmillet, quinoa…'},
+    {icon: '/images/rudimenterre/home-food-icon-4.png', title: fr?'protéines végétales':'Plant proteins', detail: fr?'texturées':'textured'},
+    {icon: '/images/rudimenterre/home-food-icon-5.png', title: fr?'poissons':'Fish', detail: fr?'et crustacés':'and shellfish'},
+    {icon: '/images/rudimenterre/home-food-icon-6.png', title: fr?'viandes':'Meat', detail: fr?'et volailles':'and poultry'},
   ];
   const openingRef = useRef<HTMLDivElement>(null);
   const heroTrackRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,14 @@ export default function Homepage() {
     if (!opening || !track || !banner) return;
 
     let frame = 0;
-    const updateBanner = () => {
+    let layout = {
+      headerHeight: 0,
+      bannerHeight: 0,
+      travel: 0,
+      trackTop: 0,
+    };
+
+    const measureBanner = () => {
       const header = document.querySelector<HTMLElement>('.site-header');
       const hero = track.querySelector<HTMLElement>('.home-hero');
       const details = track.querySelector<HTMLElement>('.home-hero__details');
@@ -75,8 +82,8 @@ export default function Homepage() {
         ? viewportHeight * .62
         : detailsBottom - heroTop + 24;
       const introLift = window.innerWidth <= 760
-        ? Math.max(72, Math.min(96, viewportHeight * .1))
-        : Math.max(96, Math.min(144, viewportHeight * .14));
+        ? Math.max(80, Math.min(112, viewportHeight * .12))
+        : Math.max(112, Math.min(168, viewportHeight * .16));
       const bannerHeight = Math.min(
         heroHeight,
         Math.max(160, targetBannerHeight, heroHeight - introLift),
@@ -87,40 +94,50 @@ export default function Homepage() {
         viewportHeight - headerHeight - bannerHeight,
         heroHeight - introLift,
       );
-      // Keep the banner moving after the reserved hero travel so it exits
-      // naturally instead of disappearing underneath the next section.
-      const scrollProgress = Math.max(
-        0,
-        window.scrollY - (trackTop - headerHeight),
-      );
-      const contentHold = Math.min(travel, scrollProgress);
+      layout = {
+        headerHeight,
+        bannerHeight,
+        travel,
+        trackTop: track.getBoundingClientRect().top + window.scrollY,
+      };
+
       track.style.setProperty('--hero-height', `${heroHeight}px`);
       track.style.setProperty('--banner-travel', `${travel}px`);
       opening.style.setProperty('--banner-travel', `${travel}px`);
       opening.style.setProperty('--banner-height', `${bannerHeight}px`);
       opening.style.setProperty('--intro-lift', `${introLift}px`);
-      opening.style.setProperty('--content-hold', `${contentHold}px`);
       opening.style.setProperty('--banner-visible-height', `${bannerHeight * .6}px`);
       banner.style.setProperty('--banner-height', `${bannerHeight}px`);
       banner.style.setProperty('--banner-top', `${headerHeight}px`);
+    };
+
+    const updateBanner = () => {
+      // Keep scroll updates transform-only. Changing the opening block's
+      // layout during scrolling lets scroll anchoring move the next section.
+      const scrollProgress = Math.max(
+        0,
+        window.scrollY - (layout.trackTop - layout.headerHeight),
+      );
+      const contentHold = Math.min(layout.travel, scrollProgress);
       banner.style.setProperty('--banner-shift', `${scrollProgress}px`);
+      opening.style.setProperty('--content-hold', `${contentHold}px`);
     };
     const scheduleBannerUpdate = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(updateBanner);
     };
+    const measureAndUpdate = () => {
+      measureBanner();
+      scheduleBannerUpdate();
+    };
 
-    updateBanner();
+    measureAndUpdate();
     window.addEventListener('scroll', scheduleBannerUpdate, {passive: true});
-    window.addEventListener('resize', scheduleBannerUpdate);
-    const resizeObserver = new ResizeObserver(scheduleBannerUpdate);
-    resizeObserver.observe(banner);
-
+    window.addEventListener('resize', measureAndUpdate);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener('scroll', scheduleBannerUpdate);
-      window.removeEventListener('resize', scheduleBannerUpdate);
-      resizeObserver.disconnect();
+      window.removeEventListener('resize', measureAndUpdate);
     };
   }, []);
 
@@ -169,10 +186,13 @@ export default function Homepage() {
         </section>
 
         <section className="home-banner-feature" aria-label={fr?'Atouts du Cuicui':'Cuicui benefits'}>
-          <div className="home-icon-strip">
-            {iconBenefits.map((benefit, index) => <article key={benefit}>
-              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              <p>{benefit}</p>
+          <div className="home-icon-strip home-icon-strip--benefits">
+            {iconBenefits.map((benefit) => <article key={benefit.title}>
+              <img src={benefit.icon} alt="" aria-hidden="true" loading="lazy" />
+              <div>
+                <h3>{benefit.title}</h3>
+                <p>{benefit.detail}</p>
+              </div>
             </article>)}
           </div>
         </section>
@@ -276,8 +296,8 @@ export default function Homepage() {
     </div>
 
     <section className="home-icon-strip home-icon-strip--food" aria-label={fr?'Aliments adaptés au Cuicui':'Foods suited to the Cuicui'}>
-      {foodGroups.map((group, index) => <article key={group.title}>
-        <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+      {foodGroups.map((group) => <article key={group.title}>
+        <img src={group.icon} alt="" aria-hidden="true" loading="lazy" />
         <div>
           <h3>{group.title}</h3>
           <p>{group.detail}</p>
