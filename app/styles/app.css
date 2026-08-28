@@ -301,22 +301,22 @@ html:has(.overlay.expanded) { overflow: hidden; }
   content: '';
   position: absolute;
   z-index: 0;
-  top: 32%;
+  top: 48%;
   left: 73%;
-   width: clamp(18rem, 31vw, 32rem);
+  width: clamp(15rem, 25vw, 26rem);
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--white);
   transform: translate(-50%, -50%);
   animation: hero-circle-reveal .8s cubic-bezier(.22, 1, .36, 1) both;
 }
-.home-intro__product {
+.home-opening__content > .home-intro__product {
   position: absolute;
-  top: clamp(-14rem, -14vw, -10rem);
-  right: clamp(2rem, 7vw, 7rem);
+  top: clamp(-24rem, -23vw, -19rem);
+  right: clamp(6rem, 14vw, 12rem);
   z-index: 6;
-  width: clamp(17rem, 25vw, 24rem);
-  max-height: min(60svh, 31rem);
+  width: clamp(19rem, 28vw, 27rem);
+  max-height: min(68svh, 35rem);
   object-fit: contain;
   filter: drop-shadow(0 1.5rem 1.1rem rgba(54, 35, 21, .16));
   animation: hero-object-reveal .9s .08s cubic-bezier(.22, 1, .36, 1) both;
@@ -331,12 +331,13 @@ html:has(.overlay.expanded) { overflow: hidden; }
   align-items: flex-start;
   justify-content: flex-start;
   align-self: stretch;
-  padding: clamp(2.5rem, 9vh, 6rem) 0 0;
+  padding: clamp(2rem, 5vh, 4rem) 0 0;
   text-align: left;
+  transform: translateY(clamp(-5rem, -7vh, -3rem));
 }
 .home-hero__copy h1 { max-width: none; margin: 0 0 .18em; color: var(--home-text); font-size: clamp(3rem, 4.7vw, 5.75rem); text-transform: none; }
 .home-hero__copy > p.home-hero__lead { max-width: 22rem; margin: 0 0 1.4rem; color: var(--home-text); font-size: clamp(1.3rem, 1.65vw, 1.75rem); font-weight: 700; line-height: 1.08; }
-.home-hero__copy > p.home-hero__details { max-width: 31rem; margin: 0; color: var(--home-text); font-size: clamp(.82rem, .95vw, 1rem); line-height: 1.5; }
+.home-hero__copy > p.home-hero__details { max-width: 31rem; margin: 0; color: var(--home-text); font-size: clamp(.82rem, .95vw, 1rem); line-height: 1.65; }
 .home-hero__details strong { font-weight: 700; }
 .home-banner {
   position: fixed;
@@ -1510,19 +1511,19 @@ html:has(.overlay.expanded) { overflow: hidden; }
     padding-block: clamp(2rem, 7vw, 3.5rem) 1.5rem;
   }
   .home-hero::before {
-    top: 22%;
+    top: 38%;
     bottom: auto;
     left: 50%;
-     width: min(68vw, 24rem);
+    width: min(58vw, 21rem);
     transform: translate(-50%, -50%);
     animation: none;
   }
-  .home-hero__copy { grid-column: 1; grid-row: 1; padding-top: 0; }
-  .home-intro__product {
-    top: -5.5rem;
-    right: .75rem;
-    width: min(44vw, 14rem);
-    max-height: 17rem;
+  .home-hero__copy { grid-column: 1; grid-row: 1; padding-top: 0; transform: none; }
+  .home-opening__content > .home-intro__product {
+    top: -8.5rem;
+    right: 3.5rem;
+    width: min(50vw, 16rem);
+    max-height: 19rem;
   }
   .home-hero__copy h1 { font-size: clamp(3rem, 13vw, 4.6rem); }
   .home-hero__lead { max-width: 20rem; font-size: clamp(1.2rem, 5.5vw, 1.65rem); }
