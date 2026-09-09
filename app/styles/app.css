@@ -397,6 +397,21 @@ html:has(.overlay.expanded) { overflow: hidden; }
   --banner-icon-overlap: 1.5rem;
   min-height: calc(var(--icon-strip-height) + var(--banner-visible-height, 12rem) - var(--banner-icon-overlap));
 }
+.home-banner-followup {
+  position: relative;
+  z-index: 3;
+  margin-top: calc(0px - var(--banner-visible-height, 12rem) + var(--banner-icon-overlap, 1.5rem));
+  height: clamp(18rem, 42svh, 34rem);
+  overflow: hidden;
+  background: #080604;
+}
+.home-banner-followup img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 60%;
+}
 .home-icon-strip {
   position: relative;
   z-index: 4;
@@ -1552,6 +1567,10 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home-banner-feature {
     --icon-strip-height: 30rem;
     --banner-icon-overlap: 1rem;
+  }
+  .home-banner-followup {
+    margin-top: 0;
+    height: clamp(14rem, 40svh, 23rem);
   }
   .benefit-grid,.practice-grid { grid-template-columns:1fr; }
   .benefit-grid > article { min-height: 0; }

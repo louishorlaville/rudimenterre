@@ -196,6 +196,9 @@ export default function Homepage() {
             </article>)}
           </div>
         </section>
+        <div className="home-banner-followup" aria-hidden="true">
+          <img src="/images/rudimenterre/home-banner.jpg" alt="" loading="lazy" />
+        </div>
       </div>
     </div>
 
