@@ -571,6 +571,20 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .practice-benefit-stack span,
 .practice-benefit-stack strong { font-size: clamp(.72rem, 1.15vw, 1.15rem); line-height: 1.2; }
 .practice-benefit-stack strong { font-weight: 700; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .practice-benefit-stack > div {
+      transform: scale(.78);
+      transform-origin: center;
+      animation: practice-benefit-grow linear both;
+      animation-timeline: view(block 72% 18%);
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+@keyframes practice-benefit-grow {
+  to { transform: scale(1); }
+}
 .practice-benefit-stack__energy { background: #ee7900; color: #9f251a !important; }
 .practice-benefit-stack__water { background: #eef3f0; }
 .practice-benefit-stack__tech { background: #a8c2aa; }
@@ -2632,10 +2646,21 @@ html:has(.overlay.expanded) { overflow: hidden; }
     );
   }
 
-  .benefit-scroll__viewport {
+  .benefit-scroll__stage {
     position: sticky;
     top: var(--benefit-sticky-top, var(--header-height));
-    height: var(--benefit-viewport-height, 80svh);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-anchor: none;
+  }
+
+  .benefit-scroll__divider {
+    padding-block: clamp(1rem, 2vw, 2rem) clamp(0.75rem, 1.25vw, 1.25rem);
+  }
+
+  .benefit-scroll__viewport {
+    height: var(--benefit-viewport-height, 68svh);
     overflow: hidden;
   }
 

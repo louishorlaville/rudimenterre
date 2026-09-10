@@ -156,6 +156,7 @@ export default function Homepage() {
     let frame = 0;
     let start = 0;
     let stepDistance = 0;
+    let sceneWidth = 0;
     let activeScene = -1;
 
     const update = () => {
@@ -165,7 +166,7 @@ export default function Homepage() {
       const sceneIndex = Math.min(scenes.length - 1, Math.round(progress / stepDistance));
       if (sceneIndex === activeScene) return;
       activeScene = sceneIndex;
-      track.style.setProperty('--benefit-shift', `${-sceneIndex * viewport.clientWidth}px`);
+      track.style.setProperty('--benefit-shift', `${-sceneIndex * sceneWidth}px`);
     };
     const scheduleUpdate = () => {
       if (frame) return;
@@ -178,18 +179,30 @@ export default function Homepage() {
         section.style.removeProperty('--benefit-viewport-height');
         track.style.removeProperty('--benefit-shift');
         activeScene = -1;
+        sceneWidth = 0;
         return;
       }
 
       const headerHeight = document.querySelector<HTMLElement>('.site-header')?.getBoundingClientRect().height ?? 0;
+      const divider = section.querySelector<HTMLElement>('.benefit-scroll__divider');
+      const dividerHeight = divider?.getBoundingClientRect().height ?? 0;
+
+      const availableHeight = Math.max(0, window.innerHeight - headerHeight);
+      const maxViewportHeight = Math.max(360, availableHeight - dividerHeight - 16);
+      const contentHeight = Math.max(...scenes.map((scene) => scene.scrollHeight));
+      sceneWidth = scenes[0].getBoundingClientRect().width;
       const viewportHeight = Math.min(
-        window.innerHeight - headerHeight,
-        window.innerHeight * 0.8,
+        Math.max(window.innerHeight * 0.68, contentHeight),
+        Math.max(maxViewportHeight, contentHeight),
       );
       stepDistance = viewportHeight;
-      const stickyOffset = headerHeight + (window.innerHeight - headerHeight - viewportHeight) / 2;
+
+      const stageHeight = dividerHeight + viewportHeight;
+      const remainingSpace = Math.max(0, availableHeight - stageHeight);
+      const stickyOffset = headerHeight + Math.min(remainingSpace / 2, 20);
+
       start = section.getBoundingClientRect().top + window.scrollY - stickyOffset;
-      section.style.setProperty('--benefit-scroll-height', `${viewportHeight + stepDistance * (scenes.length - 1)}px`);
+      section.style.setProperty('--benefit-scroll-height', `${stageHeight + stepDistance * (scenes.length - 1)}px`);
       section.style.setProperty('--benefit-sticky-top', `${stickyOffset}px`);
       section.style.setProperty('--benefit-viewport-height', `${viewportHeight}px`);
       activeScene = -1;
@@ -278,13 +291,13 @@ export default function Homepage() {
       </div>
     </div>
 
-    <div className="home-section-divider" aria-hidden="true">
-      <span>{fr?'Si vous souhaitez':'If you wish'}</span>
-      <i />
-    </div>
-
     <section className="benefit-scroll" ref={benefitScrollRef} aria-label={fr?'Pourquoi choisir le Cuicui':'Why choose Cuicui'}>
-      <div className="benefit-scroll__viewport">
+      <div className="benefit-scroll__stage">
+        <div className="home-section-divider benefit-scroll__divider" aria-hidden="true">
+          <span>{fr?'Si vous souhaitez':'If you wish'}</span>
+          <i />
+        </div>
+        <div className="benefit-scroll__viewport">
         <div className="benefit-grid" ref={benefitTrackRef}>
           <div className="benefit-scene">
       <article className="benefit-panel benefit-panel--life">
@@ -372,6 +385,7 @@ export default function Homepage() {
       </article>
           </div>
         </div>
+      </div>
       </div>
     </section>
 
