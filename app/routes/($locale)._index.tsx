@@ -48,6 +48,8 @@ export default function Homepage() {
   const openingRef = useRef<HTMLDivElement>(null);
   const heroTrackRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
+  const benefitScrollRef = useRef<HTMLElement>(null);
+  const benefitTrackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const opening = openingRef.current;
@@ -142,6 +144,80 @@ export default function Homepage() {
   }, []);
 
   useEffect(() => {
+    const section = benefitScrollRef.current;
+    const track = benefitTrackRef.current;
+    const viewport = section?.querySelector<HTMLElement>('.benefit-scroll__viewport');
+    const scenes = Array.from(track?.querySelectorAll<HTMLElement>('.benefit-scene') ?? []);
+    if (!section || !track || !viewport || !scenes.length) return;
+
+    const horizontalLayout = window.matchMedia(
+      '(min-width: 761px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)',
+    );
+    let frame = 0;
+    let start = 0;
+    let stepDistance = 0;
+    let activeScene = -1;
+
+    const update = () => {
+      frame = 0;
+      if (!horizontalLayout.matches || !stepDistance) return;
+      const progress = Math.max(0, window.scrollY - start);
+      const sceneIndex = Math.min(scenes.length - 1, Math.round(progress / stepDistance));
+      if (sceneIndex === activeScene) return;
+      activeScene = sceneIndex;
+      track.style.setProperty('--benefit-shift', `${-sceneIndex * viewport.clientWidth}px`);
+    };
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+    const measure = () => {
+      if (!horizontalLayout.matches) {
+        section.style.removeProperty('--benefit-scroll-height');
+        section.style.removeProperty('--benefit-sticky-top');
+        section.style.removeProperty('--benefit-viewport-height');
+        track.style.removeProperty('--benefit-shift');
+        activeScene = -1;
+        return;
+      }
+
+      const headerHeight = document.querySelector<HTMLElement>('.site-header')?.getBoundingClientRect().height ?? 0;
+      const viewportHeight = Math.min(
+        window.innerHeight - headerHeight,
+        window.innerHeight * 0.8,
+      );
+      stepDistance = viewportHeight;
+      const stickyOffset = headerHeight + (window.innerHeight - headerHeight - viewportHeight) / 2;
+      start = section.getBoundingClientRect().top + window.scrollY - stickyOffset;
+      section.style.setProperty('--benefit-scroll-height', `${viewportHeight + stepDistance * (scenes.length - 1)}px`);
+      section.style.setProperty('--benefit-sticky-top', `${stickyOffset}px`);
+      section.style.setProperty('--benefit-viewport-height', `${viewportHeight}px`);
+      activeScene = -1;
+      scheduleUpdate();
+    };
+    const revealFocusedScene = (event: FocusEvent) => {
+      if (!horizontalLayout.matches || !(event.target instanceof HTMLElement) || !event.target.matches(':focus-visible')) return;
+      const scene = event.target.closest<HTMLElement>('.benefit-scene');
+      const sceneIndex = scene ? scenes.indexOf(scene) : -1;
+      if (sceneIndex < 0) return;
+      window.scrollTo({top: start + sceneIndex * stepDistance, behavior: 'smooth'});
+    };
+
+    measure();
+    window.addEventListener('scroll', scheduleUpdate, {passive: true});
+    window.addEventListener('resize', measure);
+    horizontalLayout.addEventListener('change', measure);
+    track.addEventListener('focusin', revealFocusedScene);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', measure);
+      horizontalLayout.removeEventListener('change', measure);
+      track.removeEventListener('focusin', revealFocusedScene);
+    };
+  }, []);
+
+  useEffect(() => {
     const markButtonInteracted = (event: Event) => {
       if (!(event.target instanceof Element)) return;
       event.target.closest<HTMLElement>('.button')?.classList.add('button--interacted');
@@ -207,7 +283,10 @@ export default function Homepage() {
       <i />
     </div>
 
-    <section className="benefit-grid">
+    <section className="benefit-scroll" ref={benefitScrollRef} aria-label={fr?'Pourquoi choisir le Cuicui':'Why choose Cuicui'}>
+      <div className="benefit-scroll__viewport">
+        <div className="benefit-grid" ref={benefitTrackRef}>
+          <div className="benefit-scene">
       <article className="benefit-panel benefit-panel--life">
         <span className="benefit-panel__number">01</span>
         <h2>{fr?'Un Cuicui pour la vie':'A Cuicui for life'}</h2>
@@ -238,6 +317,9 @@ export default function Homepage() {
         </div>
       </article>
 
+          </div>
+
+          <div className="benefit-scene benefit-scene--tomorrow">
       <article className="benefit-media benefit-media--tomorrow">
         <img src="/images/rudimenterre/home-tomorrow.webp" alt={fr?'Des Cuicui et des préparations sur une table':'Cuicui cookers and preparations on a table'} loading="lazy" />
       </article>
@@ -256,6 +338,9 @@ export default function Homepage() {
         <Link className="button benefit-panel__cta" to={pagePath(locale,'project')}>{fr?'Visite guidée':'Guided tour'}</Link>
       </article>
 
+          </div>
+
+          <div className="benefit-scene">
       <article className="benefit-panel benefit-panel--freedom">
         <span className="benefit-panel__number">03</span>
         <h2>{fr?'Un Cuicui pour vous émanciper':'A Cuicui to set you free'}</h2>
@@ -285,6 +370,9 @@ export default function Homepage() {
       <article className="benefit-media benefit-media--freedom">
         <img src="/images/rudimenterre/home-emancipation.jpeg" alt={fr?'Cinq Cuicui annotés empilés':'Five labelled Cuicui cookers stacked together'} loading="lazy" />
       </article>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section className="home-photo-banner">

@@ -469,15 +469,24 @@ html:has(.overlay.expanded) { overflow: hidden; }
   height: 1px;
   background: currentColor;
 }
-.benefit-grid {
+.benefit-scroll {
   position: relative;
   z-index: 4;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--cream);
+}
+.benefit-scroll__viewport { margin-inline: var(--content-gutter); }
+.benefit-grid {
+  position: relative;
+  z-index: 1;
   background: var(--cream);
   overflow-anchor: none;
 }
-.benefit-grid > article { min-height: clamp(42rem, 57vw, 58rem); }
+.benefit-scene {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.benefit-scene--tomorrow > .benefit-panel { order: -1; }
+.benefit-scene > article { min-height: clamp(42rem, 57vw, 58rem); }
 .benefit-panel { display: flex; flex-direction: column; align-items: flex-start; padding: clamp(3rem, 5.4vw, 6rem) clamp(2rem, 5.8vw, 6.5rem); background: var(--cream); color: #414141; }
 .benefit-panel__number { color: #e96713; font-size: clamp(1.9rem, 2.6vw, 3rem); font-weight: 700; line-height: 1; }
 .benefit-panel h2 { max-width: 12ch; margin: .45em 0 .7em; font-size: clamp(2.5rem, 4.1vw, 5rem); line-height: .98; text-transform: uppercase; }
@@ -1572,8 +1581,8 @@ html:has(.overlay.expanded) { overflow: hidden; }
     margin-top: 0;
     height: clamp(14rem, 40svh, 23rem);
   }
-  .benefit-grid,.practice-grid { grid-template-columns:1fr; }
-  .benefit-grid > article { min-height: 0; }
+  .benefit-scene,.practice-grid { grid-template-columns:1fr; }
+  .benefit-scene > article { min-height: 0; }
   .benefit-panel { padding: 3.5rem var(--page-gutter); }
   .benefit-panel h2 { font-size: clamp(2.6rem, 11vw, 4.3rem); }
   .benefit-panel--life { min-height: 42rem !important; }
@@ -2149,10 +2158,16 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 .home-section-divider {
-  padding-block: clamp(1.5rem, 2.5vw, 2.5rem);
+  padding-block: clamp(2.5rem, 4.5vw, 4.5rem);
 }
 
-.benefit-grid > article {
+.home-section-divider span,
+.home-section-divider--practice span {
+  max-width: 50rem;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+}
+
+.benefit-scene > article {
   min-width: 0;
   min-height: clamp(35rem, 46vw, 47rem);
 }
@@ -2206,16 +2221,27 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 .home-photo-banner__frame {
+  width: 100%;
+  max-width: none;
   height: clamp(14rem, 25vw, 24rem);
 }
 
 .home-section-divider--practice {
-  padding-block: clamp(2rem, 3vw, 3rem) clamp(3rem, 5vw, 5rem);
+  padding-block: clamp(2.5rem, 4.5vw, 4.5rem);
 }
 
-.home-icon-strip--food,
+.home-icon-strip--food {
+  padding-inline: var(--content-gutter);
+}
+
 .home-icon-strip--food article {
   min-height: clamp(10rem, 14vw, 13rem);
+}
+
+.practice-grid {
+  width: min(calc(100% - 2 * var(--content-gutter)), var(--content-max));
+  margin-inline: auto;
+  grid-auto-rows: 1fr;
 }
 
 .practice-grid > article {
@@ -2243,6 +2269,11 @@ html:has(.overlay.expanded) { overflow: hidden; }
   padding-block: clamp(2.35rem, 3.4vw, 3.75rem);
 }
 
+.practice-panel__side-cta {
+  align-self: flex-start;
+  margin: 0 0 2rem 4.1rem;
+}
+
 .home-video-feature {
   padding-block: clamp(2.75rem, 5vw, 5.5rem) clamp(1.75rem, 2.5vw, 2.75rem);
 }
@@ -2268,7 +2299,15 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 .home-library__scene {
-  width: min(88%, var(--content-max));
+  width: 100%;
+  aspect-ratio: auto;
+}
+
+.home-library__canvas {
+  position: relative;
+  inset: auto;
+  width: min(calc(100% - 2 * var(--content-gutter)), var(--content-max));
+  margin-inline: auto;
 }
 
 .home-adopt-gallery {
@@ -2281,6 +2320,8 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 .home-adopt-gallery__images {
+  width: 100%;
+  max-width: none;
   height: min(39vw, 39rem);
 }
 
@@ -2289,7 +2330,11 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 .home-kitchen-compare__scene {
-  width: min(92%, var(--content-max));
+  width: min(calc(100% - 2 * var(--content-gutter)), var(--content-max));
+}
+
+.home-kitchen-compare {
+  background: var(--home-sage);
 }
 
 .home-award {
@@ -2367,8 +2412,18 @@ html:has(.overlay.expanded) { overflow: hidden; }
     padding-bottom: 2.5rem;
   }
 
-  .home-section-divider {
-    padding-block: 1.5rem;
+  .home-section-divider,
+  .home-section-divider--practice,
+  .home-section-divider--video {
+    align-items: flex-start;
+    padding-block: 2rem;
+  }
+
+  .home-section-divider span {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 22rem;
+    line-height: 1.25;
   }
 
   .benefit-panel,
@@ -2413,13 +2468,13 @@ html:has(.overlay.expanded) { overflow: hidden; }
     height: clamp(12rem, 48vw, 18rem);
   }
 
-  .home-section-divider--practice {
-    padding-block: 2rem 3rem;
-  }
-
   .home-icon-strip--food,
   .home-icon-strip--food article {
     min-height: 10rem;
+  }
+
+  .practice-grid {
+    grid-auto-rows: auto;
   }
 
   .practice-panel--dense {
@@ -2438,7 +2493,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
     min-height: 17.5rem;
   }
 
-  .benefit-grid > article:not(.benefit-media--bifurcations),
+  .benefit-scene > article:not(.benefit-media--bifurcations),
   .practice-grid > article:not(.practice-media) {
     min-height: 0;
   }
@@ -2481,6 +2536,11 @@ html:has(.overlay.expanded) { overflow: hidden; }
     height: 80vw;
   }
 
+  .home-library__canvas {
+    left: auto;
+    transform: none;
+  }
+
   .home-adopt-gallery__intro {
     min-height: 11rem;
     gap: 1.35rem;
@@ -2499,7 +2559,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
 
   .home-kitchen-compare__scene {
-    width: 100%;
+    width: min(calc(100% - 2 * var(--page-gutter)), var(--content-max));
     padding-block: 2rem 2.5rem;
   }
 
@@ -2561,5 +2621,37 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home-newsletter-banner__content {
     gap: 1.25rem;
     padding-block: 3rem 2rem;
+  }
+}
+
+@media (min-width: 761px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .benefit-scroll {
+    height: var(
+      --benefit-scroll-height,
+      calc(100svh - var(--header-height) + 200vw)
+    );
+  }
+
+  .benefit-scroll__viewport {
+    position: sticky;
+    top: var(--benefit-sticky-top, var(--header-height));
+    height: var(--benefit-viewport-height, 80svh);
+    overflow: hidden;
+  }
+
+  .benefit-grid {
+    width: 300%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform: translate3d(var(--benefit-shift, 0px), 0, 0);
+    transition: transform .45s cubic-bezier(.22, 1, .36, 1);
+    will-change: transform;
+  }
+
+  .benefit-scene,
+  .benefit-scene > article {
+    height: 100%;
+    min-height: 0;
   }
 }
