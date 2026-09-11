@@ -2781,8 +2781,19 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
 
   .benefit-scroll__viewport {
+    position: relative;
     height: var(--benefit-viewport-height, 75vh);
     overflow: hidden;
+  }
+
+  .benefit-scroll__viewport::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 2;
+    width: 2px;
+    background: var(--cream);
+    pointer-events: none;
   }
 
   .benefit-grid {
