@@ -191,7 +191,7 @@ export default function Homepage() {
       const availableHeight = Math.max(0, window.innerHeight - headerHeight);
       sceneWidth = scenes[0].getBoundingClientRect().width;
       const viewportHeight = Math.max(360, window.innerHeight * 0.75);
-      stepDistance = viewportHeight;
+      stepDistance = viewportHeight * 0.7;
 
       const stageHeight = dividerHeight + viewportHeight;
       const remainingSpace = Math.max(0, availableHeight - stageHeight);
