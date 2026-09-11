@@ -50,6 +50,7 @@ export default function Homepage() {
   const bannerRef = useRef<HTMLDivElement>(null);
   const benefitScrollRef = useRef<HTMLElement>(null);
   const benefitTrackRef = useRef<HTMLDivElement>(null);
+  const practiceBenefitStackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const opening = openingRef.current;
@@ -227,6 +228,67 @@ export default function Homepage() {
       window.removeEventListener('resize', measure);
       horizontalLayout.removeEventListener('change', measure);
       track.removeEventListener('focusin', revealFocusedScene);
+    };
+  }, []);
+
+  useEffect(() => {
+    const stack = practiceBenefitStackRef.current;
+    const items = stack
+      ? Array.from(stack.children).filter((item): item is HTMLElement => item instanceof HTMLElement)
+      : [];
+    if (!stack || !items.length) return;
+    const textNodes = items.map((item) => Array.from(item.querySelectorAll<HTMLElement>('span, strong')));
+
+    const desktopMotion = window.matchMedia(
+      '(min-width: 761px) and (prefers-reduced-motion: no-preference)',
+    );
+    let frame = 0;
+
+    const resetItems = () => {
+      items.forEach((item, index) => {
+        item.style.removeProperty('transform');
+        item.style.removeProperty('z-index');
+        textNodes[index].forEach((text) => text.style.removeProperty('transform'));
+      });
+    };
+    const update = () => {
+      frame = 0;
+      if (!desktopMotion.matches) {
+        resetItems();
+        return;
+      }
+
+      const focusY = window.innerHeight / 2;
+      items.forEach((item, index) => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const influence = Math.max(0, 1 - Math.abs(itemCenter - focusY) / (rect.height * .7));
+        const easedInfluence = Math.pow(influence, 1.8);
+        const scale = 1 + .2 * easedInfluence;
+        const textScale = 1 + .12 * easedInfluence;
+        item.style.zIndex = String(Math.round(easedInfluence * 100));
+        item.style.transform = `scale(${scale.toFixed(4)})`;
+        textNodes[index].forEach((text) => {
+          text.style.transform = `scale(${textScale.toFixed(4)})`;
+        });
+      });
+    };
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+    const handleMotionChange = () => scheduleUpdate();
+
+    scheduleUpdate();
+    window.addEventListener('scroll', scheduleUpdate, {passive: true});
+    window.addEventListener('resize', scheduleUpdate);
+    desktopMotion.addEventListener('change', handleMotionChange);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      desktopMotion.removeEventListener('change', handleMotionChange);
+      resetItems();
     };
   }, []);
 
@@ -427,7 +489,7 @@ export default function Homepage() {
         <Link className="button practice-panel__cta" to={pagePath(locale,'project')}>{fr?'Comment ça marche ?':'How does it work?'}</Link>
       </article>
       <article className="practice-media practice-media--cook-less">
-        <div className="practice-benefit-stack">
+        <div className="practice-benefit-stack" ref={practiceBenefitStackRef}>
           <div className="practice-benefit-stack__energy"><span>{fr?'Moins d’énergie':'Less energy'}</span><strong>{fr?'Plus de chaleur':'More heat'}</strong></div>
           <div className="practice-benefit-stack__water"><span>{fr?'Moins d’eau potable':'Less drinking water'}</span><strong>{fr?'Plus d’autonomie':'More autonomy'}</strong></div>
           <div className="practice-benefit-stack__tech"><span>{fr?'Moins de techno':'Less technology'}</span><strong>{fr?'Plus de bon sens':'More common sense'}</strong></div>
