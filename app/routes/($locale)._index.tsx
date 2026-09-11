@@ -68,8 +68,6 @@ export default function Homepage() {
 
     const measureBanner = () => {
       const header = document.querySelector<HTMLElement>('.site-header');
-      const hero = track.querySelector<HTMLElement>('.home-hero');
-      const details = track.querySelector<HTMLElement>('.home-hero__details');
       const headerHeight = header?.getBoundingClientRect().height ?? 0;
       const viewportHeight = window.innerHeight;
       const sectionPreviewHeight = window.innerWidth <= 760
@@ -79,18 +77,10 @@ export default function Homepage() {
         512,
         viewportHeight - headerHeight - sectionPreviewHeight,
       );
-      const heroTop = hero?.getBoundingClientRect().top ?? headerHeight;
-      const detailsBottom = details?.getBoundingClientRect().bottom;
-      const targetBannerHeight = detailsBottom == null
-        ? viewportHeight * .62
-        : detailsBottom - heroTop + 24;
       const introLift = window.innerWidth <= 760
         ? Math.max(80, Math.min(112, viewportHeight * .12))
         : Math.max(112, Math.min(168, viewportHeight * .16));
-      const bannerHeight = Math.min(
-        heroHeight,
-        Math.max(160, targetBannerHeight, heroHeight - introLift),
-      );
+      const bannerHeight = banner.getBoundingClientRect().height;
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
       const travel = Math.max(
         0,
@@ -110,7 +100,6 @@ export default function Homepage() {
       opening.style.setProperty('--banner-height', `${bannerHeight}px`);
       opening.style.setProperty('--intro-lift', `${introLift}px`);
       opening.style.setProperty('--banner-visible-height', `${bannerHeight * .6}px`);
-      banner.style.setProperty('--banner-height', `${bannerHeight}px`);
       banner.style.setProperty('--banner-top', `${headerHeight}px`);
     };
 
@@ -232,7 +221,6 @@ export default function Homepage() {
       ? Array.from(stack.children).filter((item): item is HTMLElement => item instanceof HTMLElement)
       : [];
     if (!stack || !items.length) return;
-    const textNodes = items.map((item) => Array.from(item.querySelectorAll<HTMLElement>('span, strong')));
 
     const desktopMotion = window.matchMedia(
       '(min-width: 761px) and (prefers-reduced-motion: no-preference)',
@@ -240,10 +228,10 @@ export default function Homepage() {
     let frame = 0;
 
     const resetItems = () => {
-      items.forEach((item, index) => {
-        item.style.removeProperty('transform');
+      items.forEach((item) => {
+        item.style.removeProperty('--benefit-scale');
+        item.style.removeProperty('--benefit-text-scale');
         item.style.removeProperty('z-index');
-        textNodes[index].forEach((text) => text.style.removeProperty('transform'));
       });
     };
     const update = () => {
@@ -254,18 +242,20 @@ export default function Homepage() {
       }
 
       const focusY = window.innerHeight / 2;
-      items.forEach((item, index) => {
+      items.forEach((item) => {
         const rect = item.getBoundingClientRect();
         const itemCenter = rect.top + rect.height / 2;
-        const influence = Math.max(0, 1 - Math.abs(itemCenter - focusY) / (rect.height * .7));
-        const easedInfluence = Math.pow(influence, 1.8);
-        const scale = 1 + .2 * easedInfluence;
-        const textScale = 1 + .12 * easedInfluence;
-        item.style.zIndex = String(Math.round(easedInfluence * 100));
-        item.style.transform = `scale(${scale.toFixed(4)})`;
-        textNodes[index].forEach((text) => {
-          text.style.transform = `scale(${textScale.toFixed(4)})`;
-        });
+        const distanceFromHold = Math.max(0, Math.abs(itemCenter - focusY) - rect.height * .15);
+        const influence = Math.max(0, 1 - distanceFromHold / (rect.height * .55));
+        const easedInfluence = influence * influence * (3 - 2 * influence);
+        // Finish shrinking before the neighboring square starts growing.
+        const squareInfluence = Math.max(0, 1 - distanceFromHold / (rect.height * .35));
+        const easedSquareInfluence = squareInfluence * squareInfluence * (3 - 2 * squareInfluence);
+        const scale = 1 + .2 * easedSquareInfluence;
+        const textScale = (1 + .2 * easedInfluence) * (1 + .35 * easedInfluence);
+        item.style.zIndex = squareInfluence > 0 ? '1' : '0';
+        item.style.setProperty('--benefit-scale', scale.toFixed(4));
+        item.style.setProperty('--benefit-text-scale', textScale.toFixed(4));
       });
     };
     const scheduleUpdate = () => {
@@ -601,7 +591,7 @@ export default function Homepage() {
     </div>
 
     <section className="home-kitchen-follow" aria-labelledby="home-kitchen-follow-title">
-      <h2 id="home-kitchen-follow-title">{fr?'Suivez-nous en cuisine !':'Follow us into the kitchen!'}</h2>
+      <h2 id="home-kitchen-follow-title">{fr?'Empilez - Distillez - Savourez !':'Stack - Distill - Savour!'}</h2>
       <div className="home-kitchen-follow__gallery">
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--left">
           <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Artichauts et paniers dans la cuisine Rudimenterre':'Artichokes and baskets in the Rudimenterre kitchen'} loading="lazy" />
@@ -618,9 +608,9 @@ export default function Homepage() {
         href="https://www.instagram.com/rudimenterre/reels/"
         target="_blank"
         rel="noreferrer"
-        aria-label={fr?'Voir les Reels de Rudimenterre sur Instagram (nouvel onglet)':'View Rudimenterre Reels on Instagram (new tab)'}
+        aria-label={fr?'Suivez-nous en cuisine ! sur Instagram (nouvel onglet)':'Follow us into the kitchen! on Instagram (new tab)'}
       >
-        {fr?'Regardez':'Take a look'}
+        {fr?'Suivez-nous en cuisine !':'Follow us into the kitchen!'}
       </a>
     </section>
 
@@ -657,40 +647,6 @@ export default function Homepage() {
 
           <img className="home-library__layer home-library__stool" src="/images/rudimenterre/home-library-stool.png" alt="" loading="lazy" />
         </div>
-      </div>
-    </section>
-
-    <section className="home-adopt-gallery" aria-labelledby="home-adopt-gallery-title">
-      <header className="home-adopt-gallery__intro">
-        <h2 id="home-adopt-gallery-title">
-          {fr?'Empilez - Distillez - Savourez !':'Stack - Distill - Savour!'}
-        </h2>
-        <Link className="button button--orange" to={productUrl}>
-          {fr?'Adoptez':'Adopt'}
-        </Link>
-      </header>
-      <div className="home-adopt-gallery__images">
-        <figure>
-          <img
-            src="/images/rudimenterre/home-adopt-stack.jpeg"
-            alt={fr?'Cinq récipients Cuicui empilés et annotés':'Five stacked and labelled Cuicui vessels'}
-            loading="lazy"
-          />
-        </figure>
-        <figure>
-          <img
-            src="/images/rudimenterre/home-adopt-overhead.jpeg"
-            alt={fr?'Riz, légumes et pommes de terre cuisinés dans le Cuicui':'Rice, vegetables and potatoes cooked in the Cuicui'}
-            loading="lazy"
-          />
-        </figure>
-        <figure>
-          <img
-            src="/images/rudimenterre/home-adopt-still-life.jpeg"
-            alt={fr?'Cuicui entouré de légumes frais':'Cuicui surrounded by fresh vegetables'}
-            loading="lazy"
-          />
-        </figure>
       </div>
     </section>
 
@@ -774,6 +730,34 @@ export default function Homepage() {
       </div>
     </section>
 
+    <section className="home-discover" aria-labelledby="home-discover-title">
+      <header className="home-discover__heading">
+        <h2 id="home-discover-title">{fr ? 'Pour mieux connaître le Cuicui' : 'Get to know the Cuicui'}</h2>
+      </header>
+      <div className="home-discover__grid">
+        {[
+          {tone: 'forest', image: '', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
+          {tone: 'blue', image: 'home-kitchen-plate-cuicui.png', to: '#home-cuicui-news', title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
+          {tone: 'mint', image: '', to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui 100% français' : 'The Rudimenterre project\nA 100% French Cuicui'},
+          {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
+          {tone: 'sage', image: 'home-kitchen-plate-cuicui.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
+          {tone: 'charcoal', image: 'home-kitchen-plate-casserole.png', to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Pour les chefs du futur\nServices pro' : 'For the chefs of the future\nProfessional services'},
+        ].map((card) => (
+          <Link key={card.tone} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
+            <div className="home-discover__illustration" aria-hidden="true">
+              {card.image ? <img src={`/images/rudimenterre/${card.image}`} alt="" loading="lazy" /> : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                  {card.tone === 'forest' ? <path d="M8 3h8v6a4 4 0 0 1-8 0V3ZM8 5H5v2a4 4 0 0 0 4 4m7-6h3v2a4 4 0 0 1-4 4m-3 2v5m-4 3h8m-7 0v-3h6v3" /> : <path d="M5 21V3m0 1c5-4 9 4 14 0v11c-5 4-9-4-14 0" />}
+                </svg>
+              )}
+            </div>
+            <h3>{card.title}</h3>
+            <svg className="home-discover__arrow" viewBox="0 0 32 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M3 12h25m-8-8 8 8-8 8" /></svg>
+          </Link>
+        ))}
+      </div>
+    </section>
+
     <section className="home-award" aria-labelledby="home-award-title">
       <div className="home-award__banner">
         <div className="home-award__side-label" aria-hidden="true">
@@ -813,7 +797,7 @@ export default function Homepage() {
       </div>
     </section>
 
-    <section className="home-on-tour" aria-labelledby="home-on-tour-title">
+    <section id="home-cuicui-news" className="home-on-tour" aria-labelledby="home-on-tour-title">
       <h2 id="home-on-tour-title">
         {fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}
       </h2>
