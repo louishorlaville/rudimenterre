@@ -152,7 +152,7 @@ export default function Homepage() {
     if (!section || !track || !viewport || !scenes.length) return;
 
     const horizontalLayout = window.matchMedia(
-      '(min-width: 761px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)',
+      '(min-width: 1101px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)',
     );
     let frame = 0;
     let start = 0;
@@ -189,13 +189,8 @@ export default function Homepage() {
       const dividerHeight = divider?.getBoundingClientRect().height ?? 0;
 
       const availableHeight = Math.max(0, window.innerHeight - headerHeight);
-      const maxViewportHeight = Math.max(360, availableHeight - dividerHeight - 16);
-      const contentHeight = Math.max(...scenes.map((scene) => scene.scrollHeight));
       sceneWidth = scenes[0].getBoundingClientRect().width;
-      const viewportHeight = Math.min(
-        Math.max(window.innerHeight * 0.68, contentHeight),
-        Math.max(maxViewportHeight, contentHeight),
-      );
+      const viewportHeight = Math.max(360, window.innerHeight * 0.75);
       stepDistance = viewportHeight;
 
       const stageHeight = dividerHeight + viewportHeight;

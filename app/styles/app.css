@@ -2181,6 +2181,85 @@ html:has(.overlay.expanded) { overflow: hidden; }
   font-size: clamp(1rem, 1.5vw, 1.35rem);
 }
 
+@media (min-width: 761px) {
+  .benefit-scroll .benefit-panel {
+    padding-top: clamp(2rem, 3.4vw, 3.75rem);
+  }
+
+  .benefit-scroll .benefit-panel > p:not(.benefit-script),
+  .benefit-scroll .benefit-panel .sovereignty-list p {
+    font-size: clamp(.8rem, .9vw, .95rem);
+    line-height: 1.3;
+  }
+
+  .benefit-scroll .benefit-panel .benefit-lead {
+    line-height: 1.15;
+  }
+
+  .benefit-scroll .benefit-panel--life > p:not(.benefit-script) {
+    font-size: clamp(.96rem, 1.22vw, 1.3rem);
+    line-height: 1.5;
+  }
+
+  .benefit-scroll .benefit-panel--life .benefit-script {
+    font-size: clamp(2.1rem, 3vw, 3.25rem) !important;
+    line-height: .94 !important;
+  }
+
+  .benefit-scroll .benefit-panel--freedom .benefit-lead {
+    font-size: clamp(1rem, 1.15vw, 1.2rem);
+  }
+
+  .benefit-scroll .benefit-panel .benefit-script {
+    font-size: clamp(1.4rem, 1.9vw, 2.15rem) !important;
+    line-height: .9 !important;
+  }
+
+  .benefit-scroll .benefit-panel__cta,
+  .benefit-scroll .sovereignty-list button {
+    min-height: 2.75rem;
+    padding: .65rem 1.1rem;
+    font-size: clamp(.8rem, .9vw, .95rem);
+  }
+
+  .benefit-scene > article {
+    height: 75vh;
+    min-height: 0;
+  }
+
+  .benefit-panel--tomorrow {
+    padding-block: 1.25rem;
+  }
+
+  .benefit-panel--tomorrow h2 {
+    margin-block: .2em .35em;
+    font-size: clamp(1.5rem, 2vw, 2.1rem);
+  }
+
+  .benefit-panel--tomorrow .benefit-statements {
+    gap: .45rem;
+    margin-bottom: .9rem;
+  }
+
+  .benefit-panel--tomorrow .benefit-statements p {
+    font-size: clamp(.9rem, 1vw, 1.05rem);
+    line-height: 1.15;
+  }
+
+  .benefit-panel--tomorrow .benefit-statements__future {
+    font-size: clamp(1.55rem, 2.1vw, 2.35rem) !important;
+  }
+
+  .benefit-panel--tomorrow > p {
+    font-size: clamp(.9rem, 1vw, 1.05rem);
+    line-height: 1.3;
+  }
+
+  .benefit-panel--tomorrow .benefit-panel__cta {
+    margin-top: .75rem;
+  }
+}
+
 .benefit-scene > article {
   min-width: 0;
   min-height: clamp(35rem, 46vw, 47rem);
@@ -2640,7 +2719,47 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
 }
 
-@media (min-width: 761px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+@media (max-width: 1100px) and (prefers-reduced-motion: no-preference) {
+  .benefit-scroll__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .benefit-scroll__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .benefit-grid {
+    display: flex;
+    width: 300%;
+  }
+
+  .benefit-scene {
+    flex: 0 0 33.333333%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) and (prefers-reduced-motion: no-preference) {
+  .benefit-scene {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-scene > article {
+    height: auto;
+    min-height: 0;
+  }
+
+  .benefit-scene > .benefit-media {
+    height: clamp(18rem, 42vw, 26rem);
+    min-height: clamp(18rem, 42vw, 26rem);
+  }
+}
+
+@media (min-width: 1101px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
   .benefit-scroll {
     height: var(
       --benefit-scroll-height,
@@ -2658,11 +2777,11 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
 
   .benefit-scroll__divider {
-    padding-block: clamp(2.5rem, 4.5vw, 4.5rem);
+    padding-block: clamp(1rem, 2vw, 2rem) clamp(.75rem, 1.25vw, 1.25rem);
   }
 
   .benefit-scroll__viewport {
-    height: var(--benefit-viewport-height, 68svh);
+    height: var(--benefit-viewport-height, 75vh);
     overflow: hidden;
   }
 
