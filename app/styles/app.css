@@ -445,6 +445,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .home-icon-strip article > img { width: clamp(3.5rem, 6vw, 5rem); height: 4.15rem; object-fit: contain; }
 .home-icon-strip p { max-width: 13ch; font-size: .9rem; font-weight: 700; line-height: 1.25; }
 .home-icon-strip--benefits article { gap: .45rem; }
+.home-icon-strip--benefits { padding-inline: var(--content-gutter); }
 .home-icon-strip--benefits article > div { display: grid; gap: .2rem; justify-items: center; align-content: start; min-height: 5.2rem; }
 .home-icon-strip--benefits h3 { min-height: 2.25em; margin: 0; font-size: clamp(.85rem, 1.1vw, 1.05rem); line-height: 1.05; white-space: pre-line; }
 .home-icon-strip--benefits p { max-width: 15ch; margin: 0; white-space: pre-line; color: #555; font-size: clamp(.72rem, .9vw, .88rem); font-weight: 400; line-height: 1.25; }
@@ -544,7 +545,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .home-icon-strip--food { z-index: 4; min-height: clamp(10rem, 12vw, 11.5rem); border-top: 0; }
 .home-icon-strip--food article { min-height: clamp(10rem, 12vw, 11.5rem); gap: .3rem; padding-block: 1rem; justify-content: center; }
 .home-icon-strip--food article > img { height: 3.75rem; }
-.home-icon-strip--food article > div { display: grid; gap: .05rem; justify-items: center; align-content: start; min-height: 5rem; }
+.home-icon-strip--food article > div { display: grid; gap: .05rem; justify-items: center; align-content: start; min-height: 6rem; }
 .home-icon-strip--food h3 { min-height: 2.25em; display: grid; align-content: end; margin: 0; font-size: clamp(.95rem, 1.35vw, 1.25rem); line-height: 1.05; }
 .home-icon-strip--food p { max-width: 14ch; margin: 0; white-space: pre-line; color: #555; font-size: clamp(.8rem, 1.05vw, 1rem); font-weight: 400; line-height: 1.4; }
 .practice-grid { position: relative; z-index: 4; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--cream); }
@@ -2238,7 +2239,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 
 .home-icon-strip--food article {
-  min-height: clamp(10rem, 14vw, 13rem);
+  min-height: clamp(9.5rem, 11vw, 10.5rem);
 }
 
 .practice-grid {
