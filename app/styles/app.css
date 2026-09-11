@@ -2165,8 +2165,18 @@ html:has(.overlay.expanded) { overflow: hidden; }
   padding-block: clamp(2.5rem, 4.5vw, 4.5rem);
 }
 
+.home-section-divider,
+.home-section-divider--practice,
+.home-section-divider--video,
+.benefit-scroll__divider {
+  padding-inline: var(--content-gutter);
+  padding-block: clamp(2.5rem, 4.5vw, 4.5rem);
+}
+
 .home-section-divider span,
-.home-section-divider--practice span {
+.home-section-divider--practice span,
+.home-section-divider--video span,
+.benefit-scroll__divider span {
   max-width: 50rem;
   font-size: clamp(1rem, 1.5vw, 1.35rem);
 }
@@ -2418,12 +2428,14 @@ html:has(.overlay.expanded) { overflow: hidden; }
 
   .home-section-divider,
   .home-section-divider--practice,
-  .home-section-divider--video {
+  .home-section-divider--video,
+  .benefit-scroll__divider {
     align-items: flex-start;
     padding-block: 2rem;
   }
 
-  .home-section-divider span {
+  .home-section-divider span,
+  .benefit-scroll__divider span {
     flex: 0 1 auto;
     min-width: 0;
     max-width: 22rem;
@@ -2646,7 +2658,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
 
   .benefit-scroll__divider {
-    padding-block: clamp(1rem, 2vw, 2rem) clamp(0.75rem, 1.25vw, 1.25rem);
+    padding-block: clamp(2.5rem, 4.5vw, 4.5rem);
   }
 
   .benefit-scroll__viewport {
