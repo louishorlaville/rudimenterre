@@ -20,7 +20,7 @@ export const meta: Route.MetaFunction = ({data}) => {
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
-  const locale = params.locale?.toLowerCase();
+  const locale = (params.locale?.toLowerCase() || 'fr') as string;
   if (!isStorefrontLocale(locale) || !params.page) {
     throw new Response(null, {status: 404});
   }
