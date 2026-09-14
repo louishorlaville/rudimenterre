@@ -1,5 +1,5 @@
 import {Link, redirect, useLoaderData} from 'react-router';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {Route} from './+types/($locale)._index';
 import {InteractiveTowel} from '~/components/InteractiveTowel';
 import {HomeReviews} from '~/components/HomeReviews';
@@ -51,6 +51,26 @@ export default function Homepage() {
   const benefitScrollRef = useRef<HTMLElement>(null);
   const benefitTrackRef = useRef<HTMLDivElement>(null);
   const practiceBenefitStackRef = useRef<HTMLDivElement>(null);
+  const [benefitIndex, setBenefitIndex] = useState(0);
+
+  const scrollBenefit = (direction: number) => {
+    const viewport = benefitScrollRef.current?.querySelector<HTMLElement>('.benefit-scroll__viewport');
+    if (!viewport) return;
+    viewport.scrollBy({left: direction * viewport.clientWidth, behavior: 'smooth'});
+  };
+
+  useEffect(() => {
+    const viewport = benefitScrollRef.current?.querySelector<HTMLElement>('.benefit-scroll__viewport');
+    if (!viewport) return;
+    const update = () => setBenefitIndex(Math.min(2, Math.max(0, Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth)))));
+    const observer = new ResizeObserver(update);
+    observer.observe(viewport);
+    viewport.addEventListener('scroll', update, {passive: true});
+    return () => {
+      observer.disconnect();
+      viewport.removeEventListener('scroll', update);
+    };
+  }, []);
 
   useEffect(() => {
     const opening = openingRef.current;
@@ -104,6 +124,12 @@ export default function Homepage() {
     };
 
     const updateBanner = () => {
+      if (window.innerWidth <= 760) {
+        // A short image drift keeps the mobile opening in normal document flow.
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        banner.style.setProperty('--mobile-banner-shift', `${reduced ? 0 : Math.min(24, Math.max(0, window.scrollY) * .08)}px`);
+        return;
+      }
       // Keep scroll updates transform-only. Changing the opening block's
       // layout during scrolling lets scroll anchoring move the next section.
       const scrollProgress = Math.max(
@@ -298,7 +324,7 @@ export default function Homepage() {
           <div className="home-hero__copy">
             <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
             <p className="home-hero__lead">{fr ? <>un relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
-            <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br />déconnecté, compatible <strong>tous feux</strong>.<br />Plus qu’une cocotte, le Cuicui est un relais<br />de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br />technology-free and compatible <strong>every hob</strong>.<br />More than a casserole, Cuicui is a mobile relay<br />for sustainable cooking.</>}</p>
+            <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
           </div>
           <div className="home-banner" ref={bannerRef} aria-hidden="true">
             <img src="/images/rudimenterre/home-banner.jpg" alt="" />
@@ -344,7 +370,13 @@ export default function Homepage() {
           <span>{fr?'Si vous souhaitez':'If you wish'}</span>
           <i />
         </div>
-        <div className="benefit-scroll__viewport">
+        <div className="benefit-scroll__controls" aria-label={fr ? 'Navigation des bénéfices' : 'Benefit navigation'}>
+          <span>{fr ? 'Faites défiler' : 'Swipe to explore'}</span>
+          <button type="button" onClick={() => scrollBenefit(-1)} disabled={benefitIndex === 0} aria-controls="home-benefit-viewport" aria-label={fr ? 'Bénéfice précédent' : 'Previous benefit'}>←</button>
+          <output aria-live="polite">{benefitIndex + 1} / 3</output>
+          <button type="button" onClick={() => scrollBenefit(1)} disabled={benefitIndex === 2} aria-controls="home-benefit-viewport" aria-label={fr ? 'Bénéfice suivant' : 'Next benefit'}>→</button>
+        </div>
+        <div className="benefit-scroll__viewport" id="home-benefit-viewport" tabIndex={0} role="region" aria-label={fr ? 'Les trois bénéfices du Cuicui' : 'The three benefits of Cuicui'}>
         <div className="benefit-grid" ref={benefitTrackRef}>
           <div className="benefit-scene">
       <article className="benefit-panel benefit-panel--life">
