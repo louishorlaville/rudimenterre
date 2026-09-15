@@ -4,7 +4,6 @@ import {
   getSelectedProductOptions,
   Analytics,
   useOptimisticVariant,
-  getProductOptions,
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
@@ -89,29 +88,39 @@ export default function Product() {
   // only when no search params are set in the url
   useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
 
-  // Get the product options array
-  const productOptions = getProductOptions({
-    ...product,
-    selectedOrFirstAvailableVariant: selectedVariant,
-  });
-
   const {title, descriptionHtml} = product;
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
+    <div className="product product--redesign">
+      <div className="product-breadcrumb" aria-label="Fil d’Ariane">
+        <span>Rudimenterre</span>
+        <span aria-hidden="true">/</span>
+        <span>{locale === 'fr' ? 'La collection' : 'The collection'}</span>
+      </div>
+      <div className="product-gallery">
+        <div className="product-gallery__meta">
+          <span>Objet du quotidien</span>
+          <span aria-hidden="true">01 / 01</span>
+        </div>
+        <ProductImage image={selectedVariant?.image} />
+        <p className="product-gallery__caption">Pensé pour durer. Imaginé pour être transmis.</p>
+      </div>
       <div className="product-main">
+        <div className="product-main__intro">
         <p className="eyebrow">{locale === 'fr' ? 'Adoptez' : 'Adopt'}</p>
         <h1>{title}</h1>
         <ProductPrice
           price={selectedVariant?.price}
           compareAtPrice={selectedVariant?.compareAtPrice}
         />
-        <br />
+        </div>
+        <div className="product-purchase">
         <ProductForm
-          productOptions={productOptions}
           selectedVariant={selectedVariant}
+          locale={locale}
         />
+          <p className="product-shipping">Livraison soignée · Paiement sécurisé · Fabriqué avec intention</p>
+        </div>
         <div className="product-description" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({

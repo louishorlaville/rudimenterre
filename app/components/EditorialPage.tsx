@@ -34,7 +34,7 @@ export function EditorialPage({content, locale, heroImage}: {
     </div>
     <footer className="editorial-next">
       <p>{locale === 'fr' ? 'Empilez · distillez · savourez' : 'Stack · distil · savour'}</p>
-      <Link to={`/${locale}/collections/all`} className="button button--orange">{locale === 'fr' ? 'Adoptez' : 'Adopt'}</Link>
+      <Link to={`/${locale}/adoptez`} className="button button--orange">{locale === 'fr' ? 'Adoptez' : 'Adopt'}</Link>
     </footer>
   </article>;
 }

@@ -28,6 +28,7 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
         <Link className="locale-switch" to={localizedPath(pathname, locale === 'fr' ? 'en' : 'fr')} hrefLang={locale === 'fr' ? 'en-CA' : 'fr-CA'}>{locale === 'fr' ? 'EN' : 'FR'}</Link>
         <NavLink prefetch="intent" to={`/${locale}/account`}><Suspense fallback={copy.signIn}><Await resolve={isLoggedIn} errorElement={copy.signIn}>{(loggedIn) => loggedIn ? copy.account : copy.signIn}</Await></Suspense></NavLink>
         <CartToggle cart={cart} label={copy.cart} locale={locale} />
+        <Link className="button button--orange header-cta" prefetch="intent" to={pagePath(locale, 'adopt')}>{copy.adopt}</Link>
         <button className="menu-toggle" onClick={() => open('mobile')} aria-label={copy.menu}><span /><span /></button>
       </nav>
     </header>
@@ -43,7 +44,7 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
     {label: copy.project, to: pagePath(locale, 'project')},
     {label: copy.explore, to: pagePath(locale, 'steam')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
-    {label: copy.adopt, to: pagePath(locale, 'adopt')},
+    ...(viewport === 'mobile' ? [{label: copy.adopt, to: pagePath(locale, 'adopt')}] : []),
   ];
   return <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>{links.map((item) => <NavLink key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}</nav>;
 }

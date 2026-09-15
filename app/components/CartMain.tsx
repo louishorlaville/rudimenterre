@@ -99,7 +99,7 @@ function CartEmpty({
       <br />
       <p>{locale === 'fr' ? 'Votre panier est encore vide.' : 'Your cart is still empty.'}</p>
       <br />
-      <Link to={`/${locale}/collections/all`} onClick={close} prefetch="viewport">
+      <Link to={`/${locale}/adoptez`} onClick={close} prefetch="viewport">
         {locale === 'fr' ? 'Découvrir Rudimenterre →' : 'Discover Rudimenterre →'}
       </Link>
     </div>

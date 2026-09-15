@@ -28,7 +28,7 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
 export default function Homepage() {
   const {locale,product} = useLoaderData<typeof loader>();
   const fr = locale === 'fr';
-  const productUrl = product ? `/${locale}/products/${product.handle}` : pagePath(locale,'adopt');
+  const productUrl = pagePath(locale, 'adopt');
   const iconBenefits = [
     {icon: '/images/rudimenterre/home-benefit-icon-1.png', title: fr ? 'max 95C doux' : 'max 95C gentle', detail: fr ? 'équilibré' : 'balanced'},
     {icon: '/images/rudimenterre/home-benefit-icon-2.png', title: fr ? 'multi cuisson modulables' : 'modular multi-cooking', detail: fr ? 'vapeur-étuvée\nbain-marie - four' : 'steam-stewing\nbain-marie - oven'},
