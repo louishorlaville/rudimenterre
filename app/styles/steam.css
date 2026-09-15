@@ -1,0 +1,88 @@
+.steam-page {
+  --steam-green: #4b8027;
+  --steam-forest: #3e5e31;
+  --steam-sage: #98cb8d;
+  --steam-mint: #eefff3;
+  --steam-blue: #e7f8ff;
+  --steam-yellow: #fff3c1;
+  --steam-seafoam: #c7dcd4;
+  --steam-gold: #e29b00;
+  --steam-orange: #df9c2c;
+  color: #080a08;
+  background: var(--steam-mint);
+  text-align: center;
+  font-size: clamp(16px, 1.45vw, 20px);
+  line-height: 1.6;
+}
+.steam-page h1, .steam-page h2, .steam-page h3 { margin: 0; font-size: clamp(23px, 2.5vw, 34px); line-height: 1.5; letter-spacing: -.02em; }
+.steam-page h3 { font-size: clamp(22px, 2.15vw, 30px); }
+.steam-page p { margin: 0; }
+.steam-hero { position: relative; color: var(--cream); }
+.steam-hero > img, .steam-photo { display: block; width: 100%; height: auto; }
+.steam-hero > div { position: absolute; inset: 20% 20px auto; text-shadow: 0 1px 8px #15260b80; }
+.steam-hero p { font-size: clamp(14px, 1.45vw, 20px); font-weight: 700; }
+.steam-band { padding: clamp(26px, 3vw, 44px) 6%; }
+.steam-band > p { max-width: 1250px; margin: 12px auto 0; font-style: italic; }
+.steam-band--sage, .steam-panel--sage { background: var(--steam-sage); }
+.steam-band--green { background: var(--steam-green); color: var(--cream); }
+.steam-band--forest { background: var(--steam-forest); color: var(--cream); }
+.steam-band--gold { background: var(--steam-gold); }
+.steam-panel--blue { background: var(--steam-blue); }
+.steam-panel--mint { background: var(--steam-mint); }
+.steam-panel--yellow { background: var(--steam-yellow); }
+.steam-panel--seafoam { background: var(--steam-seafoam); }
+.steam-panel--orange { background: var(--steam-orange); }
+.steam-question { color: #454743; padding-block: 22px 18px; }
+.steam-question h2 { font-size: inherit; letter-spacing: 0; }
+.steam-question > p { margin-top: 24px; }
+.steam-cycle { color: #454743; padding-block: 22px 30px; }
+.steam-cycle p { color: #151815; }
+.steam-thirds, .steam-halves { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.steam-halves { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.steam-panel { min-width: 0; padding: 30px 6%; }
+.steam-panel p { font-style: italic; }
+.steam-process .steam-panel { padding: 40px 18px 36px; }
+.steam-process__image { display: block; width: 90%; height: clamp(310px, 41vw, 570px); object-fit: contain; margin: 0 auto 24px; }
+.steam-process h3 { color: #454743; font-size: clamp(25px, 2.5vw, 34px); margin-bottom: 34px; }
+.steam-process p + p { margin-top: 26px; }
+.steam-statement { color: #454743; }
+.steam-statement > p { font-style: normal; font-size: clamp(18px, 1.8vw, 25px); font-weight: 600; }
+.steam-band--gold { color: #080a08; }
+.steam-band .steam-subheading { font-style: normal; font-weight: 700; }
+.steam-benefits-heading { padding-block: 38px; }
+.steam-benefits .steam-panel { padding: 12px 9% 20px; }
+.steam-benefits img { display: block; width: 110px; height: 90px; object-fit: contain; margin: 0 auto 16px; }
+.steam-benefits h3 { margin-bottom: 26px; }
+.steam-preparations-heading { padding-block: 10px 28px; }
+.steam-preparations-heading > p { margin-top: 2px; }
+.steam-preparations .steam-panel { padding: 30px 12%; }
+.steam-preparations h3 { line-height: 1.5; }
+.steam-modes-heading { padding-block: 30px 26px; }
+.steam-modes-heading > .steam-subheading { margin-top: 28px; }
+.steam-modes-heading > p + p { margin-top: 0; }
+.steam-modes .steam-panel { padding: 40px 5% 20px; }
+.steam-modes h3 { font-size: clamp(24px, 2.5vw, 34px); }
+.steam-mode__image { display: block; height: clamp(250px, 29vw, 395px); width: 80%; object-fit: contain; margin: 20px auto 8px; }
+.steam-page h4, .steam-emphasis { display: block; margin: 22px 0 2px; font-size: clamp(20px, 1.8vw, 25px); font-style: italic; line-height: 1.5; }
+.steam-page .steam-mode__image + h4 { margin-top: 0; }
+.steam-emphasis { margin-top: 0; }
+.steam-modes .steam-note { margin-top: 28px; text-align: left; font-size: max(13px, .8em); line-height: 1.5; }
+.steam-closing > p { margin: 0 auto; font-size: clamp(20px, 2.2vw, 30px); line-height: 1.5; font-style: normal; font-weight: 700; }
+@media (min-width: 1500px) { .steam-page { font-size: 20px; } .steam-panel p { max-width: 620px; margin-inline: auto; } }
+@media (max-width: 700px) {
+  .steam-hero > img { height: 300px; object-fit: cover; }
+  .steam-hero > div { inset: 48px 20px auto; }
+  .steam-hero h1 { font-size: 27px; }
+  .steam-hero p { max-width: 340px; margin: 8px auto 0; }
+  .steam-thirds, .steam-halves { grid-template-columns: minmax(0, 1fr); }
+  .steam-band { padding: 30px 22px; }
+  .steam-question h2 { font-size: 17px; }
+  .steam-process .steam-panel, .steam-benefits .steam-panel, .steam-preparations .steam-panel, .steam-modes .steam-panel { padding: 30px 24px; }
+  .steam-process__image { height: 350px; max-width: 260px; }
+  .steam-process h3 { margin-bottom: 24px; }
+  .steam-process p + p { margin-top: 22px; }
+  .steam-benefits h3 { margin-bottom: 16px; }
+  .steam-preparations h3 { margin-bottom: 10px; }
+  .steam-photo { min-height: 170px; object-fit: cover; }
+  .steam-mode__image { height: 300px; }
+}
