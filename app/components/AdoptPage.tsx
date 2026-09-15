@@ -31,7 +31,7 @@ export function AdoptPage({locale}: {locale: StorefrontLocale}) {
           <div className="adopt-kits">
             {[
               ['Aventurier', 'cuicui-aventurier'],
-              ['Pragmatique', 'cuicui-pragmatique'],
+              ['Pragmatique', 'explorateur-cuicui'],
               ['Gourmet', 'cuicui-gourmet'],
             ].map(([name, handle], index) => (
               <div key={name}>
