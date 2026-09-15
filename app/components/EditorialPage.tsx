@@ -1,12 +1,24 @@
 import {Link} from 'react-router';
 import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
+import {SteamPage} from './SteamPage';
+import {RecipePage} from './RecipePage';
+import {AdoptPage} from './AdoptPage';
 
 export function EditorialPage({content, locale, heroImage}: {
   content: EditorialPageContent;
   locale: StorefrontLocale;
   heroImage?: {url: string; altText?: string | null} | null;
 }) {
+  if (content.id === 'adopt') {
+    return <AdoptPage locale={locale} />;
+  }
+  if (content.id === 'creator') {
+    return <RecipePage locale={locale} heroImage={heroImage} />;
+  }
+  if (content.id === 'steam') {
+    return <SteamPage locale={locale} heroImage={heroImage} />;
+  }
   if (content.id === 'project') {
     return <ProjectPage content={content} locale={locale} heroImage={heroImage} />;
   }
