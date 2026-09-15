@@ -29,10 +29,17 @@ export function AdoptPage({locale}: {locale: StorefrontLocale}) {
             <img src="/images/rudimenterre/adopt-options.webp" alt="" loading="lazy" />
           </div>
           <div className="adopt-kits">
-            {['Aventurier', 'Pragmatique', 'Gourmet'].map((name, index) => (
+            {[
+              ['Aventurier', 'cuicui-aventurier'],
+              ['Pragmatique', 'cuicui-pragmatique'],
+              ['Gourmet', 'cuicui-gourmet'],
+            ].map(([name, handle], index) => (
               <div key={name}>
                 <h3>Kit<br />{name}</h3>
                 <p>{['550', '585', '698'][index]}{fr ? ' $' : ' CAD'}</p>
+                <Link className="adopt-kit__link" to={`/${locale}/products/${handle}`}>
+                  {fr ? 'Voir le produit' : 'View product'}
+                </Link>
               </div>
             ))}
           </div>

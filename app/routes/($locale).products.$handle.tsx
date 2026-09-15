@@ -5,18 +5,52 @@ import {
   Analytics,
   useOptimisticVariant,
   getAdjacentAndFirstAvailableVariants,
-  useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
+type ProductDetails = {
+  eyebrow?: string;
+  subtitle?: string;
+  galleryCaption?: string;
+  dimensions?: string;
+  description?: string;
+  characteristics?: string;
+  delivery?: string;
+};
+
+function readProductDetails(value?: string | null): ProductDetails {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function readDimensions(description: string) {
+  return description
+    .match(
+      /Dimensions\s*:\s*([\s\S]*?)(?:Tous les Cuicuis|All Cuicuis|$)/i,
+    )?.[1]
+    ?.trim()
+    .replace(/\s+/g, ' · ');
+}
+
 export const meta: Route.MetaFunction = ({data}) => {
   const locale = data?.locale ?? 'fr';
   return [
-    {title: `${data?.product.seo?.title || data?.product.title || 'Rudimenterre'} — Rudimenterre`},
-    {name: 'description', content: data?.product.seo?.description || data?.product.description || ''},
+    {
+      title: `${data?.product.seo?.title || data?.product.title || 'Rudimenterre'} — Rudimenterre`,
+    },
+    {
+      name: 'description',
+      content:
+        data?.product.seo?.description || data?.product.description || '',
+    },
     {
       rel: 'canonical',
       href: `/${locale}/products/${data?.product.handle}`,
@@ -84,59 +118,124 @@ export default function Product() {
     getAdjacentAndFirstAvailableVariants(product),
   );
 
-  // Sets the search param to the selected variant without navigation
-  // only when no search params are set in the url
-  useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
-
-  const {title, descriptionHtml} = product;
+  const {title, description, descriptionHtml, images} = product;
+  const details = readProductDetails(product.metafield?.value);
+  const galleryImages = (images?.nodes ?? []).filter(
+    (image) => image.url !== selectedVariant?.image?.url,
+  );
+  const dimensions = details.dimensions || readDimensions(description);
+  const summary =
+    details.subtitle || description.match(/^.*?[.!?]/)?.[0] || description;
 
   return (
     <div className="product product--redesign">
-      <div className="product-breadcrumb" aria-label="Fil d’Ariane">
-        <span>Rudimenterre</span>
-        <span aria-hidden="true">/</span>
-        <span>{locale === 'fr' ? 'La collection' : 'The collection'}</span>
-      </div>
       <div className="product-gallery">
-        <div className="product-gallery__meta">
-          <span>Objet du quotidien</span>
-          <span aria-hidden="true">01 / 01</span>
-        </div>
         <ProductImage image={selectedVariant?.image} />
-        <p className="product-gallery__caption">Pensé pour durer. Imaginé pour être transmis.</p>
+        {dimensions ? (
+          <div className="product-specs">
+            <p className="product-section-label">
+              {locale === 'fr' ? 'Dimensions' : 'Dimensions'}
+            </p>
+            <p>{dimensions}</p>
+          </div>
+        ) : null}
+        {galleryImages.length > 0 ? (
+          <div className="product-gallery__thumbs">
+            {galleryImages.slice(0, 3).map((image) => (
+              <img
+                key={image.id || image.url}
+                src={image.url}
+                alt={image.altText || title}
+                width={image.width || undefined}
+                height={image.height || undefined}
+                loading="lazy"
+              />
+            ))}
+          </div>
+        ) : null}
+        {details.galleryCaption ? (
+          <p className="product-gallery__caption">{details.galleryCaption}</p>
+        ) : null}
       </div>
       <div className="product-main">
         <div className="product-main__intro">
-        <p className="eyebrow">{locale === 'fr' ? 'Adoptez' : 'Adopt'}</p>
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
+          <p className="eyebrow">
+            {details.eyebrow ||
+              (locale === 'fr'
+                ? 'Vase de cuisson modulaire'
+                : 'Modular cooking vessel')}
+          </p>
+          <h1>{title}</h1>
+          <ProductPrice
+            price={selectedVariant?.price}
+            compareAtPrice={selectedVariant?.compareAtPrice}
+          />
+          <p className="product-subtitle">{summary}</p>
         </div>
         <div className="product-purchase">
-        <ProductForm
-          selectedVariant={selectedVariant}
-          locale={locale}
-        />
-          <p className="product-shipping">Livraison soignée · Paiement sécurisé · Fabriqué avec intention</p>
+          <ProductForm selectedVariant={selectedVariant} locale={locale} />
         </div>
-        <div className="product-description" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+        <div className="product-accordions">
+          <details>
+            <summary>
+              {locale === 'fr' ? 'Description' : 'Description'}{' '}
+              <span aria-hidden="true">+</span>
+            </summary>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: details.description || descriptionHtml,
+              }}
+            />
+          </details>
+          <details>
+            <summary>
+              {locale === 'fr' ? 'Caractéristiques' : 'Details'}{' '}
+              <span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              {details.characteristics ||
+                (locale === 'fr'
+                  ? 'Pièce en céramique fabriquée à la main sur commande.'
+                  : 'Handmade ceramic piece, made to order.')}
+            </p>
+          </details>
+          <details>
+            <summary>
+              {locale === 'fr' ? 'Livraison' : 'Shipping'}{' '}
+              <span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              {details.delivery ||
+                (locale === 'fr'
+                  ? 'Livraison soignée et paiement sécurisé.'
+                  : 'Careful delivery and secure payment.')}
+            </p>
+          </details>
+        </div>
       </div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: product.title,
-        description: product.description,
-        image: selectedVariant?.image?.url,
-        sku: selectedVariant?.sku,
-        offers: selectedVariant ? {
-          '@type': 'Offer',
-          price: selectedVariant.price.amount,
-          priceCurrency: selectedVariant.price.currencyCode,
-          availability: selectedVariant.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-        } : undefined,
-      })}} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.title,
+            description: product.description,
+            image: selectedVariant?.image?.url,
+            sku: selectedVariant?.sku,
+            offers: selectedVariant
+              ? {
+                  '@type': 'Offer',
+                  price: selectedVariant.price.amount,
+                  priceCurrency: selectedVariant.price.currencyCode,
+                  availability: selectedVariant.availableForSale
+                    ? 'https://schema.org/InStock'
+                    : 'https://schema.org/OutOfStock',
+                }
+              : undefined,
+          }),
+        }}
+      />
       <Analytics.ProductView
         data={{
           products: [
@@ -201,6 +300,18 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    images(first: 20) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
+    metafield(namespace: "custom", key: "product_details") {
+      value
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {

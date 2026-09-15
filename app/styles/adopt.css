@@ -26,6 +26,8 @@
 .adopt-kits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .adopt-kits h3, .adopt-kits p { margin: 0; font-size: clamp(16px, 1.65vw, 25px); line-height: 1.45; }
 .adopt-kits p { font-size: clamp(16px, 1.5vw, 23px); }
+.adopt-kit__link { display: inline-flex; min-height: 44px; align-items: center; margin-top: 14px; padding: 8px 14px; border: 1px solid var(--ink); border-radius: 999px; font-size: .75rem; font-weight: 600; line-height: 1.2; text-transform: uppercase; letter-spacing: .06em; }
+.adopt-kit__link:hover, .adopt-kit__link:focus-visible { background: var(--ink); color: var(--paper); }
 .adopt-vital-art { width: 40%; aspect-ratio: 250 / 400; margin: 70px auto 0; }
 .adopt-vital-art img { position: absolute; max-width: none; width: 550.4%; left: -372%; top: -246.25%; }
 @media (max-width: 700px) {
