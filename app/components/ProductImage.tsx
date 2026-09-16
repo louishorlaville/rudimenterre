@@ -1,6 +1,6 @@
 import type { ProductVariantFragment } from "storefrontapi.generated";
 import { Image } from "@shopify/hydrogen";
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 
 type ProductImageData = Omit<
@@ -24,6 +24,9 @@ export function ProductImage({
   const imageFrame = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const scrollTimeout = useRef<number>();
+  const zoomFrame = useRef<number>();
+  const zoomMedia = useRef<HTMLImageElement | null>(null);
+  const scrolling = useRef(false);
   const pointer = useRef({
     id: 0,
     startX: 0,
@@ -32,14 +35,110 @@ export function ProductImage({
     dragging: false,
   });
   const [frameWidth, setFrameWidth] = useState(0);
+  const [fullscreenSize, setFullscreenSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const activeImage = images[activeIndex] || images[0];
   const imageRatio =
     activeImage?.width && activeImage?.height
       ? activeImage.width / activeImage.height
       : 1;
   const frameHeight = frameWidth ? frameWidth / imageRatio : undefined;
+  const zoomSourceWidth = activeImage?.width || 6400;
+  const zoomSrcSetStep = Math.max(1, Math.floor(zoomSourceWidth / 16));
   const reducedMotion = () =>
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const resetZoom = (immediate = false) => {
+    if (zoomFrame.current !== undefined) {
+      window.cancelAnimationFrame(zoomFrame.current);
+      zoomFrame.current = undefined;
+    }
+    const media = zoomMedia.current;
+    if (!media) return;
+    if (immediate) media.style.transition = "none";
+    media.style.setProperty("--zoom-scale", "1");
+    media.classList.remove("is-zoomed");
+  };
+
+  const followZoom = (event: PointerEvent<HTMLDivElement>) => {
+    const carousel = track.current;
+    if (
+      event.pointerType !== "mouse" ||
+      event.buttons !== 0 ||
+      document.fullscreenElement !== imageFrame.current ||
+      pointer.current.id !== 0 ||
+      scrolling.current ||
+      !carousel
+    )
+      return;
+    const { clientX, clientY } = event;
+    if (zoomFrame.current !== undefined)
+      window.cancelAnimationFrame(zoomFrame.current);
+    zoomFrame.current = window.requestAnimationFrame(() => {
+      zoomFrame.current = undefined;
+      const slide = carousel.children[activeIndex] as HTMLElement | undefined;
+      const media = slide?.querySelector("img");
+      if (!slide || !media || !media.naturalWidth || !media.naturalHeight)
+        return;
+      // Measure the untransformed slide: object-fit can leave large empty margins.
+      const bounds = slide.getBoundingClientRect();
+      if (Math.abs(bounds.left - carousel.getBoundingClientRect().left) > 1)
+        return;
+      const ratio = media.naturalWidth / media.naturalHeight;
+      const width = Math.min(bounds.width, bounds.height * ratio);
+      const height = width / ratio;
+      const left = bounds.left + (bounds.width - width) / 2;
+      const top = bounds.top + (bounds.height - height) / 2;
+      if (
+        clientX < left ||
+        clientX > left + width ||
+        clientY < top ||
+        clientY > top + height
+      ) {
+        resetZoom();
+        return;
+      }
+      zoomMedia.current = media;
+      media.style.removeProperty("transition");
+      media.style.setProperty(
+        "--zoom-x",
+        `${((clientX - bounds.left) / bounds.width) * 100}%`,
+      );
+      media.style.setProperty(
+        "--zoom-y",
+        `${((clientY - bounds.top) / bounds.height) * 100}%`,
+      );
+      media.style.setProperty("--zoom-scale", "2");
+      media.classList.add("is-zoomed");
+    });
+  };
+
+  useEffect(() => {
+    const updateFullscreen = () => {
+      resetZoom(true);
+      setFullscreenSize(
+        imageFrame.current && document.fullscreenElement === imageFrame.current
+          ? { width: window.innerWidth, height: window.innerHeight }
+          : null,
+      );
+      // A fullscreen/viewport resize changes the snap offsets without changing the index.
+      const carousel = track.current;
+      if (carousel)
+        carousel.scrollTo({
+          left: activeIndex * carousel.clientWidth,
+          behavior: "instant",
+        });
+    };
+    document.addEventListener("fullscreenchange", updateFullscreen);
+    window.addEventListener("resize", updateFullscreen);
+    return () => {
+      document.removeEventListener("fullscreenchange", updateFullscreen);
+      window.removeEventListener("resize", updateFullscreen);
+      resetZoom(true);
+    };
+  }, [activeIndex]);
 
   useEffect(() => {
     const frame = imageFrame.current;
@@ -54,6 +153,7 @@ export function ProductImage({
   useEffect(() => {
     const carousel = track.current;
     if (!carousel) return;
+    resetZoom(true);
     carousel.scrollTo({
       left: activeIndex * carousel.clientWidth,
       behavior: reducedMotion() ? "auto" : "smooth",
@@ -72,6 +172,7 @@ export function ProductImage({
   }
 
   const settle = () => {
+    scrolling.current = false;
     const carousel = track.current;
     if (!carousel?.clientWidth) return;
     const nextIndex = Math.max(
@@ -89,6 +190,7 @@ export function ProductImage({
   };
 
   const goTo = (index: number) => {
+    resetZoom(true);
     const nextIndex = (index + images.length) % images.length;
     onActiveIndexChange(nextIndex);
   };
@@ -120,17 +222,23 @@ export function ProductImage({
         aspectRatio: `${imageRatio}`,
         height: frameHeight ? `${frameHeight}px` : undefined,
       }}
+      onPointerMove={(event) => {
+        if ((event.target as HTMLElement).closest("button")) resetZoom();
+      }}
     >
       <div
         className="product-image__track"
         ref={track}
         onScroll={() => {
+          scrolling.current = true;
+          resetZoom(true);
           if (scrollTimeout.current) window.clearTimeout(scrollTimeout.current);
           scrollTimeout.current = window.setTimeout(settle, 90);
         }}
         onPointerDown={(event) => {
           const carousel = track.current;
           if (!carousel || event.button !== 0) return;
+          resetZoom(true);
           pointer.current = {
             id: event.pointerId,
             startX: event.clientX,
@@ -141,8 +249,14 @@ export function ProductImage({
           carousel.setPointerCapture(event.pointerId);
         }}
         onPointerMove={(event) => {
+          followZoom(event);
           const carousel = track.current;
-          if (!carousel || pointer.current.id !== event.pointerId) return;
+          if (
+            !carousel ||
+            pointer.current.id === 0 ||
+            pointer.current.id !== event.pointerId
+          )
+            return;
           const deltaX = event.clientX - pointer.current.startX;
           const deltaY = event.clientY - pointer.current.startY;
           if (
@@ -157,6 +271,7 @@ export function ProductImage({
           event.preventDefault();
           carousel.scrollLeft = pointer.current.startScroll - deltaX;
         }}
+        onPointerLeave={() => resetZoom()}
         onPointerUp={(event) => {
           const carousel = track.current;
           if (!carousel || pointer.current.id !== event.pointerId) return;
@@ -191,7 +306,24 @@ export function ProductImage({
               data={image}
               loading={Math.abs(index - activeIndex) <= 1 ? "eager" : "lazy"}
               draggable={false}
-              sizes="(min-width: 45em) 50vw, 100vw"
+              srcSetOptions={
+                fullscreenSize && index === activeIndex
+                  ? {
+                      intervals: Math.min(16, zoomSourceWidth),
+                      startingWidth: Math.max(
+                        1,
+                        zoomSourceWidth - 15 * zoomSrcSetStep,
+                      ),
+                      incrementSize: zoomSrcSetStep,
+                      placeholderWidth: 100,
+                    }
+                  : undefined
+              }
+              sizes={
+                fullscreenSize && index === activeIndex
+                  ? `${Math.min(image.width || Infinity, 2 * Math.min(fullscreenSize.width, fullscreenSize.height * imageRatio))}px`
+                  : "(min-width: 45em) 50vw, 100vw"
+              }
             />
           </div>
         ))}

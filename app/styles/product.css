@@ -80,6 +80,15 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.product--desktop .product-gallery .product-image--interactive:fullscreen img {
+  transform: scale(var(--zoom-scale, 1));
+}
+.product--desktop .product-image--interactive:fullscreen img.is-zoomed {
+  cursor: zoom-in;
+  will-change: transform;
 }
 .product--desktop .product-image--interactive:fullscreen .product-image__track {
   width: 100%;
@@ -126,6 +135,9 @@
   font-size: 1.35rem;
 }
 @media (prefers-reduced-motion: reduce) {
+  .product--desktop .product-image--interactive:fullscreen img {
+    transition: none;
+  }
   .product--desktop .product-image--interactive {
     transition: none;
   }
@@ -234,6 +246,44 @@
 .product--desktop .product-accordions details > div,
 .product--desktop .product-accordions details > p {
   padding-inline: 0.85rem;
+}
+.product--desktop .product-accordions details[open] > div,
+.product--desktop .product-accordions details[open] > p {
+  animation: product-accordion-reveal 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes product-accordion-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@supports (interpolate-size: allow-keywords) and selector(details::details-content) {
+  .product--desktop .product-accordions details {
+    interpolate-size: allow-keywords;
+  }
+  .product--desktop .product-accordions details::details-content {
+    height: 0;
+    overflow: clip;
+    transition:
+      height 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+      content-visibility 0.26s allow-discrete;
+  }
+  .product--desktop .product-accordions details[open]::details-content {
+    height: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .product--desktop .product-accordions details[open] > div,
+  .product--desktop .product-accordions details[open] > p {
+    animation: none;
+  }
+  .product--desktop .product-accordions details::details-content {
+    transition: none;
+  }
 }
 .product--desktop .product-specs {
   position: relative;
