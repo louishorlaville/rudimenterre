@@ -95,9 +95,9 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
     {label: locale === 'fr' ? 'Service Chef' : 'Chef service', to: `/${locale}/pages/service-decouverte-pro`},
     {label: locale === 'fr' ? 'Édition limitée' : 'Limited edition', to: pagePath(locale, 'adopt')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
-    ...(viewport === 'mobile' ? [{label: copy.adopt, to: pagePath(locale, 'adopt')}] : []),
+    ...(viewport === 'mobile' ? [{label: copy.adopt, to: pagePath(locale, 'adopt'), cta: true}] : []),
   ];
-  return <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>{links.map((item) => <NavLink key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}</nav>;
+  return <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>{links.map((item) => <NavLink className={item.cta ? 'button button--orange header-cta' : undefined} key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}</nav>;
 }
 
 function CartToggle({cart, label, locale}: {cart: HeaderProps['cart']; label: string; locale: string}) {
