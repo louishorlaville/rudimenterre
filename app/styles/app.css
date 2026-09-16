@@ -146,9 +146,13 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
 .header-menu a::after, .header-actions a::after { content: ''; position: absolute; inset: auto 0 -.35rem; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .25s; }
 .header-menu a:hover::after, .header-menu a[aria-current='page']::after, .header-actions a:hover::after { transform: scaleX(1); transform-origin: left; }
 .header-actions { justify-self: end; display: flex; align-items: center; gap: clamp(.7rem, 1.2vw, 1.2rem); font-size: .75rem; text-transform: none; letter-spacing: 0; }
-.header-actions .header-cta { min-height: 2.55rem; padding: .65rem 1.45rem; border: 2px solid var(--ink); background: #f47b00; color: var(--white); font-weight: 400; letter-spacing: 0; text-transform: none; text-decoration: none; }
+.header-actions .header-cta { min-height: 3rem; padding: .8rem 1.75rem; border: 2px solid var(--ink); background: #f47b00; color: var(--white); font-size: .82rem; font-weight: 400; letter-spacing: 0; text-transform: none; text-decoration: none; }
 .header-actions .header-cta::after { display: none; }
-.header-actions a span { display: inline-grid; place-items: center; min-width: 1.3rem; height: 1.3rem; margin-left: .2rem; border: 1px solid currentColor; border-radius: 50%; font-size: .62rem; }
+.header-actions .header-cart { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; min-height: 2.75rem; color: rgba(255,255,255,.72) !important; }
+.header-actions .header-cart::after { display: none; }
+.header-cart__icon { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; transition: transform .2s ease, color .2s ease; }
+.header-cart > span { position: absolute; top: .22rem; right: -.05rem; display: inline-grid; place-items: center; min-width: 1rem; height: 1rem; padding: 0 .18rem; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: var(--ink); color: var(--white); font-size: .55rem; line-height: 1; }
+.header-cart:hover .header-cart__icon, .header-cart:focus-visible .header-cart__icon { color: var(--white); transform: translateY(-1px); }
 .menu-toggle { display: none; width: 2.5rem; height: 2.5rem; padding: .7rem .45rem; border: 0; background: none; }
 .menu-toggle span { display: block; height: 1px; background: currentColor; margin: .35rem 0; }
 .header-menu--mobile { flex-direction: column; align-items: flex-start; gap: 1rem; font-family: var(--font-display); font-size: clamp(2rem, 10vw, 4rem); }
@@ -3277,14 +3281,18 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home-kitchen-follow__gallery { height: auto; }
   .home-kitchen-follow h2 { padding-inline: var(--page-gutter); line-height: 1.4; }
   .home-kitchen-follow__cta { max-width: calc(100% - 2 * var(--page-gutter)) !important; }
-  .home-kitchen-compare__heading--with { grid-row: 1; margin-top: 0; }
-  .home-kitchen-compare__art-side--with { grid-row: 2; aspect-ratio: 1.5; }
-  .home-kitchen-compare__heading--without { grid-row: 4; margin-top: 2rem; }
-  .home-kitchen-compare__art-side--without { grid-row: 5; transform: none; }
-  .home .home-kitchen-compare__uses { position: static; inset: auto; align-self: auto; justify-self: stretch; width: 100%; height: auto; padding: 1rem; margin: 0; transform: none; background: var(--cream); color: var(--ink); display: grid; gap: .65rem; text-align: left; }
-  .home .home-kitchen-compare__uses--with { grid-row: 3; }
-  .home .home-kitchen-compare__uses--without { grid-row: 6; }
-  .home .home-kitchen-compare__uses li:nth-child(n) { position: static; inset: auto; width: auto; padding: 0; color: inherit; font-size: .9375rem; line-height: 1.45; text-shadow: none; border: 0; }
+  .home-kitchen-compare__divider { min-height: 8rem; padding-block: 2.25rem; }
+  .home-kitchen-compare__divider h2 { max-width: 18rem; font-size: 1.15rem; line-height: 1.25; }
+  .home-kitchen-compare__heading--without { grid-row: 1; margin-top: 0; }
+  .home-kitchen-compare__art-side--without { grid-row: 2; transform: none; }
+  .home-kitchen-compare__heading--with { grid-row: 4; margin-top: 2rem; }
+  .home-kitchen-compare__art-side--with { grid-row: 5; aspect-ratio: 1.5; }
+  .home .home-kitchen-compare__uses { position: static; inset: auto; align-self: auto; justify-self: stretch; width: 100%; height: auto; padding: 0 var(--page-gutter); margin: 0; transform: none; background: transparent; color: var(--ink); display: grid; gap: .45rem; text-align: left; }
+  .home .home-kitchen-compare__uses--without { grid-row: 3; }
+  .home .home-kitchen-compare__uses--with { grid-row: 6; }
+  .home .home-kitchen-compare__uses li:nth-child(n) { position: static; inset: auto; width: auto; padding: 0 0 .4rem; color: inherit; font-size: .9375rem; line-height: 1.45; text-shadow: none; border: 0; border-bottom: 1px solid rgba(23, 23, 23, .3); }
+  .home .home-kitchen-compare__uses li:last-child { padding-bottom: 0; border-bottom: 0; }
+  .home .home-kitchen-compare__uses li::before { display: none; }
   .home .home-kitchen-compare__uses li::after { display: none; }
   .home-discover__card { grid-template-columns: 3.5rem minmax(0, 1fr) 1.5rem; grid-template-rows: auto; align-items: center; min-height: 8.5rem; gap: 1rem; padding: 1.25rem; }
   .home-discover__illustration { height: 4rem; padding: 0; }
@@ -3293,6 +3301,32 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home-discover__arrow { width: 1.5rem; align-self: center; }
   .home-reviews__card { min-height: 0; padding: 1.5rem; }
   .home-reviews__card p { font-size: 1rem; line-height: 1.6; }
+
+  /* Turn the desktop shelf collage into a vertical, two-shelf library on mobile. */
+  .home-library__scene { height: min(160vw, 50rem); min-height: 34rem; }
+  .home-library__canvas {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    margin: 0;
+    transform: none;
+  }
+  .home-library__layer:not(.home-library__stool) {
+    width: 100%;
+    height: 50%;
+    object-fit: fill;
+    transform: scaleX(2.05);
+    transform-origin: left top;
+  }
+  .home-library__layer[src*="home-library-left"] { top: 0; left: -7%; height: 80%; }
+  .home-library__layer[src*="home-library-right"] { top: 50%; left: -97%; }
+  .home-library__stool { display: none; }
+  /* Anchor each book's bottom edge to the shelf board, as in the desktop collage. */
+  .home-library__book--recipes { top: auto; right: auto; bottom: 66.7%; left: 52%; width: 30%; }
+  .home-library__book--distillation { top: auto; right: auto; bottom: 29.3%; left: 6%; width: 62%; }
+  .home-library__book--thermal { top: auto; right: auto; bottom: 29.3%; left: 18%; width: 62.5%; }
 }
 
 @media (max-width: 560px) {

@@ -75,8 +75,8 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
       <nav className="header-actions" aria-label={locale === 'fr' ? 'Outils' : 'Utilities'}>
         <Link className="locale-switch" to={localizedPath(pathname, locale === 'fr' ? 'en' : 'fr')} hrefLang={locale === 'fr' ? 'en-CA' : 'fr-CA'}>{locale === 'fr' ? 'EN' : 'FR'}</Link>
         <NavLink prefetch="intent" to={`/${locale}/account`}><Suspense fallback={copy.signIn}><Await resolve={isLoggedIn} errorElement={copy.signIn}>{(loggedIn) => loggedIn ? copy.account : copy.signIn}</Await></Suspense></NavLink>
-        <CartToggle cart={cart} label={copy.cart} locale={locale} />
         <Link className="button button--orange header-cta" prefetch="intent" to={pagePath(locale, 'adopt')}>{copy.adopt}</Link>
+        <CartToggle cart={cart} label={copy.cart} locale={locale} />
         <button className="menu-toggle" onClick={() => open('mobile')} aria-label={copy.menu}><span /><span /></button>
       </nav>
     </header>
@@ -89,7 +89,6 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
   const copy = UI_COPY[locale];
   const {close} = useAside();
   const links = [
-    {label: copy.home, to: `/${locale}`},
     {label: copy.project, to: pagePath(locale, 'project')},
     {label: copy.explore, to: pagePath(locale, 'steam')},
     {label: locale === 'fr' ? 'Les ateliers' : 'Workshops', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`},
@@ -102,7 +101,7 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
 }
 
 function CartToggle({cart, label, locale}: {cart: HeaderProps['cart']; label: string; locale: string}) {
-  return <Suspense fallback={<Link to={`/${locale}/cart`}>{label} <span>0</span></Link>}><Await resolve={cart}><CartCount label={label} locale={locale} /></Await></Suspense>;
+  return <Suspense fallback={<Link className="header-cart" aria-label={label} to={`/${locale}/cart`}><CartIcon /><span aria-hidden="true">0</span></Link>}><Await resolve={cart}><CartCount label={label} locale={locale} /></Await></Suspense>;
 }
 
 function CartCount({label, locale}: {label: string; locale: string}) {
@@ -110,5 +109,15 @@ function CartCount({label, locale}: {label: string; locale: string}) {
   const cart = useOptimisticCart(originalCart);
   const {open} = useAside();
   const count = cart?.totalQuantity ?? 0;
-  return <a href={`/${locale}/cart`} onClick={(event) => {event.preventDefault(); open('cart');}}>{label} <span aria-label={`${count} items`}>{count}</span></a>;
+  return <a className="header-cart" aria-label={`${label} (${count})`} href={`/${locale}/cart`} onClick={(event) => {event.preventDefault(); open('cart');}}><CartIcon /><span aria-hidden="true">{count}</span></a>;
+}
+
+function CartIcon() {
+  return (
+    <svg className="header-cart__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 5h2l1.6 9.2a2 2 0 0 0 2 1.7h6.8a2 2 0 0 0 1.9-1.4L20 8H7" />
+      <circle cx="10" cy="19" r="1" />
+      <circle cx="17" cy="19" r="1" />
+    </svg>
+  );
 }
