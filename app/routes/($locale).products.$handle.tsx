@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Route } from "./+types/($locale).products.$handle";
 import {
   getSelectedProductOptions,
@@ -142,39 +142,33 @@ export default function Product() {
     product;
   const details = readProductDetails(product.metafield?.value);
   const heroImage = selectedVariant?.image || images?.nodes[0];
-  const [activeImage, setActiveImage] = useState(heroImage);
-  const [previousImage, setPreviousImage] = useState<typeof heroImage>();
-  const [animationDirection, setAnimationDirection] = useState<
-    "next" | "previous"
-  >("next");
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const thumbnailBarRef = useRef<HTMLDivElement>(null);
+  const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const galleryImages = (images?.nodes ?? []).filter(
     (image) => image.url !== heroImage?.url,
   );
   const allGalleryImages = [heroImage, ...galleryImages].filter(
     (image): image is NonNullable<typeof heroImage> => Boolean(image),
   );
-  const activeImageIndex = allGalleryImages.findIndex(
-    (image) => image?.url === activeImage?.url,
-  );
-  const switchToImage = (
-    image: typeof heroImage,
-    direction?: "next" | "previous",
-  ) => {
-    if (!image || image.url === activeImage?.url || previousImage) return;
-    const nextIndex = allGalleryImages.findIndex(
-      (galleryImage) => galleryImage.url === image.url,
-    );
-    setPreviousImage(activeImage);
-    setAnimationDirection(
-      direction ?? (nextIndex > activeImageIndex ? "next" : "previous"),
-    );
-    setActiveImage(image);
-  };
+  const activeImage = allGalleryImages[activeImageIndex] || heroImage;
+
   useEffect(() => {
-    if (!previousImage) return;
-    const timeout = window.setTimeout(() => setPreviousImage(undefined), 450);
-    return () => window.clearTimeout(timeout);
-  }, [activeImage, previousImage]);
+    setActiveImageIndex(0);
+  }, [heroImage?.url]);
+
+  useEffect(() => {
+    const bar = thumbnailBarRef.current;
+    const thumbnail = thumbnailRefs.current[activeImageIndex];
+    if (!bar || !thumbnail) return;
+    bar.scrollTo({
+      left:
+        thumbnail.offsetLeft - (bar.clientWidth - thumbnail.clientWidth) / 2,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  }, [activeImageIndex]);
   const dimensions = details.dimensions || readDimensions(description);
   const summary =
     details.subtitle || description.match(/^.*?[.!?]/)?.[0] || description;
@@ -183,21 +177,10 @@ export default function Product() {
     <div className="product product--redesign product--desktop">
       <div className="product-gallery">
         <ProductImage
-          image={activeImage}
-          previousImage={previousImage}
-          preloadImages={allGalleryImages}
-          hasMultipleImages={allGalleryImages.length > 1}
-          animationDirection={animationDirection}
-          onPrevious={() => {
-            const nextIndex =
-              (activeImageIndex - 1 + allGalleryImages.length) %
-              allGalleryImages.length;
-            switchToImage(allGalleryImages[nextIndex], "previous");
-          }}
-          onNext={() => {
-            const nextIndex = (activeImageIndex + 1) % allGalleryImages.length;
-            switchToImage(allGalleryImages[nextIndex], "next");
-          }}
+          images={allGalleryImages}
+          activeIndex={activeImageIndex}
+          onActiveIndexChange={setActiveImageIndex}
+          locale={locale}
         />
         {dimensions ? (
           <div className="product-specs">
@@ -319,17 +302,22 @@ export default function Product() {
           </details>
         </div>
       </div>
-      {galleryImages.length > 0 ? (
-        <div className="product-gallery__thumbs">
-          {galleryImages.map((image) => (
+      {allGalleryImages.length > 1 ? (
+        <div className="product-gallery__thumbs" ref={thumbnailBarRef}>
+          {allGalleryImages.map((image, index) => (
             <button
               key={image.id || image.url}
               className={`product-gallery__thumb${activeImage?.url === image.url ? " is-active" : ""}`}
               type="button"
-              onClick={() => {
-                switchToImage(image);
+              ref={(element) => {
+                thumbnailRefs.current[index] = element;
               }}
-              aria-label={`Afficher ${image.altText || title}`}
+              onClick={() => setActiveImageIndex(index)}
+              aria-label={
+                locale === "fr"
+                  ? `Afficher ${image.altText || title}`
+                  : `Show ${image.altText || title}`
+              }
               aria-pressed={activeImage?.url === image.url}
             >
               <img
