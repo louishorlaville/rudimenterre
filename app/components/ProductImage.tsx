@@ -341,7 +341,13 @@ export function ProductImage({
                 : "Show previous photo"
             }
           >
-            ‹
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="m15 5-7 7 7 7" />
+            </svg>
           </button>
           <button
             className="product-image__arrow product-image__arrow--next"
@@ -352,7 +358,13 @@ export function ProductImage({
               locale === "fr" ? "Afficher la photo suivante" : "Show next photo"
             }
           >
-            ›
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="m9 5 7 7-7 7" />
+            </svg>
           </button>
         </>
       ) : null}
@@ -371,7 +383,13 @@ export function ProductImage({
             : "Show image fullscreen"
         }
       >
-        ⛶
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+        </svg>
       </button>
     </div>
   );
