@@ -1,6 +1,5 @@
 import type {StorefrontLocale} from '~/lib/i18n';
 import {recipeStoryFr} from '~/lib/recipe-story';
-import '~/styles/recipe.css';
 
 const recipeStoryEn = [
   'For my family, then for you, I learned to cook all over again.',

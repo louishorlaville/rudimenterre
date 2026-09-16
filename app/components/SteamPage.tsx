@@ -1,5 +1,4 @@
 import type {StorefrontLocale} from '~/lib/i18n';
-import '~/styles/steam.css';
 
 const asset = (name: string) => `/images/rudimenterre/steam-${name}.webp`;
 

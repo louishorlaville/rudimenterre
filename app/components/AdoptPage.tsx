@@ -1,6 +1,5 @@
 import {Link} from 'react-router';
 import type {StorefrontLocale} from '~/lib/i18n';
-import '~/styles/adopt.css';
 
 export function AdoptPage({locale}: {locale: StorefrontLocale}) {
   const fr = locale === 'fr';
