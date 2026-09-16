@@ -18,8 +18,137 @@
   object-fit: contain;
   transition: none;
 }
+.product-image__track {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+.product-image__preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+.product-image__track .product-image__media {
+  flex: 0 0 100%;
+  width: 100%;
+}
+.product-image__track--next,
+.product-image__track--previous {
+  width: 200%;
+  will-change: transform;
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+.product-image__track--next .product-image__media,
+.product-image__track--previous .product-image__media {
+  flex-basis: 50%;
+  width: 50%;
+}
+.product-image__track--next {
+  animation-name: product-image-swipe-next;
+}
+.product-image__track--previous {
+  animation-name: product-image-swipe-previous;
+}
+@keyframes product-image-swipe-next {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes product-image-swipe-previous {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
 .product--desktop .product-gallery:hover .product-image img {
   transform: none;
+}
+.product--desktop .product-image--interactive {
+  position: relative;
+  overflow: hidden;
+}
+.product--desktop .product-image--interactive:fullscreen {
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 3rem;
+  background: var(--paper);
+}
+.product--desktop .product-image--interactive:fullscreen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.product--desktop .product-image--interactive:fullscreen .product-image__track {
+  width: 100%;
+}
+.product--desktop .product-image--interactive:fullscreen .product-image__media {
+  flex-basis: 100%;
+  width: 100%;
+}
+.product-image__arrow,
+.product-image__fullscreen {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(23, 23, 23, 0.65);
+  border-radius: 50%;
+  background: rgba(246, 239, 216, 0.9);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.product-image__arrow:hover,
+.product-image__fullscreen:hover,
+.product-image__arrow:focus-visible,
+.product-image__fullscreen:focus-visible {
+  background: var(--ink);
+  color: var(--cream);
+}
+.product-image__arrow {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  line-height: 1;
+}
+.product-image__arrow--previous {
+  left: 1rem;
+}
+.product-image__arrow--next {
+  right: 1rem;
+}
+.product-image__fullscreen {
+  right: 1rem;
+  bottom: 1rem;
+  font-size: 1.35rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-image__track--next,
+  .product-image__track--previous {
+    animation: none;
+  }
+  .product-image__track--next {
+    transform: translateX(-50%);
+  }
+  .product-image__track--previous {
+    transform: translateX(0);
+  }
 }
 .product--desktop .product-main {
   position: static;
@@ -154,8 +283,28 @@
 }
 .product--desktop .product-gallery__thumbs {
   grid-column: 1 / -1;
+  display: flex;
+  overflow-x: auto;
   gap: clamp(0.5rem, 1.3vw, 1.25rem);
   margin: 0;
+  padding-bottom: 0.35rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--clay) #e9dfc6;
+}
+.product--desktop .product-gallery__thumbs::-webkit-scrollbar {
+  height: 0.45rem;
+}
+.product--desktop .product-gallery__thumbs::-webkit-scrollbar-track {
+  background: #e9dfc6;
+}
+.product--desktop .product-gallery__thumbs::-webkit-scrollbar-thumb {
+  border: 1px solid #e9dfc6;
+  border-radius: 999px;
+  background: var(--clay);
+}
+.product--desktop .product-gallery__thumbs::-webkit-scrollbar-thumb:hover {
+  background: var(--orange-deep);
 }
 .product--desktop .product-gallery__thumbs img {
   width: 100%;
@@ -164,11 +313,13 @@
   object-fit: cover;
 }
 .product--desktop .product-gallery__thumb {
+  flex: 0 0 calc((100% - 2 * clamp(0.5rem, 1.3vw, 1.25rem)) / 3);
   min-width: 0;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
+  scroll-snap-align: start;
 }
 .product--desktop .product-gallery__thumb img {
   opacity: 0.7;
@@ -245,5 +396,8 @@
   }
   .product--desktop .product-gallery__thumbs img {
     aspect-ratio: 1;
+  }
+  .product--desktop .product-gallery__thumb {
+    flex-basis: 78%;
   }
 }

@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Route } from "./+types/($locale).products.$handle";
 import {
   getSelectedProductOptions,
@@ -11,7 +11,11 @@ import { ProductPrice } from "~/components/ProductPrice";
 import { ProductImage } from "~/components/ProductImage";
 import { ProductForm } from "~/components/ProductForm";
 import { redirectIfHandleIsLocalized } from "~/lib/redirect";
-import "~/styles/product.css";
+import productStyles from "~/styles/product.css?url";
+
+export function links() {
+  return [{ rel: "stylesheet", href: productStyles }];
+}
 
 type ProductDetails = {
   eyebrow?: string;
@@ -139,9 +143,38 @@ export default function Product() {
   const details = readProductDetails(product.metafield?.value);
   const heroImage = selectedVariant?.image || images?.nodes[0];
   const [activeImage, setActiveImage] = useState(heroImage);
+  const [previousImage, setPreviousImage] = useState<typeof heroImage>();
+  const [animationDirection, setAnimationDirection] = useState<
+    "next" | "previous"
+  >("next");
   const galleryImages = (images?.nodes ?? []).filter(
     (image) => image.url !== heroImage?.url,
   );
+  const allGalleryImages = [heroImage, ...galleryImages].filter(
+    (image): image is NonNullable<typeof heroImage> => Boolean(image),
+  );
+  const activeImageIndex = allGalleryImages.findIndex(
+    (image) => image?.url === activeImage?.url,
+  );
+  const switchToImage = (
+    image: typeof heroImage,
+    direction?: "next" | "previous",
+  ) => {
+    if (!image || image.url === activeImage?.url || previousImage) return;
+    const nextIndex = allGalleryImages.findIndex(
+      (galleryImage) => galleryImage.url === image.url,
+    );
+    setPreviousImage(activeImage);
+    setAnimationDirection(
+      direction ?? (nextIndex > activeImageIndex ? "next" : "previous"),
+    );
+    setActiveImage(image);
+  };
+  useEffect(() => {
+    if (!previousImage) return;
+    const timeout = window.setTimeout(() => setPreviousImage(undefined), 450);
+    return () => window.clearTimeout(timeout);
+  }, [activeImage, previousImage]);
   const dimensions = details.dimensions || readDimensions(description);
   const summary =
     details.subtitle || description.match(/^.*?[.!?]/)?.[0] || description;
@@ -149,7 +182,23 @@ export default function Product() {
   return (
     <div className="product product--redesign product--desktop">
       <div className="product-gallery">
-        <ProductImage image={activeImage} />
+        <ProductImage
+          image={activeImage}
+          previousImage={previousImage}
+          preloadImages={allGalleryImages}
+          hasMultipleImages={allGalleryImages.length > 1}
+          animationDirection={animationDirection}
+          onPrevious={() => {
+            const nextIndex =
+              (activeImageIndex - 1 + allGalleryImages.length) %
+              allGalleryImages.length;
+            switchToImage(allGalleryImages[nextIndex], "previous");
+          }}
+          onNext={() => {
+            const nextIndex = (activeImageIndex + 1) % allGalleryImages.length;
+            switchToImage(allGalleryImages[nextIndex], "next");
+          }}
+        />
         {dimensions ? (
           <div className="product-specs">
             <div>
@@ -171,7 +220,7 @@ export default function Product() {
                   dimensionsImage.reference.image.altText ||
                   "Dessin technique du Cuicui"
                 }
-                loading="lazy"
+                loading="eager"
               />
             ) : (
               <svg
@@ -272,12 +321,14 @@ export default function Product() {
       </div>
       {galleryImages.length > 0 ? (
         <div className="product-gallery__thumbs">
-          {galleryImages.slice(0, 3).map((image) => (
+          {galleryImages.map((image) => (
             <button
               key={image.id || image.url}
               className={`product-gallery__thumb${activeImage?.url === image.url ? " is-active" : ""}`}
               type="button"
-              onClick={() => setActiveImage(image)}
+              onClick={() => {
+                switchToImage(image);
+              }}
               aria-label={`Afficher ${image.altText || title}`}
               aria-pressed={activeImage?.url === image.url}
             >
