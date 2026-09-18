@@ -663,10 +663,10 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .home-photo-banner img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 .home-section-divider--practice { padding-top: clamp(2.5rem, 4vw, 4rem); padding-bottom: clamp(4rem, 7vw, 7rem); }
 .home-section-divider--practice span { max-width: 50rem; font-size: clamp(.9rem, 1.5vw, 1.35rem); }
-.home-icon-strip--food { z-index: 4; min-height: clamp(10rem, 12vw, 11.5rem); border-top: 0; }
-.home-icon-strip--food article { min-height: clamp(10rem, 12vw, 11.5rem); gap: .3rem; padding-block: 1rem; justify-content: center; }
-.home-icon-strip--food article > img { height: 3.75rem; }
-.home-icon-strip--food article > div { display: grid; gap: .05rem; justify-items: center; align-content: start; min-height: 6rem; }
+.home-icon-strip--food { z-index: 4; min-height: clamp(9rem, 10vw, 10rem); border-top: 0; }
+.home-icon-strip--food article { min-height: clamp(9rem, 10vw, 10rem); gap: .2rem; padding-block: .6rem; justify-content: center; }
+.home-icon-strip--food article > img { height: 3.25rem; }
+.home-icon-strip--food article > div { display: grid; gap: .05rem; justify-items: center; align-content: start; min-height: 5.2rem; }
 .home-icon-strip--food h3 { min-height: 2.25em; display: grid; align-content: end; margin: 0; font-size: clamp(.95rem, 1.35vw, 1.25rem); line-height: 1.05; }
 .home-icon-strip--food p { max-width: 14ch; margin: 0; white-space: pre-line; color: #555; font-size: clamp(.8rem, 1.05vw, 1rem); font-weight: 400; line-height: 1.4; }
 .practice-grid { position: relative; z-index: 4; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--cream); }
@@ -3258,8 +3258,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home :is(h2, h3) { text-wrap: balance; }
   .home-icon-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: var(--page-gutter); }
   .home-icon-strip article { min-width: 0; }
-  .home-icon-strip--benefits article > div,
-  .home-icon-strip--food article > div { min-height: 0; }
+  .home-icon-strip--benefits article > div { min-height: 0; }
   .home-icon-strip--food h3 { font-size: 1rem; }
   .home-icon-strip--food p { font-size: .875rem; }
   .benefit-scroll__viewport { margin-inline: 0; scrollbar-width: thin; scrollbar-color: var(--home-sage) var(--cream); }
