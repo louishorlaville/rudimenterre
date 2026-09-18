@@ -52,23 +52,50 @@ export default function Homepage() {
   const benefitTrackRef = useRef<HTMLDivElement>(null);
   const practiceBenefitStackRef = useRef<HTMLDivElement>(null);
   const [benefitIndex, setBenefitIndex] = useState(0);
+  const [isMobileBenefitScroll, setIsMobileBenefitScroll] = useState(false);
 
   const scrollBenefit = (direction: number) => {
     const viewport = benefitScrollRef.current?.querySelector<HTMLElement>('.benefit-scroll__viewport');
     if (!viewport) return;
-    viewport.scrollBy({left: direction * viewport.clientWidth, behavior: 'smooth'});
+    const index = Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth));
+    viewport.scrollTo({left: (index + direction) * viewport.clientWidth, behavior: 'smooth'});
   };
 
   useEffect(() => {
     const viewport = benefitScrollRef.current?.querySelector<HTMLElement>('.benefit-scroll__viewport');
     if (!viewport) return;
-    const update = () => setBenefitIndex(Math.min(2, Math.max(0, Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth)))));
+    const mobileLayout = window.matchMedia('(max-width: 760px)');
+    const motion = window.matchMedia('(prefers-reduced-motion: no-preference)');
+    const slides = Array.from(viewport.querySelectorAll<HTMLElement>('.benefit-scene')).flatMap((scene) => [
+      scene.querySelector<HTMLElement>('.benefit-panel')!,
+      scene.querySelector<HTMLElement>('.benefit-media')!,
+    ]);
+    const update = () => {
+      const maxIndex = mobileLayout.matches ? 5 : 2;
+      const index = Math.min(maxIndex, Math.max(0, Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth))));
+      setBenefitIndex(index);
+      if (mobileLayout.matches && motion.matches) {
+        viewport.style.setProperty('--benefit-active-height', `${Math.ceil(slides[index].getBoundingClientRect().height) + 4}px`);
+      } else {
+        viewport.style.removeProperty('--benefit-active-height');
+      }
+    };
+    const updateLayout = () => {
+      setIsMobileBenefitScroll(mobileLayout.matches);
+      update();
+    };
     const observer = new ResizeObserver(update);
     observer.observe(viewport);
+    slides.forEach((slide) => observer.observe(slide));
     viewport.addEventListener('scroll', update, {passive: true});
+    updateLayout();
+    mobileLayout.addEventListener('change', updateLayout);
+    motion.addEventListener('change', updateLayout);
     return () => {
       observer.disconnect();
       viewport.removeEventListener('scroll', update);
+      mobileLayout.removeEventListener('change', updateLayout);
+      motion.removeEventListener('change', updateLayout);
     };
   }, []);
 
@@ -373,8 +400,8 @@ export default function Homepage() {
         <div className="benefit-scroll__controls" aria-label={fr ? 'Navigation des bénéfices' : 'Benefit navigation'}>
           <span>{fr ? 'Faites défiler' : 'Swipe to explore'}</span>
           <button type="button" onClick={() => scrollBenefit(-1)} disabled={benefitIndex === 0} aria-controls="home-benefit-viewport" aria-label={fr ? 'Bénéfice précédent' : 'Previous benefit'}>←</button>
-          <output aria-live="polite">{benefitIndex + 1} / 3</output>
-          <button type="button" onClick={() => scrollBenefit(1)} disabled={benefitIndex === 2} aria-controls="home-benefit-viewport" aria-label={fr ? 'Bénéfice suivant' : 'Next benefit'}>→</button>
+          <output aria-live="polite">{benefitIndex + 1} / {isMobileBenefitScroll ? 6 : 3}</output>
+          <button type="button" onClick={() => scrollBenefit(1)} disabled={benefitIndex === (isMobileBenefitScroll ? 5 : 2)} aria-controls="home-benefit-viewport" aria-label={fr ? 'Bénéfice suivant' : 'Next benefit'}>→</button>
         </div>
         <div className="benefit-scroll__viewport" id="home-benefit-viewport" tabIndex={0} role="region" aria-label={fr ? 'Les trois bénéfices du Cuicui' : 'The three benefits of Cuicui'}>
         <div className="benefit-grid" ref={benefitTrackRef}>

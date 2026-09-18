@@ -3136,8 +3136,14 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
 
   .benefit-media--bifurcations > img {
+    grid-row: 2;
+    position: static;
+    height: auto;
     object-position: 72% 50%;
   }
+
+  .benefit-media--bifurcations > .bifurcation-card--one { grid-row: 1; }
+  .benefit-media--bifurcations > .bifurcation-card--two { grid-row: 3; }
 
   .home .bifurcation-card {
     position: relative;
@@ -3259,8 +3265,21 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .benefit-scroll__viewport { margin-inline: 0; scrollbar-width: thin; scrollbar-color: var(--home-sage) var(--cream); }
   .benefit-scroll__viewport::-webkit-scrollbar { display: block; height: 4px; }
   .benefit-scroll__viewport::-webkit-scrollbar-thumb { background: var(--home-sage); border-radius: 4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .benefit-scroll__viewport { height: var(--benefit-active-height, auto); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding-inline: 0; overscroll-behavior-x: contain; transition: height .4s cubic-bezier(.22, 1, .36, 1); }
+    .benefit-grid { display: grid; grid-template-columns: repeat(6, 100%); width: 100%; align-items: start; }
+    .benefit-scene { display: contents; }
+    .benefit-scene > article { grid-row: 1; order: 0; width: auto; min-height: 0 !important; height: auto; align-self: start; scroll-snap-align: start; scroll-snap-stop: always; }
+    .benefit-scene:nth-child(1) > .benefit-panel { grid-column: 1; }
+    .benefit-scene:nth-child(1) > .benefit-media { grid-column: 2; }
+    .benefit-scene:nth-child(2) > .benefit-panel { grid-column: 3; }
+    .benefit-scene:nth-child(2) > .benefit-media { grid-column: 4; }
+    .benefit-scene:nth-child(3) > .benefit-panel { grid-column: 5; }
+    .benefit-scene:nth-child(3) > .benefit-media { grid-column: 6; }
+    .benefit-media > img { position: static; display: block; height: auto; }
+  }
   .benefit-scene { grid-template-rows: auto 1fr; align-content: start; }
-  .benefit-scene > .benefit-media { align-self: end; }
+  .benefit-scene > .benefit-media { align-self: start; }
   .home .benefit-panel { padding-inline: var(--page-gutter); }
   .home :is(.benefit-panel, .practice-panel) h2 { max-width: 17ch; font-size: clamp(1.8rem, 7.6vw, 2.5rem); line-height: 1.06; }
   .benefit-lead, .benefit-statements p, .practice-point { grid-template-columns: 1.75rem minmax(0, 1fr); gap: .6rem; }
