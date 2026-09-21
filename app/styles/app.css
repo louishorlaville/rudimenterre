@@ -874,6 +874,9 @@ html:has(.overlay.expanded) { overflow: hidden; }
   background: #6f7d70;
   color: var(--cream);
 }
+.home-kitchen-compare__track,
+.home-kitchen-compare__slide { display: contents; }
+.home-kitchen-compare__controls { display: none; }
 .home-kitchen-compare__heading {
   position: absolute;
   top: 2.5%;
@@ -973,10 +976,10 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .home-kitchen-compare__plate--gratin { left: 77%; width: 8.7%; }
 .home-kitchen-compare__towel {
   position: absolute;
-  top: 45.94%;
+  top: 42%;
   left: 1.38%;
   z-index: 3;
-  width: 19.25%;
+  width: 24%;
   height: auto;
   aspect-ratio: 619 / 872;
   border: 0;
@@ -989,10 +992,10 @@ html:has(.overlay.expanded) { overflow: hidden; }
 }
 .home-kitchen-compare__towel-hit-area {
   position: absolute;
-  top: 49.7%;
+  top: 46%;
   left: 4.8%;
   z-index: 4;
-  width: 6.5%;
+  width: 8%;
   aspect-ratio: 209 / 632;
   cursor: grab;
   pointer-events: auto;
@@ -1680,10 +1683,10 @@ html:has(.overlay.expanded) { overflow: hidden; }
     padding-block: clamp(2rem, 7vw, 3.5rem) 1.5rem;
   }
   .home-hero::before {
-    top: 38%;
+    top: calc(100% + 4rem);
     bottom: auto;
-    left: 50%;
-    width: min(58vw, 21rem);
+    left: 46%;
+    width: min(38vw, 14rem);
     transform: translate(-50%, -50%);
     animation: none;
   }
@@ -1839,19 +1842,19 @@ html:has(.overlay.expanded) { overflow: hidden; }
     width: 91%;
   }
   .home-kitchen-compare__art-side--with .home-kitchen-compare__left-plate-row {
-    bottom: 79.4%;
+    bottom: 79%;
     left: 13.4%;
     width: 68%;
   }
   .home-kitchen-compare__art-side--with .home-kitchen-compare__towel {
-    top: 20.91%;
+    top: 18%;
     left: 2.76%;
-    width: 38.5%;
+    width: 50%;
   }
   .home-kitchen-compare__art-side--with .home-kitchen-compare__towel-hit-area {
-    top: 24%;
+    top: 21%;
     left: 9.6%;
-    width: 13%;
+    width: 16%;
   }
   .home-kitchen-compare__uses {
     position: static;
@@ -3254,7 +3257,6 @@ html:has(.overlay.expanded) { overflow: hidden; }
 /* Reading order and touch sizing belong to the mobile layout, not the desktop collage. */
 @media (max-width: 760px) {
   .home-hero-track { height: auto; }
-  .home-hero::before { display: none; }
   .home-opening__content { margin: 0; transform: none; will-change: auto; }
   .home-hero__details br { display: none; }
   .home-banner-feature { min-height: 0; }
@@ -3338,6 +3340,110 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .home .home-kitchen-compare__uses--with li:last-child::before { display: none; }
   .home .home-kitchen-compare__uses--with li:nth-child(6)::after,
   .home .home-kitchen-compare__uses--with li:nth-child(8)::after { display: block; margin-top: .35rem; font-size: 1.15rem; line-height: 1; }
+  .home .home-kitchen-compare__scene {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2rem 0 3rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--home-sage) transparent;
+    overscroll-behavior-x: contain;
+  }
+  .home .home-kitchen-compare__controls {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 1.25rem var(--page-gutter) 1rem;
+    color: var(--cream);
+    font-size: .875rem;
+  }
+  .home .home-kitchen-compare__controls > span { margin-right: auto; }
+  .home .home-kitchen-compare__controls button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+  .home .home-kitchen-compare__controls button:disabled { opacity: .3; cursor: default; }
+  .home .home-kitchen-compare__controls button:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+  .home .home-kitchen-compare__controls output { min-width: 2.5rem; text-align: center; font-variant-numeric: tabular-nums; }
+  .home .home-kitchen-compare__scene { scrollbar-color: var(--cream) transparent; }
+  .home .home-kitchen-compare__scene::-webkit-scrollbar { display: block; height: 4px; }
+  .home .home-kitchen-compare__scene::-webkit-scrollbar-thumb { background: var(--cream); border-radius: 4px; }
+  .home .home-kitchen-compare__scene:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+  .home .home-kitchen-compare__track {
+    display: grid;
+    grid-template-columns: repeat(2, calc(50% - .5rem));
+    gap: 1rem;
+    width: calc(200% - 1rem);
+    align-items: start;
+  }
+  .home .home-kitchen-compare__slide {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .home .home-kitchen-compare__slide .home-kitchen-compare__heading {
+    position: static;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  .home .home-kitchen-compare__slide .home-kitchen-compare__heading h3 {
+    font-size: clamp(1.9rem, 9vw, 2.75rem);
+  }
+  .home .home-kitchen-compare__slide > :is(.home-kitchen-compare__heading, .home-kitchen-compare__art, .home-kitchen-compare__uses) {
+    order: 0;
+    grid-row: auto;
+    grid-column: auto;
+  }
+  .home .home-kitchen-compare__slide--with .home-kitchen-compare__heading {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .home .home-kitchen-compare__slide .home-kitchen-compare__art {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+  }
+  .home .home-kitchen-compare__slide .home-kitchen-compare__art { aspect-ratio: .8625 / 1; }
+  .home .home-kitchen-compare__slide--without .home-kitchen-compare__art { transform: translateX(4%); }
+  .home .home-kitchen-compare__slide--with .home-kitchen-compare__art { display: flex; align-items: center; }
+  .home .home-kitchen-compare__slide .home-kitchen-compare__art-side {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    transform: none;
+    overflow: hidden;
+  }
+  .home .home-kitchen-compare__slide--with .home-kitchen-compare__art-side--with {
+    height: auto;
+    aspect-ratio: 1.4 / 1;
+    transform: translateY(16%);
+    overflow: visible;
+  }
+  .home .home-kitchen-compare__slide--with .home-kitchen-compare__art { overflow: visible; }
+  .home .home-kitchen-compare__slide--with .home-kitchen-compare__left-plate-row {
+    align-items: flex-end;
+  }
+  .home .home-kitchen-compare__slide .home-kitchen-compare__uses {
+    grid-row: auto;
+    margin: 0 auto;
+  }
   .home-discover__card { grid-template-columns: 3.5rem minmax(0, 1fr) 1.5rem; grid-template-rows: auto; align-items: center; min-height: 8.5rem; gap: 1rem; padding: 1.25rem; }
   .home-discover__illustration { height: 4rem; padding: 0; }
   .home-discover__illustration img, .home-discover__illustration svg { width: 100%; max-height: 4rem; object-fit: contain; }

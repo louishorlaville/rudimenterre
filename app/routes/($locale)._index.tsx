@@ -50,12 +50,21 @@ export default function Homepage() {
   const bannerRef = useRef<HTMLDivElement>(null);
   const benefitScrollRef = useRef<HTMLElement>(null);
   const benefitTrackRef = useRef<HTMLDivElement>(null);
+  const kitchenCompareRef = useRef<HTMLElement>(null);
   const practiceBenefitStackRef = useRef<HTMLDivElement>(null);
   const [benefitIndex, setBenefitIndex] = useState(0);
   const [isMobileBenefitScroll, setIsMobileBenefitScroll] = useState(false);
+  const [kitchenCompareIndex, setKitchenCompareIndex] = useState(0);
 
   const scrollBenefit = (direction: number) => {
     const viewport = benefitScrollRef.current?.querySelector<HTMLElement>('.benefit-scroll__viewport');
+    if (!viewport) return;
+    const index = Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth));
+    viewport.scrollTo({left: (index + direction) * viewport.clientWidth, behavior: 'smooth'});
+  };
+
+  const scrollKitchenCompare = (direction: number) => {
+    const viewport = kitchenCompareRef.current?.querySelector<HTMLElement>('.home-kitchen-compare__scene');
     if (!viewport) return;
     const index = Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth));
     viewport.scrollTo({left: (index + direction) * viewport.clientWidth, behavior: 'smooth'});
@@ -96,6 +105,22 @@ export default function Homepage() {
       viewport.removeEventListener('scroll', update);
       mobileLayout.removeEventListener('change', updateLayout);
       motion.removeEventListener('change', updateLayout);
+    };
+  }, []);
+
+  useEffect(() => {
+    const section = kitchenCompareRef.current;
+    const viewport = section?.querySelector<HTMLElement>('.home-kitchen-compare__scene');
+    if (!viewport) return;
+    const update = () => {
+      setKitchenCompareIndex(Math.min(1, Math.max(0, Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth)))));
+    };
+    viewport.addEventListener('scroll', update, {passive: true});
+    window.addEventListener('resize', update);
+    update();
+    return () => {
+      viewport.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
     };
   }, []);
 
@@ -709,57 +734,78 @@ export default function Homepage() {
       </div>
     </section>
 
-    <section className="home-kitchen-compare" aria-labelledby="home-kitchen-compare-title">
+    <section className="home-kitchen-compare" ref={kitchenCompareRef} aria-labelledby="home-kitchen-compare-title">
       <header className="home-kitchen-compare__divider">
         <h2 id="home-kitchen-compare-title">
           {fr?'Et libérez votre cuisine !':'And free your kitchen!'}
         </h2>
       </header>
-      <div className="home-kitchen-compare__scene">
-        <div className="home-kitchen-compare__heading home-kitchen-compare__heading--with">
-          <h3>{fr?'Une cuisine avec un Cuicui':'A kitchen with a Cuicui'}</h3>
-        </div>
-        <div className="home-kitchen-compare__heading home-kitchen-compare__heading--without">
-          <h3>{fr?'Une cuisine sans Cuicui':'A kitchen without a Cuicui'}</h3>
-        </div>
-
-        <div className="home-kitchen-compare__art" aria-hidden="true">
-          <div className="home-kitchen-compare__art-side home-kitchen-compare__art-side--with">
-            <img className="home-kitchen-compare__shelf" src="/images/rudimenterre/home-kitchen-compare-shelf.png" alt="" loading="lazy" />
-            <div className="home-kitchen-compare__left-plate-row">
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--casserole" src="/images/rudimenterre/home-kitchen-plate-casserole.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--cuicui" src="/images/rudimenterre/home-kitchen-plate-cuicui.png" alt="" loading="lazy" />
-              <span className="home-kitchen-compare__plant-pot">
-                <img className="home-kitchen-compare__plant-pot-image" src="/images/rudimenterre/home-kitchen-compare-vase.png" alt="" loading="lazy" />
-              </span>
+      <div className="home-kitchen-compare__controls" aria-label={fr ? 'Navigation de la comparaison des cuisines' : 'Kitchen comparison navigation'}>
+        <span>{fr ? 'Faites défiler' : 'Swipe to explore'}</span>
+        <button type="button" onClick={() => scrollKitchenCompare(-1)} disabled={kitchenCompareIndex === 0} aria-controls="home-kitchen-compare-scene" aria-label={fr ? 'Cuisine précédente' : 'Previous kitchen'}>←</button>
+        <output aria-live="polite">{kitchenCompareIndex + 1} / 2</output>
+        <button type="button" onClick={() => scrollKitchenCompare(1)} disabled={kitchenCompareIndex === 1} aria-controls="home-kitchen-compare-scene" aria-label={fr ? 'Cuisine suivante' : 'Next kitchen'}>→</button>
+      </div>
+      <div id="home-kitchen-compare-scene" className="home-kitchen-compare__scene" role="region" tabIndex={0} aria-label={fr ? 'Comparaison des cuisines, faites défiler horizontalement' : 'Kitchen comparison, scroll horizontally'}>
+        <div className="home-kitchen-compare__track">
+          <article className="home-kitchen-compare__slide home-kitchen-compare__slide--without">
+            <div className="home-kitchen-compare__heading home-kitchen-compare__heading--without">
+              <h3>{fr?'Une cuisine sans Cuicui':'A kitchen without a Cuicui'}</h3>
             </div>
-            <InteractiveTowel />
-          </div>
-          <div className="home-kitchen-compare__art-side home-kitchen-compare__art-side--without">
-            <img className="home-kitchen-compare__cabinet" src="/images/rudimenterre/home-kitchen-compare-cabinet.png" alt="" loading="lazy" />
-            <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--one">
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--cocotte-top" src="/images/rudimenterre/home-kitchen-plate-cocotte.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--steamer" src="/images/rudimenterre/home-kitchen-plate-cocotte.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--tajine" src="/images/rudimenterre/home-kitchen-plate-tajine.png" alt="" loading="lazy" />
+            <div className="home-kitchen-compare__art" aria-hidden="true">
+              <div className="home-kitchen-compare__art-side home-kitchen-compare__art-side--without">
+                <img className="home-kitchen-compare__cabinet" src="/images/rudimenterre/home-kitchen-compare-cabinet.png" alt="" loading="lazy" />
+                <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--one">
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--cocotte-top" src="/images/rudimenterre/home-kitchen-plate-cocotte.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--steamer" src="/images/rudimenterre/home-kitchen-plate-cocotte.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--tajine" src="/images/rudimenterre/home-kitchen-plate-tajine.png" alt="" loading="lazy" />
+                </div>
+                <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--two">
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--presentation" src="/images/rudimenterre/home-kitchen-plate-presentation.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--pressure" src="/images/rudimenterre/home-kitchen-plate-pressure-cooker.png" alt="" loading="lazy" />
+                </div>
+                <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--three">
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--bain-marie" src="/images/rudimenterre/home-kitchen-plate-bain-marie.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--rice-cooker" src="/images/rudimenterre/home-kitchen-plate-rice-cooker.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--cocotte-low" src="/images/rudimenterre/home-kitchen-plate-steamer.png" alt="" loading="lazy" />
+                </div>
+                <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--four">
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--romertopf" src="/images/rudimenterre/home-kitchen-plate-romertopf.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--kouglof" src="/images/rudimenterre/home-kitchen-plate-kouglof.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--gratin" src="/images/rudimenterre/home-kitchen-plate-gratin.png" alt="" loading="lazy" />
+                </div>
+              </div>
             </div>
-            <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--two">
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--presentation" src="/images/rudimenterre/home-kitchen-plate-presentation.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--pressure" src="/images/rudimenterre/home-kitchen-plate-pressure-cooker.png" alt="" loading="lazy" />
+            <ul className="home-kitchen-compare__uses home-kitchen-compare__uses--without">
+              <li>{fr?'Mijoter lentement':'Simmer slowly'}</li>
+              <li>{fr?'Présenter et servir':'Present and serve'}</li>
+              <li>{fr?'Cuire à la vapeur étuvée sous pression':'Pressure steam-stew'}</li>
+              <li>{fr?'Cuire au bain-marie':'Cook in a bain-marie'}</li>
+              <li>{fr?'Cuire le riz':'Cook rice'}</li>
+              <li>{fr?'Cuire à la vapeur douce':'Gently steam'}</li>
+              <li>{fr?'Cuire à l’étouffée':'Braise'}</li>
+              <li>{fr?'Moule à gâteaux':'Bake cakes'}</li>
+              <li>{fr?'Gratiner':'Gratinate'}</li>
+            </ul>
+          </article>
+          <article className="home-kitchen-compare__slide home-kitchen-compare__slide--with">
+            <div className="home-kitchen-compare__heading home-kitchen-compare__heading--with">
+              <h3>{fr?'Une cuisine avec un Cuicui':'A kitchen with a Cuicui'}</h3>
             </div>
-            <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--three">
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--bain-marie" src="/images/rudimenterre/home-kitchen-plate-bain-marie.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--rice-cooker" src="/images/rudimenterre/home-kitchen-plate-rice-cooker.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--cocotte-low" src="/images/rudimenterre/home-kitchen-plate-steamer.png" alt="" loading="lazy" />
+            <div className="home-kitchen-compare__art" aria-hidden="true">
+              <div className="home-kitchen-compare__art-side home-kitchen-compare__art-side--with">
+                <img className="home-kitchen-compare__shelf" src="/images/rudimenterre/home-kitchen-compare-shelf.png" alt="" loading="lazy" />
+                <div className="home-kitchen-compare__left-plate-row">
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--casserole" src="/images/rudimenterre/home-kitchen-plate-casserole.png" alt="" loading="lazy" />
+                  <img className="home-kitchen-compare__plate home-kitchen-compare__plate--cuicui" src="/images/rudimenterre/home-kitchen-plate-cuicui.png" alt="" loading="lazy" />
+                  <span className="home-kitchen-compare__plant-pot">
+                    <img className="home-kitchen-compare__plant-pot-image" src="/images/rudimenterre/home-kitchen-compare-vase.png" alt="" loading="lazy" />
+                  </span>
+                </div>
+                <InteractiveTowel />
+              </div>
             </div>
-            <div className="home-kitchen-compare__plate-row home-kitchen-compare__plate-row--four">
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--romertopf" src="/images/rudimenterre/home-kitchen-plate-romertopf.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--kouglof" src="/images/rudimenterre/home-kitchen-plate-kouglof.png" alt="" loading="lazy" />
-              <img className="home-kitchen-compare__plate home-kitchen-compare__plate--gratin" src="/images/rudimenterre/home-kitchen-plate-gratin.png" alt="" loading="lazy" />
-            </div>
-          </div>
-        </div>
-
-        <ul className="home-kitchen-compare__uses home-kitchen-compare__uses--with">
+            <ul className="home-kitchen-compare__uses home-kitchen-compare__uses--with">
           <li>{fr?'Mijoter efficacement':'Simmer efficiently'}</li>
           <li>{fr?'Cuire ou réchauffer à la vapeur étuvée':'Steam-stew or reheat'}</li>
           <li>{fr?'Cuire à la vapeur douce':'Gently steam'}</li>
@@ -769,18 +815,9 @@ export default function Homepage() {
           <li>{fr?'Gratiner':'Gratinate'}</li>
           <li>{fr?'Moules à pain et gâteaux':'Bake bread and cakes'}</li>
           <li>{fr?'Présenter, servir et mettre en appétit':'Present, serve and whet the appetite'}</li>
-        </ul>
-        <ul className="home-kitchen-compare__uses home-kitchen-compare__uses--without">
-          <li>{fr?'Mijoter lentement':'Simmer slowly'}</li>
-          <li>{fr?'Présenter et servir':'Present and serve'}</li>
-          <li>{fr?'Cuire à la vapeur étuvée sous pression':'Pressure steam-stew'}</li>
-          <li>{fr?'Cuire au bain-marie':'Cook in a bain-marie'}</li>
-          <li>{fr?'Cuire le riz':'Cook rice'}</li>
-          <li>{fr?'Cuire à la vapeur douce':'Gently steam'}</li>
-          <li>{fr?'Cuire à l’étouffée':'Braise'}</li>
-          <li>{fr?'Moule à gâteaux':'Bake cakes'}</li>
-          <li>{fr?'Gratiner':'Gratinate'}</li>
-        </ul>
+            </ul>
+          </article>
+        </div>
         <p className="sr-only">
           {fr
             ? 'Comparaison illustrée entre une cuisine organisée autour du Cuicui et une cuisine nécessitant de nombreux récipients spécialisés.'
