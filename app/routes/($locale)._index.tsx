@@ -791,7 +791,7 @@ export default function Homepage() {
 
     <section className="home-discover" aria-labelledby="home-discover-title">
       <header className="home-discover__heading">
-        <h2 id="home-discover-title">{fr ? 'Pour mieux connaître le Cuicui' : 'Get to know the Cuicui'}</h2>
+        <h2 id="home-discover-title"><span>{fr ? 'Pour mieux' : 'Get to know'}</span>{' '}<span>{fr ? 'connaître le Cuicui' : 'the Cuicui'}</span></h2>
       </header>
       <div className="home-discover__grid">
         {[
@@ -1003,8 +1003,9 @@ export default function Homepage() {
       </div>
     </section>
 
-    <div className="home-future-divider">
-      <h2>{fr ? 'Un Cuicui pour demain' : 'A Cuicui for tomorrow'}</h2>
+    <div className="home-section-divider home-future-divider">
+      <span>{fr ? 'Un Cuicui pour demain' : 'A Cuicui for tomorrow'}</span>
+      <i aria-hidden="true" />
     </div>
 
     <section className="home-newsletter-banner" aria-labelledby="home-newsletter-banner-title">
