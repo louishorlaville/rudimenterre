@@ -678,10 +678,10 @@ export default function Homepage() {
       <h2 id="home-kitchen-follow-title">{fr?'Empilez - Distillez - Savourez !':'Stack - Distill - Savour!'}</h2>
       <div className="home-kitchen-follow__gallery">
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--left">
-          <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Artichauts et paniers dans la cuisine Rudimenterre':'Artichokes and baskets in the Rudimenterre kitchen'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Riz et légumes préparés dans un récipient Rudimenterre':'Rice and vegetables prepared in a Rudimenterre vessel'} loading="lazy" />
         </figure>
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--center">
-          <img src="/images/rudimenterre/home-follow-kitchen-center.jpg" alt={fr?'Gâteau aux pommes préparé dans le Cuicui':'Apple cake prepared in the Cuicui'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-center.jpg" alt={fr?'Récipients Rudimenterre empilés pour plusieurs préparations':'Rudimenterre vessels stacked for several preparations'} loading="lazy" />
         </figure>
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--right">
           <img src="/images/rudimenterre/home-follow-kitchen-right.jpg" alt={fr?'Préparations disposées dans plusieurs récipients Cuicui':'Food arranged in several Cuicui vessels'} loading="lazy" />
