@@ -23,6 +23,14 @@ export const HOME_REVIEWS: HomeReview[] = [
     author: 'Hélène, Poissy, France',
   },
   {
+    id: 'robin-concarneau',
+    quote: {
+      fr: 'Nous avons expérimenté le far du Kig Ha Farz avec le Cuicui et ça marche très bien.',
+      en: 'We tried making Kig Ha Farz with Cuicui, and it works very well.',
+    },
+    author: 'Robin, Concarneau, France',
+  },
+  {
     id: 'timothee-montreal',
     quote: {
       fr: 'Après les fêtes passées en famille et bien trop copieuses, je suis ravie de retrouver mon Cuicui pour tester de nouvelles recettes. Les carnets sont fabuleux, merci pour ce partage.',
@@ -37,5 +45,29 @@ export const HOME_REVIEWS: HomeReview[] = [
       en: 'I have so much fun with my Cuicui - I love it! For a long time, I had been looking for a way to combine healthy cooking (steam, low temperature and natural materials) with an ecological and economical approach. I found it with Cuicui. It is also very practical: leftovers keep well and can be reheated or become the base of another recipe. Its clean design makes it a beautiful serving dish on my table.',
     },
     author: 'Barbara, Saint-Denis, France',
+  },
+  {
+    id: 'cloe-montreal',
+    quote: {
+      fr: 'Ce soir j’ai fait le riz et je m’imaginais empiler un Cuicui de plus pour faire mon curry dedans ! Je m’y mets avec beaucoup enthousiasme. Bravo pour ton travail !',
+      en: 'Tonight I made rice and found myself imagining stacking another Cuicui on top to make my curry in it! I am getting into it with so much enthusiasm. Congratulations on your work!',
+    },
+    author: 'Cloe, Montréal, Canada',
+  },
+  {
+    id: 'patrick-sherbrooke',
+    quote: {
+      fr: 'Le Cuicui a intégré mon quotidien en cuisine. Sa modularité et son design pratique me permettent de trouver de nouvelles manières de cuisiner sainement et simplement. En empilant les récipients, je peux par exemple cuire à la fois mon riz et mon potage de légumes ! J’y gagne du temps, et des saveurs !',
+      en: 'Cuicui has become part of my everyday cooking. Its modular design and practicality help me find new ways to cook healthy food simply. By stacking the dishes, I can cook my rice and vegetable soup at the same time, for example. I save time and gain flavour!',
+    },
+    author: 'Patrick, Sherbrooke, Canada',
+  },
+  {
+    id: 'philippe-montreal',
+    quote: {
+      fr: 'J’aime la simplicité d’utilisation, on peut préparer des repas complets en n’utilisant qu’un seul point de chauffe. Les plats sont beaux et peuvent être amenés directement de la cuisine à la table à manger, et les accessoires comme le couvercle plat « zéro déchet » permettent un stockage au frigo en optimisant l’espace.',
+      en: 'I love how simple it is to use: you can prepare complete meals using a single heat source. The dishes are beautiful and can be brought straight from the kitchen to the dining table, while accessories such as the “zero-waste” flat lid make the most of fridge space for storage.',
+    },
+    author: 'Philippe, Montréal, Canada',
   },
 ];
