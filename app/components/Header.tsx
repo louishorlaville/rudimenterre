@@ -88,16 +88,41 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
   const locale = localeFromPathname(pathname);
   const copy = UI_COPY[locale];
   const {close} = useAside();
+  const documentationLinks = [
+    {label: locale === 'fr' ? 'Distillation' : 'Distillation', to: pagePath(locale, 'distillation')},
+    {label: locale === 'fr' ? 'Vapeur Étuvée' : 'Steam cooking', to: pagePath(locale, 'steam')},
+    {label: locale === 'fr' ? 'Thermique' : 'Thermal', to: pagePath(locale, 'thermal')},
+    {label: locale === 'fr' ? 'Visite Guidée Potager' : 'Guided kitchen garden tour', to: pagePath(locale, 'garden')},
+    {label: locale === 'fr' ? 'Atlas des Cocottes à poile' : 'Cocottes à poile atlas', to: `/${locale}/pages/atlas-des-cocottes-a-poile`},
+  ];
   const links = [
     {label: copy.project, to: pagePath(locale, 'project')},
-    {label: copy.explore, to: pagePath(locale, 'steam')},
     {label: locale === 'fr' ? 'Les ateliers' : 'Workshops', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`},
     {label: locale === 'fr' ? 'Service Chef' : 'Chef service', to: `/${locale}/pages/service-decouverte-pro`},
     {label: locale === 'fr' ? 'Édition limitée' : 'Limited edition', to: pagePath(locale, 'adopt')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
     ...(viewport === 'mobile' ? [{label: copy.adopt, to: pagePath(locale, 'adopt'), cta: true}] : []),
   ];
-  return <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>{links.map((item) => <NavLink className={item.cta ? 'button button--orange header-cta' : undefined} key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}</nav>;
+  return (
+    <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>
+      <NavLink onClick={close} to={links[0].to} prefetch="intent">{links[0].label}</NavLink>
+      <details
+        className="header-documentation"
+        onMouseEnter={viewport === 'desktop' ? (event) => {event.currentTarget.open = true;} : undefined}
+        onMouseLeave={viewport === 'desktop' ? (event) => {event.currentTarget.open = false;} : undefined}
+      >
+        <summary data-active={documentationLinks.some((item) => pathname === item.to) || undefined}>
+          Documentation<span aria-hidden="true" />
+        </summary>
+        <div className="header-documentation__menu">
+          {documentationLinks.map((item) => (
+            <NavLink className="header-documentation__link" key={item.to} onClick={(event) => {event.currentTarget.closest('details')?.removeAttribute('open'); close();}} to={item.to} prefetch="intent"><span>{item.label}</span></NavLink>
+          ))}
+        </div>
+      </details>
+      {links.slice(1).map((item) => <NavLink className={item.cta ? 'button button--orange header-cta' : undefined} key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}
+    </nav>
+  );
 }
 
 function CartToggle({cart, label, locale}: {cart: HeaderProps['cart']; label: string; locale: string}) {
