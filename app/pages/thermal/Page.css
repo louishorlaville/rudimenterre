@@ -101,9 +101,9 @@
 .thermal-principle__art {
   position: relative;
   flex: none;
-  width: clamp(185px, 19vw, 350px);
+  width: clamp(205px, 21.5vw, 400px);
   aspect-ratio: .45;
-  margin: auto 0 0;
+  margin: clamp(18px, 2vw, 36px) 0 0;
   overflow: hidden;
   transform: translateX(1.1vw);
 }
@@ -185,19 +185,19 @@
 }
 
 .thermal-reading--rapid .thermal-reading__arrow {
-  top: 68%;
+  top: 61%;
   left: -13.4vw;
   width: 10.8vw;
 }
 
 .thermal-reading--insulating .thermal-reading__arrow--long {
-  top: 75%;
+  top: 70%;
   left: -26vw;
   width: 18.3vw;
 }
 
 .thermal-reading--gentle .thermal-reading__arrow {
-  top: 45%;
+  top: 38%;
   left: -13.4vw;
   width: 10.8vw;
 }
@@ -261,7 +261,7 @@
   position: relative;
   width: fit-content;
   max-width: min(550px, 31vw);
-  margin: 2.2vw 2.5vw 0 auto !important;
+  margin: 1.1vw 2.5vw 0 auto !important;
   padding: 1vw 1.4vw;
   border-radius: 2.4vw;
   background: var(--thermal-cream);
