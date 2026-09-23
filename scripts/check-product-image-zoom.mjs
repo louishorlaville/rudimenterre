@@ -255,7 +255,7 @@ assert.equal(frames.size, 0, 'Unmount cancels RAF');
 assert.equal(listeners.size, 0, 'Unmount removes listeners');
 assert.equal(selected, 0, 'Hover never changes the selected image');
 const css = readFileSync(
-  new URL('../app/styles/product.css', import.meta.url),
+  new URL('../app/pages/product/Page.css', import.meta.url),
   'utf8',
 );
 assert.match(

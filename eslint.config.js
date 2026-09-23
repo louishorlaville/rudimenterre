@@ -27,6 +27,7 @@ export default [
       '**/node_modules/',
       '**/build/',
       '**/dist/',
+      '**/tmp/',
       '**/*.graphql.d.ts',
       '**/*.graphql.ts',
       '**/*.generated.d.ts',

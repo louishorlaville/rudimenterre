@@ -15,10 +15,6 @@ import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
-import editorialStyles from '~/styles/editorial-page.css?url';
-import adoptStyles from '~/styles/adopt.css?url';
-import recipeStyles from '~/styles/recipe.css?url';
-import steamStyles from '~/styles/steam.css?url';
 import {PageLayout} from './components/PageLayout';
 import {localeFromPathname} from './lib/i18n';
 
@@ -81,7 +77,6 @@ export function links() {
       type: 'font/ttf',
       crossOrigin: 'anonymous',
     },
-    {rel: 'stylesheet', href: editorialStyles},
   ];
 }
 
@@ -173,10 +168,6 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
-        {/* Keep editorial CSS owned by React, not Vite's runtime style injection. */}
-        <link rel="stylesheet" href={adoptStyles} />
-        <link rel="stylesheet" href={recipeStyles} />
-        <link rel="stylesheet" href={steamStyles} />
         <Meta />
         <Links />
       </head>

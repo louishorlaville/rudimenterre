@@ -11,7 +11,8 @@
     "lint": "eslint --no-error-on-unmatched-pattern .",
     "typecheck": "react-router typegen && tsc --noEmit",
     "codegen": "shopify hydrogen codegen && react-router typegen",
-    "check:encoding": "node scripts/check-encoding.mjs"
+    "check:encoding": "node scripts/check-encoding.mjs",
+    "check:route-manifest": "node scripts/check-route-manifest.mjs"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {

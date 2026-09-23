@@ -1,6 +1,10 @@
 # Rudimenterre Hydrogen storefront
 
-Bilingual, French-first storefront built with Shopify Hydrogen, React Router, TypeScript and CSS Modules. French routes live under `/fr`, English routes under `/en`, and `/` redirects to `/fr`. Requests on `rudimenterre.fr` use Shopify's France market context; `rudimenterre.com` uses Canada.
+Bilingual, French-first storefront built with Shopify Hydrogen, React Router, TypeScript and page-level CSS. French routes live under `/fr`, English routes under `/en`, and `/` redirects to `/fr`. Requests on `rudimenterre.fr` use Shopify's France market context; `rudimenterre.com` uses Canada.
+
+## Page structure
+
+`app/routes` contains React Router entry points. Visible pages live in `app/pages/<page>/Page.tsx`, with `Page.css` beside the TSX when the page has unique styles. Shared UI remains in `app/components`, and `app/styles/app.css` holds site-wide styles. Editorial slugs use the common route in `app/pages/editorial` and choose a page component and stylesheet by content ID.
 
 ## Local development
 
