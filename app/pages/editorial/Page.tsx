@@ -6,6 +6,7 @@ import distillationStyles from '~/pages/distillation/Page.css?url';
 import adoptStyles from '~/pages/adopt/Page.css?url';
 import creatorStyles from '~/pages/creator/Page.css?url';
 import steamStyles from '~/pages/steam/Page.css?url';
+import thermalStyles from '~/pages/thermal/Page.css?url';
 import {EditorialPage} from './Renderer';
 import {
   alternatePagePath,
@@ -22,6 +23,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     adopt: adoptStyles,
     creator: creatorStyles,
     steam: steamStyles,
+    thermal: thermalStyles,
   };
   return [
     {tagName: 'link', rel: 'stylesheet', href: specialStyles[data.content.id] || editorialStyles},

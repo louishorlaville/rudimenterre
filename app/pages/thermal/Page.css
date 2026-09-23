@@ -1,0 +1,457 @@
+.thermal-page {
+  --thermal-ink: #191919;
+  --thermal-rust: #854235;
+  --thermal-rust-dark: #803c31;
+  --thermal-cream: #fffbd7;
+  --thermal-blue: #e1f5fc;
+  --thermal-rose: #dc9b8b;
+  --thermal-orange: #d8582c;
+  color: var(--thermal-ink);
+  background: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(16px, 1.25vw, 20px);
+  line-height: 1.5;
+  overflow: clip;
+}
+
+.thermal-page h1,
+.thermal-page h2,
+.thermal-page h3,
+.thermal-page p {
+  margin: 0;
+}
+
+.thermal-page h1,
+.thermal-page h2,
+.thermal-page h3 {
+  font-weight: 700;
+  line-height: 1.18;
+}
+
+.thermal-hero {
+  position: relative;
+  min-height: clamp(310px, 40.95vw, 660px);
+  color: #fff;
+  text-align: center;
+  background: #121717;
+}
+
+.thermal-hero > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 48%;
+}
+
+.thermal-hero__copy {
+  position: relative;
+  padding: clamp(68px, 8vw, 128px) 20px 0;
+  text-shadow: 0 2px 9px #0008;
+}
+
+.thermal-hero h1 {
+  font-size: clamp(25px, 3vw, 46px);
+}
+
+.thermal-hero p {
+  margin-top: 12px;
+  font-size: clamp(15px, 1.55vw, 23px);
+  font-weight: 700;
+}
+
+.thermal-intro {
+  padding: 20px 6% 23px;
+  color: #fff8e9;
+  background: var(--thermal-rust);
+  text-align: center;
+}
+
+.thermal-intro h2,
+.thermal-advice > h2 {
+  font-size: clamp(19px, 2vw, 29px);
+}
+
+.thermal-intro p {
+  margin: 9px auto 0;
+  font-style: italic;
+}
+
+.thermal-principle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: clamp(620px, 63vw, 1140px);
+}
+
+.thermal-principle__diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5vw clamp(28px, 5vw, 90px) 1vw;
+  background: var(--thermal-cream);
+  text-align: center;
+}
+
+.thermal-principle__diagram h2 {
+  font-size: clamp(21px, 2.15vw, 39px);
+}
+
+.thermal-principle__art {
+  position: relative;
+  flex: none;
+  width: clamp(185px, 19vw, 350px);
+  aspect-ratio: .45;
+  margin: auto 0 0;
+  overflow: hidden;
+  transform: translateX(1.1vw);
+}
+
+.thermal-principle__art > img {
+  position: absolute;
+  top: -26%;
+  left: 60%;
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 132%;
+  transform: translateX(-50%);
+}
+
+.thermal-experiments {
+  padding: 5vw 2vw 2vw 6vw;
+  background: #fff;
+}
+
+.thermal-experiments > h2 {
+  font-size: clamp(22px, 2.3vw, 42px);
+}
+
+.thermal-experiments__intro {
+  max-width: 30vw;
+  margin-top: .7vw !important;
+  font-size: clamp(16px, 1.5vw, 27px);
+  font-style: italic;
+}
+
+.thermal-readings {
+  display: grid;
+  grid-template-columns: 18vw 17.2vw;
+  grid-template-rows: minmax(14vw, auto) minmax(11.5vw, auto);
+  column-gap: 2.4vw;
+  row-gap: 9.4vw;
+  width: max-content;
+  margin: 3.2vw 0 0 -4.3vw;
+}
+
+.thermal-reading {
+  position: relative;
+  min-width: 0;
+  padding: 1.25vw;
+  border-radius: 2.5vw;
+  font-size: clamp(14px, 1.5vw, 27px);
+  line-height: 1.32;
+}
+
+.thermal-reading h3 {
+  margin-bottom: 4px;
+  font-size: clamp(18px, 1.8vw, 32px);
+}
+
+.thermal-reading h3 em {
+  font-weight: 400;
+}
+
+.thermal-reading--rapid {
+  background: var(--thermal-cream);
+}
+
+.thermal-reading--insulating {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  min-height: 24.4vw;
+  padding: 1.25vw;
+  color: var(--thermal-ink);
+  background: var(--thermal-orange);
+}
+
+.thermal-reading__arrow {
+  position: absolute;
+  z-index: 1;
+  height: auto;
+  object-fit: contain;
+}
+
+.thermal-reading--rapid .thermal-reading__arrow {
+  top: 68%;
+  left: -13.4vw;
+  width: 10.8vw;
+}
+
+.thermal-reading--insulating .thermal-reading__arrow--long {
+  top: 75%;
+  left: -26vw;
+  width: 18.3vw;
+}
+
+.thermal-reading--gentle .thermal-reading__arrow {
+  top: 45%;
+  left: -13.4vw;
+  width: 10.8vw;
+}
+
+.thermal-reading--gentle {
+  background: var(--thermal-rose);
+}
+
+.thermal-reading__number {
+  display: block;
+  margin-top: 3px;
+  font-size: clamp(24px, 2.6vw, 46px);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.thermal-reading__number small {
+  font-size: .68em;
+  font-weight: 400;
+}
+
+.thermal-reading__suffix {
+  display: block;
+  margin-top: 3px;
+  font-style: italic;
+}
+
+.thermal-reading--insulating ul {
+  display: grid;
+  gap: .7vw;
+  margin: 1.4vw 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thermal-reading--insulating li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: .85em;
+}
+
+.thermal-reading--insulating li strong {
+  font-size: clamp(23px, 2.4vw, 44px);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.thermal-reading__match {
+  position: absolute;
+  top: -16.4vw;
+  left: 100%;
+  width: auto;
+  max-width: none;
+  height: 36.5vw;
+  object-fit: contain;
+}
+
+.thermal-energy {
+  position: relative;
+  width: fit-content;
+  max-width: min(550px, 31vw);
+  margin: 2.2vw 2.5vw 0 auto !important;
+  padding: 1vw 1.4vw;
+  border-radius: 2.4vw;
+  background: var(--thermal-cream);
+  font-size: clamp(14px, 1.4vw, 26px);
+  font-style: italic;
+  text-align: center;
+}
+
+.thermal-energy__arrow {
+  position: absolute;
+  top: 50%;
+  left: -18.6vw;
+  width: 18.3vw;
+  height: auto;
+  object-fit: contain;
+  transform: translateY(-50%);
+}
+
+.thermal-advice {
+  --thermal-advice-title-space: clamp(48px, 6.3vw, 114px);
+  position: relative;
+  padding: var(--thermal-advice-title-space) 1.1vw clamp(48px, 5vw, 76px);
+  color: #fff8e9;
+  background: #7d4438;
+  text-align: center;
+}
+
+.thermal-advice > h2 {
+  max-width: 1100px;
+  margin: 0 auto var(--thermal-advice-title-space);
+  font-size: clamp(21px, 2vw, 34px);
+  line-height: 1.2;
+}
+
+.thermal-advice > p {
+  max-width: 760px;
+  margin: 36px auto 0;
+  font-size: clamp(19px, 2vw, 30px);
+  font-weight: 700;
+}
+
+.thermal-advice__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  text-align: left;
+}
+
+.thermal-advice-card {
+  position: relative;
+  min-width: 0;
+  min-height: clamp(400px, 39.5vw, 720px);
+  padding: 6.2vw 4.2vw 4vw 6.3vw;
+  color: #151515;
+  font-size: clamp(15px, 1.5vw, 27px);
+  line-height: 1.54;
+}
+
+.thermal-advice-card h3 {
+  min-height: 0;
+  margin: 0 -2.1vw 0 -4.2vw;
+  font-size: clamp(15px, 1.55vw, 28px);
+  line-height: 1.15;
+  text-align: center;
+}
+
+.thermal-advice-card h3 span { display: block; }
+.thermal-advice-card__large { font-size: 1.75em; }
+.thermal-advice-card__medium { font-size: 1.45em; }
+
+.thermal-advice-card p {
+  margin-top: 8.6vw;
+  font-style: italic;
+  text-align: left;
+}
+
+.thermal-advice-card__callout {
+  display: block;
+  margin-top: 1vw;
+  color: #444;
+  font-size: 1.85em;
+  font-style: normal;
+  font-weight: 700;
+  text-align: center;
+}
+
+.thermal-advice-card:nth-child(n + 4) { min-height: clamp(450px, 44vw, 800px); }
+
+.thermal-advice-card--cream { background: var(--thermal-cream); }
+.thermal-advice-card--white { background: #fff; }
+.thermal-advice-card--rose { background: var(--thermal-rose); }
+.thermal-advice-card--orange { background: var(--thermal-orange); }
+.thermal-advice-card--blue { background: var(--thermal-blue); }
+
+.thermal-advice-card__number {
+  position: absolute;
+  top: 13px;
+  left: 16px;
+  color: #19191980;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.thermal-notes {
+  position: relative;
+  min-height: 520px;
+  padding: clamp(45px, 5vw, 76px) clamp(24px, 5vw, 78px);
+  overflow: visible;
+  color: #fff8e9;
+  background: var(--thermal-rust-dark);
+}
+
+.thermal-notes > h2 {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  margin: 0 auto 72px;
+  font-size: clamp(21px, 2vw, 30px);
+  text-align: center;
+}
+
+.thermal-notes__copy {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  font-size: clamp(15px, 1.25vw, 19px);
+  font-style: italic;
+}
+
+.thermal-notes__copy p + p {
+  margin-top: 22px;
+}
+
+.thermal-notes__flame {
+  position: absolute;
+  right: clamp(14px, 6vw, 90px);
+  top: -28vw;
+  width: clamp(180px, 28vw, 420px);
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 900px) {
+  .thermal-principle { grid-template-columns: 1fr; }
+  .thermal-principle__diagram { min-height: 620px; padding: 42px 24px 18px; }
+  .thermal-principle__art { width: clamp(190px, 31vw, 285px); transform: none; }
+  .thermal-experiments { padding: 38px clamp(76px, 10vw, 90px) 34px clamp(24px, 7vw, 64px); }
+  .thermal-experiments__intro { max-width: 36rem; margin-top: 10px !important; font-size: clamp(16px, 2vw, 20px); }
+  .thermal-readings { width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 20px; margin: 28px 0 0; }
+  .thermal-reading { min-height: 0; padding: 18px; border-radius: 24px; font-size: clamp(15px, 2vw, 18px); }
+  .thermal-reading h3 { font-size: clamp(18px, 2.2vw, 22px); }
+  .thermal-reading--insulating { min-height: 320px; padding: 18px; }
+  .thermal-reading--insulating ul { gap: 12px; margin-top: 28px; }
+  .thermal-reading--insulating li strong { font-size: clamp(25px, 3.5vw, 34px); }
+  .thermal-reading__match { top: -65px; height: 280px; }
+  .thermal-reading__arrow, .thermal-energy__arrow { display: none; }
+  .thermal-energy { max-width: 100%; margin: 24px 0 0 auto !important; padding: 12px 18px; border-radius: 24px; font-size: 16px; }
+  .thermal-advice__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .thermal-advice-card,
+  .thermal-advice-card:nth-child(n + 4) { min-height: 420px; padding: 48px clamp(24px, 5vw, 42px) 38px; font-size: 16px; }
+  .thermal-advice-card h3 { margin: 0; font-size: 16px; }
+  .thermal-advice-card p { margin-top: 72px; }
+  .thermal-notes__flame { top: -180px; }
+}
+
+@media (max-width: 640px) {
+  .thermal-hero { min-height: 320px; }
+  .thermal-hero > img { object-position: center; }
+  .thermal-hero__copy { padding-top: 72px; }
+  .thermal-intro { padding: 23px 20px; }
+  .thermal-principle__diagram { min-height: 0; padding: 42px 22px 18px; }
+  .thermal-principle__diagram h2 { font-size: 23px; }
+  .thermal-principle__art { width: clamp(160px, 48vw, 205px); }
+  .thermal-experiments { padding: 38px 20px 32px; }
+  .thermal-experiments__intro { max-width: none; }
+  .thermal-readings { grid-template-columns: 1fr; grid-template-rows: auto; gap: 12px; margin-top: 24px; }
+  .thermal-reading { padding: 16px 13px; border-radius: 22px; }
+  .thermal-reading--insulating { grid-column: auto; grid-row: auto; min-height: 280px; padding: 16px 76px 16px 14px; }
+  .thermal-reading__match { top: 14%; left: auto; right: 12px; width: 52px; height: 230px; }
+  .thermal-reading--insulating ul { margin-top: 27px; }
+  .thermal-advice { --thermal-advice-title-space: 42px; padding: var(--thermal-advice-title-space) 14px 45px; }
+  .thermal-advice > p { margin: 25px auto 0; }
+  .thermal-advice__grid { grid-template-columns: 1fr; }
+  .thermal-advice-card,
+  .thermal-advice-card:nth-child(n + 4) { min-height: 0; padding: 48px 28px 48px; }
+  .thermal-advice-card p { margin-top: 45px; }
+  .thermal-notes { min-height: 700px; padding: 38px 22px 280px; }
+  .thermal-notes > h2 { margin-bottom: 38px; }
+  .thermal-notes__flame { top: -135px; right: 8%; width: min(58vw, 290px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thermal-page *, .thermal-page *::before, .thermal-page *::after { scroll-behavior: auto !important; }
+}
