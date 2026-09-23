@@ -66,10 +66,10 @@
   }
   .home-discover__card:is(:hover, :focus-visible) {
     z-index: 1;
-    transform: translateY(-6px) scale(1.02);
+    transform: scale(1.02);
     box-shadow: 0 14px 28px rgba(23, 23, 23, .16);
   }
-  .home-discover__card:is(:hover, :focus-visible) .home-discover__illustration { transform: translateY(-4px) scale(1.035); }
+  .home-discover__card:is(:hover, :focus-visible) .home-discover__illustration { transform: scale(1.035); }
   .home-discover__card:is(:hover, :focus-visible) .home-discover__arrow { transform: translateX(8px); }
 }
 #home-cuicui-news { scroll-margin-top: calc(var(--header-height) + 24px); }
