@@ -9,12 +9,19 @@ export function PaginatedResourceSection<NodesType>({
   children,
   ariaLabel,
   resourcesClassName,
+  labels,
 }: {
   connection: React.ComponentProps<typeof Pagination<NodesType>>['connection'];
   children: React.FunctionComponent<{node: NodesType; index: number}>;
   ariaLabel?: string;
   resourcesClassName?: string;
+  labels?: {loading: string; previous: string; next: string};
 }) {
+  const copy = labels ?? {
+    loading: 'Loading…',
+    previous: 'Load previous',
+    next: 'Load more',
+  };
   return (
     <Pagination connection={connection}>
       {({nodes, isLoading, PreviousLink, NextLink}) => {
@@ -26,10 +33,10 @@ export function PaginatedResourceSection<NodesType>({
           <div>
             <PreviousLink>
               {isLoading ? (
-                'Loading...'
+                copy.loading
               ) : (
                 <span>
-                  <span aria-hidden="true">↑</span> Load previous
+                  <span aria-hidden="true">↑</span> {copy.previous}
                 </span>
               )}
             </PreviousLink>
@@ -46,10 +53,10 @@ export function PaginatedResourceSection<NodesType>({
             )}
             <NextLink>
               {isLoading ? (
-                'Loading...'
+                copy.loading
               ) : (
                 <span>
-                  Load more <span aria-hidden="true">↓</span>
+                  {copy.next} <span aria-hidden="true">↓</span>
                 </span>
               )}
             </NextLink>

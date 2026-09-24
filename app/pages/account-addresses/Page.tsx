@@ -12,6 +12,8 @@ import {
   type Fetcher,
 } from 'react-router';
 import type {Route} from '../../routes/+types/($locale).account.addresses';
+import {useId} from 'react';
+import type {AccountContext, AccountLocale} from '~/pages/account/context';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
@@ -27,8 +29,8 @@ export type ActionResponse = {
   updatedAddress?: AddressFragment;
 };
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Addresses'}];
+export const meta: Route.MetaFunction = ({params}) => {
+  return [{title: params.locale === 'fr' ? 'Mes adresses' : 'My addresses'}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {
@@ -39,6 +41,7 @@ export async function loader({context}: Route.LoaderArgs) {
 
 export async function action({request, context}: Route.ActionArgs) {
   const {customerAccount} = context;
+  const fr = new URL(request.url).pathname.split('/')[1] !== 'en';
 
   try {
     const form = await request.formData();
@@ -47,14 +50,24 @@ export async function action({request, context}: Route.ActionArgs) {
       ? String(form.get('addressId'))
       : null;
     if (!addressId) {
-      throw new Error('You must provide an address id.');
+      throw new Error(
+        fr
+          ? 'Une adresse doit être sélectionnée.'
+          : 'You must provide an address id.',
+      );
     }
 
     // this will ensure redirecting to login never happen for mutatation
     const isLoggedIn = await customerAccount.isLoggedIn();
     if (!isLoggedIn) {
       return data(
-        {error: {[addressId]: 'Unauthorized'}},
+        {
+          error: {
+            [addressId]: fr
+              ? 'Votre session a expiré. Reconnectez-vous.'
+              : 'Your session has expired. Sign in again.',
+          },
+        },
         {
           status: 401,
         },
@@ -109,7 +122,11 @@ export async function action({request, context}: Route.ActionArgs) {
           }
 
           if (!data?.customerAddressCreate?.customerAddress) {
-            throw new Error('Customer address create failed.');
+            throw new Error(
+              fr
+                ? 'La création de l’adresse a échoué.'
+                : 'Address creation failed.',
+            );
           }
 
           return {
@@ -159,7 +176,11 @@ export async function action({request, context}: Route.ActionArgs) {
           }
 
           if (!data?.customerAddressUpdate?.customerAddress) {
-            throw new Error('Customer address update failed.');
+            throw new Error(
+              fr
+                ? 'La mise à jour de l’adresse a échoué.'
+                : 'Address update failed.',
+            );
           }
 
           return {
@@ -207,7 +228,11 @@ export async function action({request, context}: Route.ActionArgs) {
           }
 
           if (!data?.customerAddressDelete?.deletedAddressId) {
-            throw new Error('Customer address delete failed.');
+            throw new Error(
+              fr
+                ? 'La suppression de l’adresse a échoué.'
+                : 'Address deletion failed.',
+            );
           }
 
           return {error: null, deletedAddress: addressId};
@@ -231,7 +256,13 @@ export async function action({request, context}: Route.ActionArgs) {
 
       default: {
         return data(
-          {error: {[addressId]: 'Method not allowed'}},
+          {
+            error: {
+              [addressId]: fr
+                ? 'Méthode non autorisée.'
+                : 'Method not allowed.',
+            },
+          },
           {
             status: 405,
           },
@@ -257,35 +288,53 @@ export async function action({request, context}: Route.ActionArgs) {
 }
 
 export default function Addresses() {
-  const {customer} = useOutletContext<{customer: CustomerFragment}>();
+  const {customer, locale} = useOutletContext<AccountContext>();
   const {defaultAddress, addresses} = customer;
+  const fr = locale === 'fr';
 
   return (
     <div className="account-addresses">
-      <h2>Addresses</h2>
-      <br />
-      <div>
-        <div>
-          <legend>Create address</legend>
-          <NewAddressForm key={addresses.nodes.length} />
-        </div>
-        <br />
-        <hr />
-        <br />
-        {!addresses.nodes.length ? (
-          <p>You have no addresses saved.</p>
-        ) : (
-          <ExistingAddresses
-            addresses={addresses}
-            defaultAddress={defaultAddress}
-          />
-        )}
+      <header className="account-section-heading">
+        <p className="eyebrow">
+          {fr ? 'Livraison en toute simplicité' : 'A smoother delivery'}
+        </p>
+        <h2>{fr ? 'Mes adresses' : 'My addresses'}</h2>
+        <p>
+          {fr
+            ? 'Enregistrez vos adresses pour simplifier vos prochaines commandes.'
+            : 'Save your addresses to make your next order easier.'}
+        </p>
+      </header>
+      <div className="account-addresses__grid">
+        <section className="account-addresses__new">
+          <h3>{fr ? 'Ajouter une adresse' : 'Add an address'}</h3>
+          <NewAddressForm locale={locale} />
+        </section>
+        <section className="account-addresses__saved">
+          <h3>{fr ? 'Adresses enregistrées' : 'Saved addresses'}</h3>
+          {!addresses.nodes.length ? (
+            <div className="account-empty-state account-empty-state--compact">
+              <p>
+                {fr
+                  ? 'Vous n’avez pas encore enregistré d’adresse.'
+                  : 'You haven’t saved an address yet.'}
+              </p>
+            </div>
+          ) : (
+            <ExistingAddresses
+              addresses={addresses}
+              defaultAddress={defaultAddress}
+              locale={locale}
+            />
+          )}
+        </section>
       </div>
     </div>
   );
 }
 
-function NewAddressForm() {
+function NewAddressForm({locale}: {locale: AccountLocale}) {
+  const fr = locale === 'fr';
   const newAddress = {
     address1: '',
     address2: '',
@@ -305,15 +354,23 @@ function NewAddressForm() {
       addressId={'NEW_ADDRESS_ID'}
       address={newAddress}
       defaultAddress={null}
+      locale={locale}
     >
       {({stateForMethod}) => (
-        <div>
+        <div className="account-form-actions">
           <button
+            className="account-button account-button--orange"
             disabled={stateForMethod('POST') !== 'idle'}
             formMethod="POST"
             type="submit"
           >
-            {stateForMethod('POST') !== 'idle' ? 'Creating' : 'Create'}
+            {stateForMethod('POST') !== 'idle'
+              ? fr
+                ? 'Création…'
+                : 'Creating…'
+              : fr
+                ? 'Créer l’adresse'
+                : 'Create address'}
           </button>
         </div>
       )}
@@ -324,32 +381,50 @@ function NewAddressForm() {
 function ExistingAddresses({
   addresses,
   defaultAddress,
-}: Pick<CustomerFragment, 'addresses' | 'defaultAddress'>) {
+  locale,
+}: Pick<CustomerFragment, 'addresses' | 'defaultAddress'> & {
+  locale: AccountLocale;
+}) {
+  const fr = locale === 'fr';
   return (
     <div>
-      <legend>Existing addresses</legend>
       {addresses.nodes.map((address) => (
         <AddressForm
           key={address.id}
           addressId={address.id}
           address={address}
           defaultAddress={defaultAddress}
+          locale={locale}
         >
           {({stateForMethod}) => (
-            <div>
+            <div className="account-form-actions">
               <button
+                className="account-button account-button--orange"
                 disabled={stateForMethod('PUT') !== 'idle'}
                 formMethod="PUT"
                 type="submit"
               >
-                {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
+                {stateForMethod('PUT') !== 'idle'
+                  ? fr
+                    ? 'Enregistrement…'
+                    : 'Saving…'
+                  : fr
+                    ? 'Enregistrer'
+                    : 'Save address'}
               </button>
               <button
+                className="account-button account-button--outline account-button--danger"
                 disabled={stateForMethod('DELETE') !== 'idle'}
                 formMethod="DELETE"
                 type="submit"
               >
-                {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
+                {stateForMethod('DELETE') !== 'idle'
+                  ? fr
+                    ? 'Suppression…'
+                    : 'Deleting…'
+                  : fr
+                    ? 'Supprimer'
+                    : 'Delete'}
               </button>
             </div>
           )}
@@ -363,11 +438,13 @@ export function AddressForm({
   addressId,
   address,
   defaultAddress,
+  locale,
   children,
 }: {
   addressId: AddressFragment['id'];
   address: CustomerAddressInput;
   defaultAddress: CustomerFragment['defaultAddress'];
+  locale: AccountLocale;
   children: (props: {
     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
   }) => React.ReactNode;
@@ -376,137 +453,158 @@ export function AddressForm({
   const action = useActionData<ActionResponse>();
   const error = action?.error?.[addressId];
   const isDefaultAddress = defaultAddress?.id === addressId;
+  const generatedId = useId();
+  const fr = locale === 'fr';
+  const field = (
+    name: string,
+    label: string,
+    placeholder: string,
+    autoComplete: string,
+    value?: string | null,
+    required = false,
+    maxLength?: number,
+    type = 'text',
+    pattern?: string,
+  ) => {
+    const id = `${generatedId}-${name}`;
+    return (
+      <div className="account-field" key={name}>
+        <label htmlFor={id}>
+          {label}
+          {required ? ' *' : ''}
+        </label>
+        <input
+          id={id}
+          name={name}
+          type={type}
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          defaultValue={value ?? ''}
+          required={required}
+          maxLength={maxLength}
+          pattern={pattern}
+          aria-label={label}
+        />
+      </div>
+    );
+  };
+
   return (
     <Form id={addressId}>
-      <fieldset>
+      <fieldset className="account-form-card account-address-card">
+        <legend className="sr-only">
+          {addressId === 'NEW_ADDRESS_ID'
+            ? fr
+              ? 'Nouvelle adresse'
+              : 'New address'
+            : fr
+              ? 'Adresse enregistrée'
+              : 'Saved address'}
+        </legend>
         <input type="hidden" name="addressId" defaultValue={addressId} />
-        <label htmlFor="firstName">First name*</label>
-        <input
-          aria-label="First name"
-          autoComplete="given-name"
-          defaultValue={address?.firstName ?? ''}
-          id="firstName"
-          name="firstName"
-          placeholder="First name"
-          required
-          type="text"
-        />
-        <label htmlFor="lastName">Last name*</label>
-        <input
-          aria-label="Last name"
-          autoComplete="family-name"
-          defaultValue={address?.lastName ?? ''}
-          id="lastName"
-          name="lastName"
-          placeholder="Last name"
-          required
-          type="text"
-        />
-        <label htmlFor="company">Company</label>
-        <input
-          aria-label="Company"
-          autoComplete="organization"
-          defaultValue={address?.company ?? ''}
-          id="company"
-          name="company"
-          placeholder="Company"
-          type="text"
-        />
-        <label htmlFor="address1">Address line*</label>
-        <input
-          aria-label="Address line 1"
-          autoComplete="address-line1"
-          defaultValue={address?.address1 ?? ''}
-          id="address1"
-          name="address1"
-          placeholder="Address line 1*"
-          required
-          type="text"
-        />
-        <label htmlFor="address2">Address line 2</label>
-        <input
-          aria-label="Address line 2"
-          autoComplete="address-line2"
-          defaultValue={address?.address2 ?? ''}
-          id="address2"
-          name="address2"
-          placeholder="Address line 2"
-          type="text"
-        />
-        <label htmlFor="city">City*</label>
-        <input
-          aria-label="City"
-          autoComplete="address-level2"
-          defaultValue={address?.city ?? ''}
-          id="city"
-          name="city"
-          placeholder="City"
-          required
-          type="text"
-        />
-        <label htmlFor="zoneCode">State / Province*</label>
-        <input
-          aria-label="State/Province"
-          autoComplete="address-level1"
-          defaultValue={address?.zoneCode ?? ''}
-          id="zoneCode"
-          name="zoneCode"
-          placeholder="State / Province"
-          required
-          type="text"
-        />
-        <label htmlFor="zip">Zip / Postal Code*</label>
-        <input
-          aria-label="Zip"
-          autoComplete="postal-code"
-          defaultValue={address?.zip ?? ''}
-          id="zip"
-          name="zip"
-          placeholder="Zip / Postal Code"
-          required
-          type="text"
-        />
-        <label htmlFor="territoryCode">Country Code*</label>
-        <input
-          aria-label="Country code"
-          autoComplete="country"
-          defaultValue={address?.territoryCode ?? ''}
-          id="territoryCode"
-          name="territoryCode"
-          placeholder="Country"
-          required
-          type="text"
-          maxLength={2}
-        />
-        <label htmlFor="phoneNumber">Phone</label>
-        <input
-          aria-label="Phone Number"
-          autoComplete="tel"
-          defaultValue={address?.phoneNumber ?? ''}
-          id="phoneNumber"
-          name="phoneNumber"
-          placeholder="+16135551111"
-          pattern="^\+?[1-9]\d{3,14}$"
-          type="tel"
-        />
-        <div>
+        <div className="account-form-grid account-address-grid">
+          {field(
+            'firstName',
+            fr ? 'Prénom' : 'First name',
+            fr ? 'Votre prénom' : 'Your first name',
+            'given-name',
+            address?.firstName,
+            true,
+          )}
+          {field(
+            'lastName',
+            fr ? 'Nom' : 'Last name',
+            fr ? 'Votre nom' : 'Your last name',
+            'family-name',
+            address?.lastName,
+            true,
+          )}
+          {field(
+            'company',
+            fr ? 'Entreprise' : 'Company',
+            fr ? 'Entreprise (facultatif)' : 'Company (optional)',
+            'organization',
+            address?.company,
+          )}
+          {field(
+            'address1',
+            fr ? 'Adresse' : 'Address',
+            fr ? 'Numéro et nom de rue' : 'Street address',
+            'address-line1',
+            address?.address1,
+            true,
+          )}
+          {field(
+            'address2',
+            fr ? 'Complément d’adresse' : 'Apartment, suite, etc.',
+            fr ? 'Appartement, bureau…' : 'Apartment, suite, etc.',
+            'address-line2',
+            address?.address2,
+          )}
+          {field(
+            'city',
+            fr ? 'Ville' : 'City',
+            fr ? 'Ville' : 'City',
+            'address-level2',
+            address?.city,
+            true,
+          )}
+          {field(
+            'zoneCode',
+            fr ? 'Province ou région' : 'State / Province',
+            fr ? 'Province ou région' : 'State / Province',
+            'address-level1',
+            address?.zoneCode,
+            true,
+          )}
+          {field(
+            'zip',
+            fr ? 'Code postal' : 'Postal code',
+            fr ? 'Code postal' : 'Postal code',
+            'postal-code',
+            address?.zip,
+            true,
+          )}
+          {field(
+            'territoryCode',
+            fr ? 'Pays (code)' : 'Country code',
+            fr ? 'Ex. CA ou FR' : 'e.g. CA or US',
+            'country',
+            address?.territoryCode,
+            true,
+            2,
+          )}
+          {field(
+            'phoneNumber',
+            fr ? 'Téléphone' : 'Phone',
+            '+1 613 555-0111',
+            'tel',
+            address?.phoneNumber,
+            false,
+            undefined,
+            'tel',
+            '^\\+?[1-9]\\d{3,14}$',
+          )}
+        </div>
+        <label
+          className="account-checkbox"
+          htmlFor={`${generatedId}-defaultAddress`}
+        >
           <input
             defaultChecked={isDefaultAddress}
-            id="defaultAddress"
+            id={`${generatedId}-defaultAddress`}
             name="defaultAddress"
             type="checkbox"
           />
-          <label htmlFor="defaultAddress">Set as default address</label>
-        </div>
+          <span>
+            {fr ? 'Définir comme adresse par défaut' : 'Set as default address'}
+          </span>
+        </label>
         {error ? (
-          <p>
-            <mark>
-              <small>{error}</small>
-            </mark>
+          <p className="account-form-error" role="alert">
+            <small>{error}</small>
           </p>
-        ) : (
-          <br />
-        )}
+        ) : null}
         {children({
           stateForMethod: (method) => (formMethod === method ? state : 'idle'),
         })}

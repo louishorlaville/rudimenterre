@@ -1,4 +1,4 @@
-﻿import {redirect, useLoaderData} from 'react-router';
+import {Link, redirect, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).account.orders.$id';
 import {Money, Image} from '@shopify/hydrogen';
 import type {
@@ -6,15 +6,25 @@ import type {
   OrderQuery,
 } from 'customer-accountapi.generated';
 import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
+import {
+  accountLocale,
+  accountPath,
+  accountStatus,
+} from '~/pages/account/context';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Order ${data?.order?.name}`}];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  return [
+    {
+      title: `${params.locale === 'fr' ? 'Commande' : 'Order'} ${data?.order?.name}`,
+    },
+  ];
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
   const {customerAccount} = context;
+  const locale = accountLocale(params.locale);
   if (!params.id) {
-    return redirect('/account/orders');
+    return redirect(accountPath(locale, '/account/orders'));
   }
 
   const orderId = atob(params.id);
@@ -39,7 +49,8 @@ export async function loader({params, context}: Route.LoaderArgs) {
   const discountApplications = order.discountApplications.nodes;
 
   // Get fulfillment status from first fulfillment node
-  const fulfillmentStatus = order.fulfillments.nodes[0]?.status ?? 'N/A';
+  const fulfillmentStatus =
+    order.fulfillments.nodes[0]?.status ?? 'UNFULFILLED';
 
   // Get first discount value with proper type checking
   const firstDiscount = discountApplications[0]?.value;
@@ -70,6 +81,7 @@ export async function loader({params, context}: Route.LoaderArgs) {
     discountValue,
     discountPercentage,
     fulfillmentStatus,
+    locale,
   };
 }
 
@@ -80,87 +92,100 @@ export default function OrderRoute() {
     discountValue,
     discountPercentage,
     fulfillmentStatus,
+    locale,
   } = useLoaderData<typeof loader>();
+  const fr = locale === 'fr';
+  const date = new Intl.DateTimeFormat(fr ? 'fr-CA' : 'en-CA', {
+    dateStyle: 'long',
+  }).format(new Date(order.processedAt!));
   return (
     <div className="account-order">
-      <h2>Order {order.name}</h2>
-      <p>Placed on {new Date(order.processedAt!).toDateString()}</p>
-      {order.confirmationNumber && (
-        <p>Confirmation: {order.confirmationNumber}</p>
-      )}
-      <br />
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Product</th>
-              <th scope="col">Price</th>
-              <th scope="col">Quantity</th>
-              <th scope="col">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lineItems.map((lineItem, lineItemIndex) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <OrderLineRow key={lineItemIndex} lineItem={lineItem} />
-            ))}
-          </tbody>
-          <tfoot>
-            {((discountValue && discountValue.amount) ||
-              discountPercentage) && (
+      <Link
+        className="account-back-link"
+        to={accountPath(locale, '/account/orders')}
+      >
+        ← {fr ? 'Retour aux commandes' : 'Back to orders'}
+      </Link>
+      <header className="account-section-heading">
+        <p className="eyebrow">
+          {fr ? 'Commande' : 'Order'} {order.name}
+        </p>
+        <h2>{fr ? 'Merci pour votre commande' : 'Thank you for your order'}</h2>
+      </header>
+      <div className="account-order-meta">
+        <span>
+          {fr ? 'Passée le' : 'Placed on'} {date}
+        </span>
+        {order.confirmationNumber && (
+          <span>
+            {fr ? 'Confirmation' : 'Confirmation'} · {order.confirmationNumber}
+          </span>
+        )}
+        <span className="account-status-pill">
+          {accountStatus(fulfillmentStatus, locale)}
+        </span>
+      </div>
+      <div className="account-order-detail-grid">
+        <div className="account-order-table">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{fr ? 'Produit' : 'Product'}</th>
+                <th scope="col">{fr ? 'Prix' : 'Price'}</th>
+                <th scope="col">{fr ? 'Quantité' : 'Quantity'}</th>
+                <th scope="col">{fr ? 'Total' : 'Total'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lineItems.map((lineItem) => (
+                <OrderLineRow key={lineItem.id} lineItem={lineItem} />
+              ))}
+            </tbody>
+            <tfoot>
+              {((discountValue && discountValue.amount) ||
+                discountPercentage) && (
+                <tr>
+                  <th scope="row" colSpan={3}>
+                    <p>{fr ? 'Réduction' : 'Discount'}</p>
+                  </th>
+                  <td>
+                    {discountPercentage ? (
+                      <span>-{discountPercentage}%</span>
+                    ) : (
+                      discountValue && <Money data={discountValue!} />
+                    )}
+                  </td>
+                </tr>
+              )}
               <tr>
                 <th scope="row" colSpan={3}>
-                  <p>Discounts</p>
-                </th>
-                <th scope="row">
-                  <p>Discounts</p>
+                  <p>{fr ? 'Sous-total' : 'Subtotal'}</p>
                 </th>
                 <td>
-                  {discountPercentage ? (
-                    <span>-{discountPercentage}% OFF</span>
-                  ) : (
-                    discountValue && <Money data={discountValue!} />
-                  )}
+                  <Money data={order.subtotal!} />
                 </td>
               </tr>
-            )}
-            <tr>
-              <th scope="row" colSpan={3}>
-                <p>Subtotal</p>
-              </th>
-              <th scope="row">
-                <p>Subtotal</p>
-              </th>
-              <td>
-                <Money data={order.subtotal!} />
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" colSpan={3}>
-                Tax
-              </th>
-              <th scope="row">
-                <p>Tax</p>
-              </th>
-              <td>
-                <Money data={order.totalTax!} />
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" colSpan={3}>
-                Total
-              </th>
-              <th scope="row">
-                <p>Total</p>
-              </th>
-              <td>
-                <Money data={order.totalPrice!} />
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-        <div>
-          <h3>Shipping Address</h3>
+              <tr>
+                <th scope="row" colSpan={3}>
+                  <p>{fr ? 'Taxes' : 'Tax'}</p>
+                </th>
+                <td>
+                  <Money data={order.totalTax!} />
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" colSpan={3}>
+                  <p>{fr ? 'Total' : 'Total'}</p>
+                </th>
+                <td>
+                  <Money data={order.totalPrice!} />
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <aside className="account-order-address">
+          <h3>{fr ? 'Adresse de livraison' : 'Shipping address'}</h3>
           {order?.shippingAddress ? (
             <address>
               <p>{order.shippingAddress.name}</p>
@@ -176,32 +201,48 @@ export default function OrderRoute() {
               )}
             </address>
           ) : (
-            <p>No shipping address defined</p>
+            <p>
+              {fr ? 'Aucune adresse de livraison.' : 'No shipping address.'}
+            </p>
           )}
-          <h3>Status</h3>
-          <div>
-            <p>{fulfillmentStatus}</p>
-          </div>
-        </div>
+          <h3>{fr ? 'Suivi' : 'Tracking'}</h3>
+          <p>{accountStatus(fulfillmentStatus, locale)}</p>
+          <a
+            className="account-button account-button--light"
+            target="_blank"
+            href={order.statusPageUrl}
+            rel="noreferrer"
+          >
+            {fr ? 'Suivre la commande' : 'Track this order'}{' '}
+            <span aria-hidden="true">↗</span>
+          </a>
+        </aside>
       </div>
-      <br />
-      <p>
-        <a target="_blank" href={order.statusPageUrl} rel="noreferrer">
-          View Order Status →
-        </a>
-      </p>
     </div>
   );
 }
 
 function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
+  const lineTotal = {
+    ...lineItem.price!,
+    amount: (
+      Number(lineItem.price!.amount) * lineItem.quantity -
+      Number(lineItem.totalDiscount?.amount ?? 0)
+    ).toFixed(2),
+  };
+
   return (
     <tr key={lineItem.id}>
       <td>
         <div>
-          {lineItem?.image && (
+          {lineItem.image && (
             <div>
-              <Image data={lineItem.image} width={96} height={96} />
+              <Image
+                data={lineItem.image}
+                alt={lineItem.image.altText ?? lineItem.title}
+                width={96}
+                height={96}
+              />
             </div>
           )}
           <div>
@@ -215,7 +256,7 @@ function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
       </td>
       <td>{lineItem.quantity}</td>
       <td>
-        <Money data={lineItem.totalDiscount!} />
+        <Money data={lineTotal} />
       </td>
     </tr>
   );
