@@ -21,7 +21,7 @@ export function PageLayout({cart, children = null, footer, header, isLoggedIn, p
   return (
     <Aside.Provider>
       <a className="skip-link" href="#main-content">{locale === 'fr' ? 'Aller au contenu' : 'Skip to content'}</a>
-      <Aside type="cart" heading={locale === 'fr' ? 'PANIER' : 'CART'}>
+      <Aside type="cart" heading={locale === 'fr' ? 'PANIER' : 'CART'} closeLabel={locale === 'fr' ? 'Fermer le panier' : 'Close cart'}>
         <Suspense fallback={<p>{locale === 'fr' ? 'Chargement…' : 'Loading…'}</p>}>
           <Await resolve={cart}>{(resolvedCart) => <CartMain cart={resolvedCart} layout="aside" />}</Await>
         </Suspense>

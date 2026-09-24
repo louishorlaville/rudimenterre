@@ -1,9 +1,15 @@
-import {useOptimisticCart} from '@shopify/hydrogen';
+import {useOptimisticCart, type OptimisticCart} from '@shopify/hydrogen';
 import {Link, useLocation} from 'react-router';
-import type {CartApiQueryFragment} from 'storefrontapi.generated';
+import type {
+  CartApiQueryFragment,
+  MoneyFragment,
+} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
+import {localeFromPathname} from '~/lib/i18n';
+import type {StorefrontLocale} from '~/lib/i18n';
+import {useEffect, useRef} from 'react';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -45,19 +51,54 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const withDiscount =
     cart &&
     Boolean(cart?.discountCodes?.filter((code) => code.applicable)?.length);
-  const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
+  const className = `cart-main cart-main--${layout} ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
+  const originalQuantities = new Map(
+    (originalCart?.lines?.nodes ?? []).map((line) => [line.id, line.quantity]),
+  );
+  const pendingLineIds = new Set(
+    (cart?.lines?.nodes ?? [])
+      .filter((line) => originalQuantities.get(line.id) !== line.quantity)
+      .map((line) => line.id),
+  );
+  const locale = localeFromPathname(useLocation().pathname);
+  const {type: activeAside} = useAside();
+  const sectionRef = useRef<HTMLElement>(null);
+  const displayedSubtotal = getDisplayedSubtotal(cart, originalCart);
+
+  useEffect(() => {
+    if (
+      layout === 'aside' &&
+      activeAside === 'cart' &&
+      document.activeElement === document.body
+    ) {
+      sectionRef.current
+        ?.querySelector<HTMLElement>(
+          cartHasItems ? '.cart-line a' : '.cart-empty a',
+        )
+        ?.focus();
+    }
+  }, [activeAside, cartHasItems, cart?.totalQuantity, layout]);
 
   return (
     <section
+      ref={sectionRef}
       className={className}
-      aria-label={layout === 'page' ? 'Cart page' : 'Cart drawer'}
+      aria-label={
+        locale === 'fr'
+          ? layout === 'page'
+            ? 'Page panier'
+            : 'Panier'
+          : layout === 'page'
+            ? 'Cart page'
+            : 'Cart drawer'
+      }
     >
-      <CartEmpty hidden={linesCount} layout={layout} />
+      <CartEmpty hidden={linesCount} layout={layout} locale={locale} />
       <div className="cart-details">
         <p id="cart-lines" className="sr-only">
-          Line items
+          {locale === 'fr' ? 'Articles du panier' : 'Cart items'}
         </p>
         <div>
           <ul aria-labelledby="cart-lines">
@@ -75,32 +116,122 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
                   line={line}
                   layout={layout}
                   childrenMap={childrenMap}
+                  locale={locale}
+                  pendingLineIds={pendingLineIds}
                 />
               );
             })}
           </ul>
         </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
+        {cartHasItems && (
+          <CartSummary
+            cart={cart}
+            layout={layout}
+            locale={locale}
+            displayedSubtotal={displayedSubtotal}
+          />
+        )}
       </div>
     </section>
   );
 }
 
+function getDisplayedSubtotal(
+  cart: OptimisticCart<CartApiQueryFragment | null>,
+  originalCart: CartApiQueryFragment | null,
+): MoneyFragment | undefined {
+  const currentLines = (cart?.lines?.nodes ?? []).filter(
+    (line) =>
+      !('parentRelationship' in line && line.parentRelationship?.parent),
+  );
+  const originalLines = (originalCart?.lines?.nodes ?? []).filter(
+    (line) =>
+      !('parentRelationship' in line && line.parentRelationship?.parent),
+  );
+  const originalById = new Map(originalLines.map((line) => [line.id, line]));
+  const currentById = new Map(currentLines.map((line) => [line.id, line]));
+  const hasPendingQuantityChange =
+    originalById.size !== currentById.size ||
+    originalLines.some(
+      (line) => currentById.get(line.id)?.quantity !== line.quantity,
+    );
+  const originalSubtotal = originalCart?.cost?.subtotalAmount;
+
+  if (!hasPendingQuantityChange || !originalSubtotal) {
+    const subtotal = cart?.cost?.subtotalAmount;
+    return subtotal?.amount && subtotal.currencyCode
+      ? {amount: subtotal.amount, currencyCode: subtotal.currencyCode}
+      : undefined;
+  }
+
+  let amount = Number(originalSubtotal.amount);
+
+  for (const originalLine of originalLines) {
+    const currentLine = currentById.get(originalLine.id);
+    const unitAmount =
+      Number(originalLine.cost.totalAmount.amount) / originalLine.quantity;
+    amount +=
+      ((currentLine?.quantity ?? 0) - originalLine.quantity) * unitAmount;
+  }
+
+  for (const currentLine of currentLines) {
+    if (!originalById.has(currentLine.id)) {
+      amount +=
+        Number(
+          currentLine.cost?.amountPerQuantity?.amount ??
+            currentLine.merchandise.price.amount,
+        ) * currentLine.quantity;
+    }
+  }
+
+  const precision = Math.min(
+    6,
+    Math.max(
+      originalSubtotal.amount.split('.')[1]?.length ?? 0,
+      ...originalLines.map(
+        (line) => line.cost.totalAmount.amount.split('.')[1]?.length ?? 0,
+      ),
+    ),
+  );
+
+  return {
+    currencyCode: originalSubtotal.currencyCode,
+    amount: amount.toFixed(precision),
+  };
+}
+
 function CartEmpty({
   hidden = false,
+  layout,
+  locale,
 }: {
   hidden: boolean;
-  layout?: CartMainProps['layout'];
+  layout: CartMainProps['layout'];
+  locale: StorefrontLocale;
 }) {
   const {close} = useAside();
-  const locale = useLocation().pathname.split('/')[1] === 'en' ? 'en' : 'fr';
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>{locale === 'fr' ? 'Votre panier est encore vide.' : 'Your cart is still empty.'}</p>
-      <br />
+    <div
+      className={
+        layout === 'aside' ? 'cart-empty cart-empty--aside' : 'cart-empty'
+      }
+      hidden={hidden}
+    >
+      {layout === 'page' && <br />}
+      <p>
+        {locale === 'fr'
+          ? 'Votre panier est encore vide.'
+          : 'Your cart is still empty.'}
+      </p>
+      {layout === 'page' && <br />}
       <Link to={`/${locale}/adoptez`} onClick={close} prefetch="viewport">
-        {locale === 'fr' ? 'Découvrir Rudimenterre →' : 'Discover Rudimenterre →'}
+        {layout === 'aside'
+          ? locale === 'fr'
+            ? 'Découvrir les produits'
+            : 'Explore products'
+          : locale === 'fr'
+            ? 'Découvrir Rudimenterre →'
+            : 'Discover Rudimenterre →'}
       </Link>
     </div>
   );

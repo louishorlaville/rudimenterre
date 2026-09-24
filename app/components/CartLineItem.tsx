@@ -5,6 +5,7 @@ import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
+import type {StorefrontLocale} from '~/lib/i18n';
 import type {
   CartApiQueryFragment,
   CartLineFragment,
@@ -22,24 +23,39 @@ export function CartLineItem({
   layout,
   line,
   childrenMap,
+  locale,
+  pendingLineIds,
 }: {
   layout: CartLayout;
   line: CartLine;
   childrenMap: LineItemChildrenMap;
+  locale: StorefrontLocale;
+  pendingLineIds: ReadonlySet<string>;
 }) {
   const {id, merchandise} = line;
-  const {product, title, image, selectedOptions} = merchandise;
+  const {product, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
+  const visibleOptions = selectedOptions.filter(
+    (option) => option.value !== 'Default Title',
+  );
+  const unitPrice = line.cost?.amountPerQuantity ?? merchandise.price;
+  const displayedPrice =
+    line.isOptimistic || pendingLineIds.has(id)
+      ? {
+          ...unitPrice,
+          amount: multiplyMoney(unitPrice.amount, line.quantity),
+        }
+      : line.cost?.totalAmount;
 
   return (
     <li key={id} className="cart-line">
       <div className="cart-line-inner">
         {image && (
           <Image
-            alt={title}
+            alt={product.title}
             aspectRatio="1/1"
             data={image}
             height={100}
@@ -48,7 +64,7 @@ export function CartLineItem({
           />
         )}
 
-        <div>
+        <div className="cart-line-copy">
           <Link
             prefetch="intent"
             to={lineItemUrl}
@@ -58,28 +74,34 @@ export function CartLineItem({
               }
             }}
           >
-            <p>
+            <p className="cart-line-title">
               <strong>{product.title}</strong>
             </p>
           </Link>
-          <ProductPrice price={line?.cost?.totalAmount} />
-          <ul>
-            {selectedOptions.map((option) => (
-              <li key={option.name}>
-                <small>
-                  {option.name}: {option.value}
-                </small>
-              </li>
-            ))}
-          </ul>
-          <CartLineQuantity line={line} />
+          <ProductPrice
+            price={displayedPrice}
+            label={locale === 'fr' ? 'Prix' : 'Price'}
+          />
+          {visibleOptions.length > 0 && (
+            <ul className="cart-line-options">
+              {visibleOptions.map((option) => (
+                <li key={option.name}>
+                  <small>
+                    {option.name}: {option.value}
+                  </small>
+                </li>
+              ))}
+            </ul>
+          )}
+          <CartLineQuantity line={line} locale={locale} layout={layout} />
         </div>
       </div>
 
       {lineItemChildren ? (
         <div>
           <p id={childrenLabelId} className="sr-only">
-            Line items with {product.title}
+            {locale === 'fr' ? 'Articles avec' : 'Line items with'}{' '}
+            {product.title}
           </p>
           <ul aria-labelledby={childrenLabelId} className="cart-line-children">
             {lineItemChildren.map((childLine) => (
@@ -88,6 +110,8 @@ export function CartLineItem({
                 key={childLine.id}
                 line={childLine}
                 layout={layout}
+                locale={locale}
+                pendingLineIds={pendingLineIds}
               />
             ))}
           </ul>
@@ -97,12 +121,25 @@ export function CartLineItem({
   );
 }
 
+function multiplyMoney(amount: string, quantity: number) {
+  const decimals = amount.split('.')[1]?.length ?? 0;
+  return (Number(amount) * quantity).toFixed(decimals);
+}
+
 /**
  * Provides the controls to update the quantity of a line item in the cart.
  * These controls are disabled when the line item is new, and the server
  * hasn't yet responded that it was successfully added to the cart.
  */
-function CartLineQuantity({line}: {line: CartLine}) {
+function CartLineQuantity({
+  line,
+  locale,
+  layout,
+}: {
+  line: CartLine;
+  locale: StorefrontLocale;
+  layout: CartLayout;
+}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
   const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
@@ -110,30 +147,48 @@ function CartLineQuantity({line}: {line: CartLine}) {
 
   return (
     <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
+      <small>
+        {locale === 'fr' ? 'Quantité' : 'Quantity'}
+        {layout === 'page' ? ` : ${quantity}` : ''}
+      </small>
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
         <button
-          aria-label="Decrease quantity"
+          aria-label={
+            locale === 'fr'
+              ? `Diminuer la quantité de ${line.merchandise.product.title}`
+              : `Decrease quantity of ${line.merchandise.product.title}`
+          }
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
           value={prevQuantity}
         >
-          <span>&#8722; </span>
+          <span aria-hidden="true">&#8722;</span>
         </button>
       </CartLineUpdateButton>
-      &nbsp;
+      {layout === 'aside' && (
+        <span className="cart-line-quantity-value" aria-live="polite">
+          {quantity}
+        </span>
+      )}
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
-          aria-label="Increase quantity"
+          aria-label={
+            locale === 'fr'
+              ? `Augmenter la quantité de ${line.merchandise.product.title}`
+              : `Increase quantity of ${line.merchandise.product.title}`
+          }
           name="increase-quantity"
           value={nextQuantity}
           disabled={!!isOptimistic}
         >
-          <span>&#43;</span>
+          <span aria-hidden="true">&#43;</span>
         </button>
       </CartLineUpdateButton>
-      &nbsp;
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+      <CartLineRemoveButton
+        lineIds={[lineId]}
+        disabled={!!isOptimistic}
+        locale={locale}
+      />
     </div>
   );
 }
@@ -146,9 +201,11 @@ function CartLineQuantity({line}: {line: CartLine}) {
 function CartLineRemoveButton({
   lineIds,
   disabled,
+  locale,
 }: {
   lineIds: string[];
   disabled: boolean;
+  locale: StorefrontLocale;
 }) {
   return (
     <CartForm
@@ -157,8 +214,8 @@ function CartLineRemoveButton({
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button disabled={disabled} type="submit">
-        Remove
+      <button className="cart-line-remove" disabled={disabled} type="submit">
+        {locale === 'fr' ? 'Retirer' : 'Remove'}
       </button>
     </CartForm>
   );
