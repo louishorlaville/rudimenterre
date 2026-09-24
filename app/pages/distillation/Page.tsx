@@ -275,45 +275,55 @@ export function DistillationPage() {
         <h2>CE N’EST PAS DE LA MAGIE, C’EST DE LA PHYSIQUE !</h2>
         <p>
           Comment peut-on récupérer plus d’eau pure (290ml au lieu de 200ml)
-          alors que la casserole du bas a moins évaporé&nbsp;? C’est la physique
-          du Cuicui&nbsp;!
+          alors que la casserole du bas a moins évaporé&nbsp;?
+          <br />
+          C’est la physique du Cuicui&nbsp;!
           <br />
           Le deuxième récipient agit comme un régulateur : il ralentit la fuite
           de la vapeur en bas, ce qui permet au couvercle de rester plus frais.
           Au lieu de produire de la vapeur à tout vitesse et de la laisser
-          s’échapper dans la cuisine, le système prend son temps et piège la
+          s’échapper dans la cuisine <strong>(pas de pression**)</strong>, le système prend son temps et piège la
           vapeur avec une efficacité redoutable. Moins de gaspillage en bas,
           plus d’eau pure en haut.
         </p>
       </section>
-      <section className="distillation-notes">
-        <p>
-          <strong>PFAS***</strong>
-          <br />
-          <strong>
-            La distillation thermique est, avec l’osmose inverse, l’une des deux
-            méthodes les plus efficaces reconnues pour éliminer les PFAS.
-          </strong>{' '}
-          En exploitant la différence des points d’ébullition (l’eau s’évapore à
-          100°C tandis que les PFAS nécessitent plus de 180°C), cette technique
-          laisse les polluants éternels piégés au fond de la casserole du bas.
-          Les études scientifiques menées sur les procédés de distillation
-          résidentielle démontrent une efficacité supérieure à 99% sur
-          l’élimination des PFOA/PFOS. Données récentes de l’Institute of
-          Science Tokyo (2025/2026)&nbsp;: les recherches en génie
-          environnemental confirment que l’exploitation des différences de
-          points d’ébullition permet de faire chuter les taux de PFAS sous les
-          limites de détection environnementales globales.
-        </p>
-        <p>
-          <strong>Pas de pression**</strong>
-          <br />
-          <strong>
-            Le Cuicui n’est pas sous pression pour ne jamais dépasser les 100°C
-          </strong>{' '}
-          et conserver le maximum de nutriments et vitamines. Il y a donc
-          toujours un peu de vapeur qui s’échappe entre chaque élément.
-        </p>
+      <section className="distillation-sources" aria-labelledby="distillation-sources-title">
+        <h2 id="distillation-sources-title">LIENS ET SOURCES</h2>
+        <div className="distillation-sources__pfas">
+          <h3>PFAS***</h3>
+          <p>
+            La distillation thermique est, avec l’osmose inverse, l’une des méthodes les plus efficaces <strong>issues des principes de séparation physique validés par les autorités sanitaires (notamment l’US EPA)</strong> pour éliminer les PFAS. Mais contrairement à l’osmose inverse, qui nécessite le remplacement régulier de filtres et de membranes jetables, la distillation s’appuie sur une loi physique invariable — le changement d’état de l’eau — sans aucun consommable à remplacer.
+          </p>
+          <p>
+            La séparation des PFAS par distillation thermique repose sur les propriétés thermodynamiques fondamentales des fluides (Kaiser et al., <em>Journal of Chemical &amp; Engineering Data</em>). Présentant un point d’ébullition supérieur à 180 °C et une pression de vapeur négligeable à 100 °C, les polluants perfluorés (PFOA/PFOS) ne peuvent pas passer en phase gazeuse lors de l’ébullition. Seule la molécule d’eau s’évapore, laissant l’intégralité des polluants non volatils piégés dans le récipient source (données de référence CDC / ATSDR Toxicological Profiles et US EPA Treatability Database).
+          </p>
+          <ul className="distillation-sources__references">
+            <li><strong>Données thermodynamiques</strong> (Pression de vapeur et ébullition des PFAS)<br />Kaiser et al., <em>Journal of Chemical &amp; Engineering Data</em>, 2025 : <a href="https://doi.org/10.1021/je050070r">https://doi.org/10.1021/je050070r</a></li>
+            <li><strong>Propriétés physico-chimiques officielles</strong> (Point d’ébullition &gt; 180C)<br />CDC / ATSDR - <em>Toxicological Profile for Perfluoroalkyls</em>, Chapitre 4 : <a href="https://www.atsdr.cdc.gov/toxprofiles/tp200.pdf">https://www.atsdr.cdc.gov/toxprofiles/tp200.pdf</a></li>
+            <li><strong>Cadre réglementaire et technologies de traitement des PFAS</strong><br />US EPA - <em>Per- and Polyfluoroalkyl Substances (PFAS)</em> : <a href="https://www.epa.gov/pfas">https://www.epa.gov/pfas</a></li>
+          </ul>
+        </div>
+        <div className="distillation-sources__pressure">
+          <h3>Pas de pression**</h3>
+          <p><strong>Le Cuicui n’est pas sous pression pour ne jamais dépasser les 100C</strong> et conserver le maximum de nutriment et vitamines. Il y a donc toujours un peu de vapeur qui s’échapper entre chaque éléments.</p>
+          <ul className="distillation-sources__references">
+            <li><strong>Richard Rocca-Poliméri</strong> - Thèse : Contribution à la compréhension de la cuisson domestique sous pression de vapeur. Étude expérimentale et modélisation de transferts - AgroParisTech 2007 - NNT : 2007AGPT0045. pastel-00004560</li>
+            <li><strong>Kadri Fouzia</strong> - Mémoire en sciences alimentaires : Effet de 2 modes de cuisson et de la durée de stockage à température ambiante sur la teneur en polyphénols totaux de 4 espèces de légumes - I.N.A.T.A.A, 2014/2015</li>
+          </ul>
+        </div>
+      </section>
+      <section className="distillation-further-reading">
+        <h2>POUR ALLER PLUS LOIN SI LA DISTILLATION VOUS INTÉRESSE</h2>
+        <ul>
+          <li><strong>Livre LOW, une anthropologie pour comprendre les low-tech</strong>, dirigée par Clément Gaillard, postface Philippe Bihouix, 2023. T&amp;P Publishing, ISBN 979-10-95513-20-9<br />p.283 /289 La purification avec la jacinthe d’eau - p.291/300 Le distillateur solaire d’urgence - p.301/310 La distillation de l’eau</li>
+          <li><strong>Objectif sciences international</strong> - Site web :<br /><a href="https://osi-perception.org">osi-perception.org</a>, programme de recherche participatives et d’éducation aux sciences de l’ONG Objectif Sciences International - Fiche d’activité pour créer un distillateur solaire</li>
+          <li><strong>Projet Heliowater</strong> - Site web : <a href="https://heliowater.fr">heliowater.fr</a></li>
+          <li><strong>L’Heliodomestico</strong> - Site web : <a href="https://eau-nature.fr">eau-nature.fr</a><br />Un distillateur solaire domestique designer par Gabriele Diamanti, article du 4-11-2017, lien article :<br /><a href="https://www.eau-nature.fr/leliodomestico-un-dessalinisateur-solaire-a-fabriquer-soi-meme/">https://www.eau-nature.fr/leliodomestico-un-dessalinisateur-solaire-a-fabriquer-soi-meme/</a></li>
+        </ul>
+      </section>
+      <section className="distillation-other-reading">
+        <h2>ET POUR CEUX QUI VOUDRAIENT DISTILLER AUTRE CHOSE QUE DE L’EAU…</h2>
+        <p><strong>Principes de la distillation</strong> - Site web : Arbo Schwin, <a href="https://www.arboschwin.com">arboschwin.com</a><br />lien principe distillation : <a href="https://www.arboschwin.com/index.php?page=disti_princip">https://www.arboschwin.com/index.php?page=disti_princip</a></p>
       </section>
     </article>
   );

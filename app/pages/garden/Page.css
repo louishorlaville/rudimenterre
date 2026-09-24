@@ -1,0 +1,48 @@
+.garden-page { --garden-yellow: #ffe483; --garden-cream: #fff9e7; --garden-gold: #f7c565; --garden-ochre: #dc982e; color: #151515; font-family: Arial, Helvetica, sans-serif; }
+.garden-page h1, .garden-page h2, .garden-page h3, .garden-page p { margin: 0; letter-spacing: normal; }
+.garden-intro { padding: clamp(2.5rem, 4vw, 4rem) var(--content-gutter) clamp(3rem, 5vw, 5rem); background: var(--garden-yellow); text-align: center; }
+.garden-intro h1 { font-size: clamp(1.7rem, 2.4vw, 2.3rem); }
+.garden-intro p { margin-top: 1.4rem; font-size: clamp(1.15rem, 2vw, 1.8rem); font-weight: 700; line-height: 1.3; }
+.garden-history { padding: clamp(2rem, 3vw, 3rem) var(--content-gutter) clamp(3rem, 5vw, 5rem); background: var(--garden-cream); }
+.garden-history__cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 2vw, 2rem); }
+.garden-card { display: flex; flex-direction: column; min-width: 0; border: 4px solid #111; background: #fff; }
+.garden-card__heading { min-height: clamp(9rem, 14vw, 13rem); padding: clamp(1rem, 2vw, 2rem) .8rem .7rem; }
+.garden-card__heading h2 { font-size: clamp(2rem, 4vw, 4rem); line-height: 1.06; }
+.garden-card__heading p { margin-top: 1rem; font-size: clamp(1rem, 1.7vw, 1.55rem); line-height: 1.35; }
+.garden-card--medieval .garden-card__heading, .garden-card--medieval .garden-card__definition { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+.garden-card--medieval .garden-card__heading h2 { font-family: var(--font-script); font-size: clamp(3rem, 5vw, 5rem); font-weight: 400; }
+.garden-card > img { display: block; width: 100%; height: clamp(25rem, 54vw, 54rem); object-fit: cover; object-position: center; }
+.garden-card--medieval > img { border-block: 12px double #111; object-fit: contain; }
+.garden-card__definition { min-height: 10.5rem; padding: 1rem .8rem; font-size: clamp(.9rem, 1.4vw, 1.2rem); line-height: 1.5; text-align: justify; }
+.garden-card--medieval .garden-card__definition { border-top: 12px double #111; }
+.garden-history__conclusion { margin: clamp(2rem, 3vw, 3rem) auto 0 !important; font-size: clamp(1rem, 1.55vw, 1.35rem); line-height: 1.55; text-align: justify; }
+.garden-future { padding: clamp(2.8rem, 4vw, 4.2rem) var(--content-gutter); background: var(--garden-yellow); text-align: center; }
+.garden-future h2 { font-size: clamp(1.45rem, 2.35vw, 2.2rem); line-height: 1.2; }
+.garden-future p { margin-top: .75rem; font-size: clamp(1.2rem, 1.95vw, 1.8rem); font-weight: 700; line-height: 1.35; }
+.garden-cooking__manifesto { padding: .8rem var(--content-gutter); background: var(--garden-yellow); font-size: clamp(1rem, 1.55vw, 1.4rem); font-style: italic; line-height: 1.5; text-align: center; }
+.garden-cooking__banner { display: block; width: 100%; height: clamp(17rem, 33vw, 34rem); object-fit: cover; }
+.garden-cooking__single-fire { padding: clamp(2rem, 3vw, 3rem) var(--content-gutter); background: #fff2ae; color: #4b4b4b; }
+.garden-cooking__single-fire h2, .garden-cooking__fraternity h2 { font-size: clamp(1.45rem, 2vw, 2rem); text-align: center; }
+.garden-cooking__single-fire p { max-width: 31rem; margin: 1.75rem auto 0; font-size: clamp(1.05rem, 1.5vw, 1.35rem); line-height: 1.5; text-align: justify; }
+.garden-cooking__fraternity { padding: clamp(2rem, 3vw, 3rem) var(--content-gutter); background: var(--garden-gold); color: #4b4b4b; }
+.garden-cooking__fraternity p { max-width: 45rem; margin: 1.7rem auto 0; font-size: clamp(1.05rem, 1.5vw, 1.35rem); line-height: 1.5; text-align: justify; }
+.garden-benefits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1rem, 2.5vw, 2.5rem); padding: 1rem var(--content-gutter) .6rem; background: var(--garden-ochre); }
+.garden-benefits section { min-width: 0; }
+.garden-benefits h3 { display: flex; align-items: end; justify-content: space-between; gap: .5rem; min-height: 4.8rem; padding-bottom: .2rem; border-bottom: 2px solid #111; font-size: clamp(1.35rem, 2.2vw, 2.25rem); line-height: 1.1; white-space: nowrap; }
+.garden-benefits h3 img { width: clamp(2rem, 4vw, 4.5rem); height: 4rem; object-fit: contain; }
+.garden-benefits p { padding-top: .45rem; font-size: clamp(1rem, 1.45vw, 1.3rem); line-height: 1.55; }
+.garden-cooking__banner--bottom { height: clamp(19rem, 36vw, 37rem); }
+@media (max-width: 760px) {
+  .garden-history__cards { grid-template-columns: 1fr; max-width: 34rem; }
+  .garden-card__heading { min-height: auto; }
+  .garden-card > img { height: 34rem; }
+  .garden-card--medieval > img { height: auto; }
+  .garden-card__definition { min-height: auto; }
+  .garden-history__conclusion { text-align: left; }
+  .garden-card__definition, .garden-cooking__single-fire p, .garden-cooking__fraternity p { text-align: left; }
+  .garden-benefits { grid-template-columns: 1fr; gap: 1.3rem; padding-block: 1.5rem; }
+  .garden-benefits h3 { min-height: 3.5rem; }
+  .garden-cooking__manifesto br { display: none; }
+  .garden-cooking__banner { height: 16rem; }
+  .garden-cooking__banner--bottom { height: 19rem; }
+}

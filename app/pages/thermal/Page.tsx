@@ -142,7 +142,7 @@ export function ThermalPage({locale}: {locale: StorefrontLocale}) {
 
     <footer className="thermal-notes">
       <h2>{fr ? 'LA CHALEUR CONTINUE SON TRAVAIL' : 'HEAT KEEPS DOING THE WORK'}</h2>
-      <img className="thermal-notes__flame" src={image('flame')} alt="" aria-hidden="true" loading="lazy" />
+      <img className="thermal-notes__flame" src="/images/rudimenterre/thermal-flame.png" alt="" aria-hidden="true" loading="lazy" />
       <div className="thermal-notes__copy">
         <p><strong>67 °C*</strong><br />{fr ? <>La température interne feu éteint ne doit pas descendre sous <strong>60 °C</strong> pour être sécuritaire. Sous ce seuil, les bactéries peuvent proliférer rapidement, ce qui rend la préparation dangereuse à la consommation si le temps de maintien au chaud se prolonge.</> : <>The internal temperature after switching off the heat should not fall below <strong>60 °C</strong> to remain safe. Below this threshold, bacteria can multiply quickly, making food unsafe if it is kept warm for too long.</>}</p>
         <p><strong>{fr ? 'N’IMPORTE QUELLE SOURCE D’ÉNERGIE**' : 'ANY ENERGY SOURCE**'}</strong><br />{fr ? 'Puisque la cuisson est indirecte, c’est la matière de la casserole complémentaire qui détermine la compatibilité avec la source de chaleur en contact direct.' : 'Because cooking is indirect, the material of the saucepan determines which direct heat sources it can be used with.'}</p>
