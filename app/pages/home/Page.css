@@ -714,10 +714,10 @@
 .home-kitchen-compare__plate--gratin { left: 77%; width: 8.7%; }
 .home-kitchen-compare__towel {
   position: absolute;
-  top: 42%;
-  left: 1.38%;
+  top: 46.8%;
+  left: 1.7%;
   z-index: 3;
-  width: 24%;
+  width: 18%;
   height: auto;
   aspect-ratio: 619 / 872;
   border: 0;
@@ -730,10 +730,10 @@
 }
 .home-kitchen-compare__towel-hit-area {
   position: absolute;
-  top: 46%;
-  left: 4.8%;
+  top: 50.3%;
+  left: 4.9%;
   z-index: 4;
-  width: 8%;
+  width: 6%;
   aspect-ratio: 209 / 632;
   cursor: grab;
   pointer-events: auto;
@@ -1596,14 +1596,14 @@
     width: 68%;
   }
   .home-kitchen-compare__art-side--with .home-kitchen-compare__towel {
-    top: 18%;
-    left: 2.76%;
-    width: 50%;
+    top: 23.5%;
+    left: 2.9%;
+    width: 37.5%;
   }
   .home-kitchen-compare__art-side--with .home-kitchen-compare__towel-hit-area {
-    top: 21%;
+    top: 26.5%;
     left: 9.6%;
-    width: 16%;
+    width: 12.7%;
   }
   .home-kitchen-compare__uses {
     position: static;

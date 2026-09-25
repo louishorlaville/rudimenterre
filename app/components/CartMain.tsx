@@ -224,7 +224,12 @@ function CartEmpty({
           : 'Your cart is still empty.'}
       </p>
       {layout === 'page' && <br />}
-      <Link to={`/${locale}/adoptez`} onClick={close} prefetch="viewport">
+      <Link
+        className={layout === 'aside' ? 'button button--orange' : undefined}
+        to={`/${locale}/adoptez`}
+        onClick={close}
+        prefetch="viewport"
+      >
         {layout === 'aside'
           ? locale === 'fr'
             ? 'Découvrir les produits'
