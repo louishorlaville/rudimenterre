@@ -130,6 +130,10 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
 .header-menu--desktop .header-documentation:hover summary span { transform: translateY(.12rem) rotate(225deg); }
 .header-actions { justify-self: end; display: flex; align-items: center; gap: clamp(.7rem, 1.2vw, 1.2rem); font-size: .75rem; text-transform: none; letter-spacing: 0; }
 .header-cta { min-height: 3rem; padding: .8rem 1.75rem; border: 2px solid var(--ink); background: #f47b00; color: var(--white); font-size: .82rem; font-weight: 400; letter-spacing: 0; text-transform: none; text-decoration: none; }
+.header-cta::before { z-index: -1; }
+.header-cta:is(:hover, :focus-visible) { color: var(--charcoal); }
+.site-header .header-menu a.header-cta:is(:hover, :focus-visible) { color: var(--ink) !important; }
+.header-cta:is(:hover, :focus-visible) > * { position: relative; z-index: 1; }
 .header-cta::after { display: none; }
 .header-actions .header-cart { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; min-height: 2.75rem; color: rgba(255,255,255,.72) !important; }
 .header-actions .header-cart::after { display: none; }

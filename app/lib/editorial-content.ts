@@ -24,17 +24,30 @@ export type EditorialPageContent = {
   sections: EditorialSection[];
 };
 
-export const PAGE_SLUGS: Record<EditorialPageId, Record<StorefrontLocale, string>> = {
-  project: {fr: 'projet-rudimenterre', en: 'rudimenterre-project'},
-  steam: {fr: 'vapeur-etuvee', en: 'steam-cooking'},
-  garden: {fr: 'potager', en: 'kitchen-garden'},
-  making: {fr: 'fabrication-et-entretien', en: 'making-and-care'},
-  thermal: {fr: 'experience-thermique', en: 'thermal-experiments'},
-  distillation: {fr: 'experience-distillation', en: 'distillation-experiments'},
-  creator: {fr: 'la-recette-rudimenterre', en: 'the-rudimenterre-recipe'},
-  jury: {fr: 'jury', en: 'awards'},
-  adopt: {fr: 'adoptez', en: 'adopt'},
-  shipping: {fr: 'tarifs-livraison-garanties', en: 'pricing-shipping-warranty'},
+export const PAGE_SLUGS: Record<EditorialPageId, string> = {
+  project: 'projet-rudimenterre',
+  steam: 'vapeur-etuvee',
+  garden: 'potager',
+  making: 'fabrication-et-entretien',
+  thermal: 'experience-thermique',
+  distillation: 'experience-distillation',
+  creator: 'la-recette-rudimenterre',
+  jury: 'jury',
+  adopt: 'adoptez',
+  shipping: 'tarifs-livraison-garanties',
+};
+
+const LEGACY_EN_SLUGS: Partial<Record<EditorialPageId, string>> = {
+  project: 'rudimenterre-project',
+  steam: 'steam-cooking',
+  garden: 'kitchen-garden',
+  making: 'making-and-care',
+  thermal: 'thermal-experiments',
+  distillation: 'distillation-experiments',
+  creator: 'the-rudimenterre-recipe',
+  jury: 'awards',
+  adopt: 'adopt',
+  shipping: 'pricing-shipping-warranty',
 };
 
 const img = (name: string) => `/images/rudimenterre/${name}`;
@@ -169,10 +182,12 @@ export function getContent(id: EditorialPageId, locale: StorefrontLocale) {
 }
 
 export function getPageBySlug(locale: StorefrontLocale, slug: string) {
-  const id = (Object.keys(PAGE_SLUGS) as EditorialPageId[]).find((key) => PAGE_SLUGS[key][locale] === slug);
+  const id = (Object.keys(PAGE_SLUGS) as EditorialPageId[]).find((key) =>
+    PAGE_SLUGS[key] === slug || (locale === 'en' && LEGACY_EN_SLUGS[key] === slug),
+  );
   return id ? getContent(id, locale) : null;
 }
-export const pagePath = (locale: StorefrontLocale, id: EditorialPageId) => `/${locale}/${PAGE_SLUGS[id][locale]}`;
+export const pagePath = (locale: StorefrontLocale, id: EditorialPageId) => `/${locale}/${PAGE_SLUGS[id]}`;
 export const alternatePagePath = (locale: StorefrontLocale, id: EditorialPageId) => pagePath(locale === 'fr' ? 'en' : 'fr', id);
 export function localizedPath(pathname: string, target: StorefrontLocale) {
   const parts = pathname.split('/').filter(Boolean);

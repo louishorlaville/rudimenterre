@@ -23,7 +23,7 @@ export function EditorialPage(props: {
     case 'steam': return <SteamPage locale={locale} heroImage={heroImage} />;
     case 'project': return <ProjectPage {...props} />;
     case 'distillation': return locale === 'fr' ? <DistillationPage /> : <DistillationFallbackPage {...props} />;
-    case 'garden': return <GardenPage {...props} />;
+    case 'garden': return <GardenPage locale={locale} />;
     case 'making': return <MakingPage {...props} />;
     case 'thermal': return <ThermalPage {...props} />;
     case 'jury': return <JuryPage {...props} />;
