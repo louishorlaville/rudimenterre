@@ -103,7 +103,7 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
       <HeaderSubmenu label={locale === 'fr' ? 'Comment ça marche' : 'How it works'} links={howItWorks} pathname={pathname} onNavigate={close} viewport={viewport} />
       <HeaderSubmenu label={locale === 'fr' ? 'En cuisine' : 'In the kitchen'} links={kitchenLinks} pathname={pathname} onNavigate={close} viewport={viewport} />
       <NavLink onClick={close} to={pagePath(locale, 'project')} prefetch="intent">{copy.project}</NavLink>
-      <NavLink className="button button--orange header-cta" onClick={close} to={pagePath(locale, 'adopt')} prefetch="intent">{copy.adopt}</NavLink>
+      <NavLink className="button button--orange header-cta" onClick={close} to={pagePath(locale, 'adopt')} prefetch="intent"><span>{copy.adopt}</span></NavLink>
     </nav>
   );
 }

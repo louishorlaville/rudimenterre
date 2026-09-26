@@ -1,4 +1,4 @@
-import {useLoaderData} from 'react-router';
+import {redirect, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).$page';
 import editorialStyles from './Page.css?url';
 import projectStyles from '~/pages/project/Page.css?url';
@@ -15,6 +15,7 @@ import {EditorialPage} from './Renderer';
 import {
   alternatePagePath,
   getPageBySlug,
+  PAGE_SLUGS,
   pagePath,
 } from '~/lib/editorial-content';
 import {isStorefrontLocale} from '~/lib/i18n';
@@ -28,7 +29,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     creator: creatorStyles,
     steam: steamStyles,
     thermal: thermalStyles,
-    garden: data.locale === 'fr' ? gardenStyles : editorialStyles,
+    garden: gardenStyles,
     jury: juryStyles,
     making: makingStyles,
     shipping: shippingStyles,
@@ -43,13 +44,17 @@ export const meta: Route.MetaFunction = ({data}) => {
   ];
 };
 
-export async function loader({params, context}: Route.LoaderArgs) {
+export async function loader({params, context, request}: Route.LoaderArgs) {
   const locale = (params.locale?.toLowerCase() || 'fr') as string;
   if (!isStorefrontLocale(locale) || !params.page) {
     throw new Response(null, {status: 404});
   }
   const fallback = getPageBySlug(locale, params.page);
   if (!fallback) throw new Response(null, {status: 404});
+  if (params.page !== PAGE_SLUGS[fallback.id]) {
+    const url = new URL(request.url);
+    throw redirect(`${pagePath(locale, fallback.id)}${url.search}`);
+  }
 
   const response = await context.storefront
     .query(EDITORIAL_PAGE_QUERY, {

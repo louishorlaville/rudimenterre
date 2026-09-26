@@ -391,11 +391,11 @@ export default function Homepage() {
       </div>
 
       <div className="home-opening__content">
-        <img className="home-intro__product" src="/images/rudimenterre/home-hero.webp" alt="Le Cuicui Rudimenterre entouré de légumes" />
+        <img className="home-intro__product" src="/images/rudimenterre/home-hero.webp" alt={fr ? 'Le Cuicui Rudimenterre entouré de légumes' : 'The Rudimenterre Cuicui surrounded by vegetables'} />
         <section className="home-intro">
           <div className="home-intro__media">
             <Link className="button button--light home-intro__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
-            <img src="/images/rudimenterre/home-life.webp" alt="Le Cuicui utilisé dans une cuisine" loading="lazy" />
+            <img src="/images/rudimenterre/home-life.webp" alt={fr ? 'Le Cuicui utilisé dans une cuisine' : 'The Cuicui being used in a kitchen'} loading="lazy" />
           </div>
           <div className="home-intro__copy">
             <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
