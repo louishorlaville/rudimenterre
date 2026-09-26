@@ -3,17 +3,17 @@ import {useEffect, useRef} from 'react';
 const IMAGE_SOURCE = '/images/rudimenterre/home-kitchen-compare-towel.png';
 const TEXTURE_WIDTH = 209;
 const TEXTURE_HEIGHT = 632;
-const LEFT_PADDING = 110;
-const RIGHT_PADDING = 300;
-const TOP_PADDING = 80;
-const BOTTOM_PADDING = 160;
+const LEFT_PADDING = 170;
+const RIGHT_PADDING = 1121;
+const TOP_PADDING = 170;
+const BOTTOM_PADDING = 260;
 const CANVAS_WIDTH = TEXTURE_WIDTH + LEFT_PADDING + RIGHT_PADDING;
 const CANVAS_HEIGHT = TEXTURE_HEIGHT + TOP_PADDING + BOTTOM_PADDING;
-const COLUMN_COUNT = 5;
-const ROW_COUNT = 9;
-const GRAVITY = 0.46;
-const AIR_RESISTANCE = 0.972;
-const MAX_FALL_SPEED = 15;
+const COLUMN_COUNT = 7;
+const ROW_COUNT = 15;
+const GRAVITY = 0.38;
+const AIR_RESISTANCE = 0.965;
+const MAX_FALL_SPEED = 13;
 const CONSTRAINT_ITERATIONS = 8;
 
 type ClothPoint = {
@@ -30,6 +30,7 @@ type ClothConstraint = {
   first: number;
   second: number;
   length: number;
+  stiffness: number;
 };
 
 function drawTexturedTriangle(
@@ -95,7 +96,6 @@ export function InteractiveTowel() {
     const reducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    if (reducedMotion) return;
 
     const image = new Image();
     let animationFrame = 0;
@@ -105,6 +105,9 @@ export function InteractiveTowel() {
     let initialized = false;
     let draggedPoint: number | null = null;
     let hoverPointer: {x: number; y: number} | null = null;
+    let dragPointer: {x: number; y: number} | null = null;
+    let lastScrollY = window.scrollY;
+    let lastScrollImpulseTime = 0;
     let quietFrames = 0;
     const points: ClothPoint[] = [];
     const constraints: ClothConstraint[] = [];
@@ -114,13 +117,14 @@ export function InteractiveTowel() {
     const pointIndex = (column: number, row: number) =>
       row * COLUMN_COUNT + column;
 
-    const addConstraint = (first: number, second: number) => {
+    const addConstraint = (first: number, second: number, stiffness: number) => {
       const pointA = points[first];
       const pointB = points[second];
       constraints.push({
         first,
         second,
         length: Math.hypot(pointB.x - pointA.x, pointB.y - pointA.y),
+        stiffness,
       });
     };
 
@@ -145,14 +149,20 @@ export function InteractiveTowel() {
         for (let column = 0; column < COLUMN_COUNT; column += 1) {
           const current = pointIndex(column, row);
           if (column < COLUMN_COUNT - 1) {
-            addConstraint(current, pointIndex(column + 1, row));
+            addConstraint(current, pointIndex(column + 1, row), 0.94);
           }
           if (row < ROW_COUNT - 1) {
-            addConstraint(current, pointIndex(column, row + 1));
+            addConstraint(current, pointIndex(column, row + 1), 0.94);
           }
           if (column < COLUMN_COUNT - 1 && row < ROW_COUNT - 1) {
-            addConstraint(current, pointIndex(column + 1, row + 1));
-            addConstraint(pointIndex(column + 1, row), pointIndex(column, row + 1));
+            addConstraint(current, pointIndex(column + 1, row + 1), 0.84);
+            addConstraint(pointIndex(column + 1, row), pointIndex(column, row + 1), 0.84);
+          }
+          if (column < COLUMN_COUNT - 2) {
+            addConstraint(current, pointIndex(column + 2, row), 0.16);
+          }
+          if (row < ROW_COUNT - 2) {
+            addConstraint(current, pointIndex(column, row + 2), 0.16);
           }
         }
       }
@@ -209,6 +219,36 @@ export function InteractiveTowel() {
       }
 
       canvas.dataset.ready = 'true';
+      const left = Math.max(0, Math.min(...points.map((point) => point.x)) - 12);
+      const right = Math.min(CANVAS_WIDTH, Math.max(...points.map((point) => point.x)) + 12);
+      const top = Math.max(0, Math.min(...points.map((point) => point.y)) - 12);
+      const bottom = Math.min(CANVAS_HEIGHT, Math.max(...points.map((point) => point.y)) + 12);
+      hitArea.style.left = `${(left / CANVAS_WIDTH) * 100}%`;
+      hitArea.style.top = `${(top / CANVAS_HEIGHT) * 100}%`;
+      hitArea.style.width = `${((right - left) / CANVAS_WIDTH) * 100}%`;
+      hitArea.style.height = `${((bottom - top) / CANVAS_HEIGHT) * 100}%`;
+    };
+
+    const keepApart = (
+      first: number,
+      second: number,
+      axis: 'x' | 'y',
+      minimum: number,
+    ) => {
+      const pointA = points[first];
+      const pointB = points[second];
+      const overlap = minimum - (pointB[axis] - pointA[axis]);
+      if (overlap <= 0) return;
+      const pointAFixed = pointA.pinned || first === draggedPoint;
+      const pointBFixed = pointB.pinned || second === draggedPoint;
+      if (!pointAFixed && !pointBFixed) {
+        pointA[axis] -= overlap * 0.5;
+        pointB[axis] += overlap * 0.5;
+      } else if (pointAFixed && !pointBFixed) {
+        pointB[axis] += overlap;
+      } else if (!pointAFixed && pointBFixed) {
+        pointA[axis] -= overlap;
+      }
     };
 
     const constrainMesh = () => {
@@ -224,7 +264,7 @@ export function InteractiveTowel() {
           const differenceY = pointB.y - pointA.y;
           const distance = Math.hypot(differenceX, differenceY) || 1;
           const correction =
-            ((distance - constraint.length) / distance) * 0.94;
+            ((distance - constraint.length) / distance) * constraint.stiffness;
           const pointAFixed =
             pointA.pinned || constraint.first === draggedPoint;
           const pointBFixed =
@@ -244,11 +284,27 @@ export function InteractiveTowel() {
           }
         }
 
+        for (let row = 0; row < ROW_COUNT; row += 1) {
+          for (let column = 0; column < COLUMN_COUNT; column += 1) {
+            const current = pointIndex(column, row);
+            if (column < COLUMN_COUNT - 1) {
+              keepApart(current, pointIndex(column + 1, row), 'x', columnStep * 0.5);
+            }
+            if (row < ROW_COUNT - 1) {
+              keepApart(current, pointIndex(column, row + 1), 'y', rowStep * 0.5);
+            }
+          }
+        }
+
         for (const point of points) {
           if (!point.pinned) continue;
           point.x = point.originX;
           point.y = point.originY;
         }
+      }
+      for (const point of points) {
+        point.x = Math.max(2, Math.min(CANVAS_WIDTH - 2, point.x));
+        point.y = Math.max(2, Math.min(CANVAS_HEIGHT - 2, point.y));
       }
     };
 
@@ -256,6 +312,10 @@ export function InteractiveTowel() {
       for (let index = 0; index < points.length; index += 1) {
         const point = points[index];
         if (point.pinned || index === draggedPoint) continue;
+        if (draggedPoint === null) {
+          point.previousX += (point.x - point.originX) * 0.006;
+          point.previousY += (point.y - point.originY) * 0.01;
+        }
         const velocityX =
           (point.x - point.previousX) * AIR_RESISTANCE;
         const velocityY = Math.min(
@@ -301,7 +361,7 @@ export function InteractiveTowel() {
 
       if (
         draggedPoint !== null ||
-        (quietFrames < 18 && time - lastInteractionTime < 10000)
+        (!reducedMotion && quietFrames < 18 && time - lastInteractionTime < 10000)
       ) {
         animationFrame = requestAnimationFrame(animate);
       }
@@ -368,7 +428,6 @@ export function InteractiveTowel() {
     const onPointerDown = (event: PointerEvent) => {
       if (!initialized) return;
       const pointer = pointerPosition(event);
-      if (!pointerTouchesTowel(pointer)) return;
       let nearestPoint = -1;
       let nearestDistance = Number.POSITIVE_INFINITY;
 
@@ -381,17 +440,19 @@ export function InteractiveTowel() {
         }
       });
 
-      if (nearestPoint < 0 || nearestDistance > 90) return;
+      if (nearestPoint < 0) return;
       event.preventDefault();
       hoverPointer = null;
       draggedPoint = nearestPoint;
+      dragPointer = pointer;
       hitArea.setPointerCapture(event.pointerId);
       hitArea.dataset.dragging = 'true';
       points[nearestPoint].previousX = points[nearestPoint].x;
       points[nearestPoint].previousY = points[nearestPoint].y;
       points[nearestPoint].x = pointer.x;
       points[nearestPoint].y = pointer.y;
-      startAnimation();
+      if (reducedMotion) render();
+      else startAnimation();
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -399,18 +460,34 @@ export function InteractiveTowel() {
       event.preventDefault();
       const pointer = pointerPosition(event);
       const point = points[draggedPoint];
+      if (dragPointer) {
+        const movementX = pointer.x - dragPointer.x;
+        const movementY = pointer.y - dragPointer.y;
+        for (const clothPoint of points) {
+          if (clothPoint.pinned || clothPoint === point) continue;
+          const depth = (clothPoint.originY - TOP_PADDING) / TEXTURE_HEIGHT;
+          const influence = 0.15 + depth * 0.7;
+          clothPoint.x += movementX * influence;
+          clothPoint.y += movementY * influence;
+          clothPoint.previousX += movementX * influence;
+          clothPoint.previousY += movementY * influence;
+        }
+      }
+      dragPointer = pointer;
       point.x = Math.max(
         0,
         Math.min(CANVAS_WIDTH, pointer.x),
       );
       point.y = Math.max(0, Math.min(CANVAS_HEIGHT, pointer.y));
       lastInteractionTime = performance.now();
+      constrainMesh();
       render();
     };
 
     const onAmbientPointerMove = (event: PointerEvent) => {
       if (
         event.pointerType !== 'mouse' ||
+        reducedMotion ||
         draggedPoint !== null ||
         !visible ||
         !initialized
@@ -437,7 +514,7 @@ export function InteractiveTowel() {
         -65,
         Math.min(65, pointer.y - hoverPointer.y),
       );
-      const influenceRadius = 200;
+      const influenceRadius = 125;
       let affected = false;
 
       points.forEach((point) => {
@@ -453,10 +530,8 @@ export function InteractiveTowel() {
         if (distance >= influenceRadius) return;
         const influence = (1 - distance / influenceRadius) ** 2;
         const wave = depth ** 1.35;
-        point.previousX -=
-          movementX * (influence * 0.18 + wave * 0.1);
-        point.previousY -=
-          movementY * (influence * 0.12 + wave * 0.05);
+        point.previousX -= movementX * (influence * 0.07 + wave * 0.025);
+        point.previousY -= movementY * (influence * 0.05 + wave * 0.015);
         affected = true;
       });
 
@@ -469,13 +544,35 @@ export function InteractiveTowel() {
     const releasePointer = (event: PointerEvent) => {
       if (draggedPoint === null) return;
       const point = points[draggedPoint];
-      const pointer = pointerPosition(event);
-      point.previousX = point.x - (pointer.x - point.previousX) * 0.08;
-      point.previousY = point.y - (pointer.y - point.previousY) * 0.08;
+      point.previousX = point.x;
+      point.previousY = point.y;
       draggedPoint = null;
+      dragPointer = null;
       delete hitArea.dataset.dragging;
       if (hitArea.hasPointerCapture(event.pointerId)) {
         hitArea.releasePointerCapture(event.pointerId);
+      }
+      if (reducedMotion) {
+        for (const point of points) {
+          point.x = point.previousX = point.originX;
+          point.y = point.previousY = point.originY;
+        }
+        render();
+      } else startAnimation();
+    };
+
+    const onScroll = () => {
+      const movement = Math.max(-48, Math.min(48, window.scrollY - lastScrollY));
+      lastScrollY = window.scrollY;
+      const now = performance.now();
+      if (reducedMotion || !visible || !initialized || draggedPoint !== null ||
+          Math.abs(movement) < 2 || now - lastScrollImpulseTime < 120) return;
+      lastScrollImpulseTime = now;
+      for (const point of points) {
+        if (point.pinned) continue;
+        const depth = (point.originY - TOP_PADDING) / TEXTURE_HEIGHT;
+        point.previousX += movement * depth * 0.004;
+        point.previousY += movement * depth * 0.0015;
       }
       startAnimation();
     };
@@ -489,7 +586,7 @@ export function InteractiveTowel() {
         } else if (visible && initialized) {
           points.forEach((point) => {
             if (point.originY > TEXTURE_HEIGHT * 0.35) {
-              point.previousX += 4 * (point.originY / TEXTURE_HEIGHT);
+              point.previousX += point.originY / TEXTURE_HEIGHT;
             }
           });
           startAnimation();
@@ -513,6 +610,7 @@ export function InteractiveTowel() {
     document.addEventListener('pointermove', onAmbientPointerMove, {
       passive: true,
     });
+    window.addEventListener('scroll', onScroll, {passive: true});
     observer.observe(canvas);
 
     return () => {
@@ -523,11 +621,12 @@ export function InteractiveTowel() {
       hitArea.removeEventListener('pointerup', releasePointer);
       hitArea.removeEventListener('pointercancel', releasePointer);
       document.removeEventListener('pointermove', onAmbientPointerMove);
+      window.removeEventListener('scroll', onScroll);
     };
   }, []);
 
   return (
-    <>
+    <span className="home-kitchen-compare__towel-stage">
       <canvas
         ref={canvasRef}
         className="home-kitchen-compare__towel"
@@ -538,6 +637,6 @@ export function InteractiveTowel() {
         ref={hitAreaRef}
         className="home-kitchen-compare__towel-hit-area"
       />
-    </>
+    </span>
   );
 }

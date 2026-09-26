@@ -8,6 +8,7 @@ import creatorStyles from '~/pages/creator/Page.css?url';
 import steamStyles from '~/pages/steam/Page.css?url';
 import thermalStyles from '~/pages/thermal/Page.css?url';
 import gardenStyles from '~/pages/garden/Page.css?url';
+import juryStyles from '~/pages/jury/Page.css?url';
 import {makingStyles} from '~/pages/making/Page';
 import {EditorialPage} from './Renderer';
 import {
@@ -27,6 +28,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     steam: steamStyles,
     thermal: thermalStyles,
     garden: data.locale === 'fr' ? gardenStyles : editorialStyles,
+    jury: juryStyles,
     making: makingStyles,
   };
   return [
