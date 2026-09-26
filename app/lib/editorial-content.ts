@@ -86,7 +86,7 @@ const FR: Record<EditorialPageId, EditorialPageContent> = {
     {title:'Une édition limitée', body:'Un objet de céramique Cuicui fabriqué artisanalement en faïence au Canada en attendant la production française.', image:img('adopt-options.webp'), imageAlt:'Les options de Cuicui', tone:'cream'},
     {title:'Du kit vital aux modules complémentaires', body:'Faites Cuicui français. Le kit vital réunit les éléments indispensables; les modules complémentaires enrichissent les usages.', image:img('adopt-kit.webp'), imageAlt:'Le kit vital du Cuicui', tone:'green'},
   ]},
-  shipping: {id:'shipping', eyebrow:'Des séries limitées', title:'Tarifs, livraisons, garanties', intro:'Expéditions prochaines séries fabriquées en France.', seoDescription:'Informations sur les emballages, livraisons, retours et garanties Rudimenterre.', heroImage:img('shipping.webp'), sections:[
+  shipping: {id:'shipping', eyebrow:'Des séries limitées', title:'Tarifs livraisons garanties', intro:'Expéditions prochaines séries fabriquées en France.', seoDescription:'Informations sur les emballages, livraisons, retours et garanties Rudimenterre.', heroImage:img('shipping.webp'), sections:[
     {title:'Emballage Rudimenterre', body:'Un emballage recyclable et protecteur est essentiel à la livraison de pièces en céramique. Chaque élément est soigneusement calé.', tone:'cream'},
     {title:'Expéditions', body:'Les frais, taxes et délais dépendent de la destination. Les montants définitifs sont confirmés avant la commande.', tone:'white'},
     {title:'Retours', body:'Contactez Rudimenterre avant tout retour afin de recevoir les informations nécessaires.', tone:'cream'},

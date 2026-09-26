@@ -1,0 +1,40 @@
+.shipping-page { background: var(--paper); color: var(--charcoal); }
+.shipping-hero { position: relative; display: grid; aspect-ratio: 3316 / 1456; place-items: center; overflow: hidden; color: #fff; isolation: isolate; }
+.shipping-hero > img, .shipping-hero__shade { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; }
+.shipping-hero > img { object-fit: cover; object-position: center 48%; z-index: -2; }
+.shipping-hero__shade { background: rgba(25, 19, 15, .14); }
+.shipping-hero__copy { width: min(90%, 56rem); padding: 5rem 0; text-align: center; text-shadow: 0 2px 14px rgba(0,0,0,.4); }
+.shipping-hero h1 { margin: 0 auto .85rem; font-size: clamp(1.5rem, 2.25vw, 2.5rem); line-height: 1.15; text-transform: uppercase; }
+.shipping-hero h1 span { display: block; }
+.shipping-hero__copy > span { display: block; font-size: clamp(.88rem, 1.4vw, 1.1rem); font-weight: 600; line-height: 1.5; text-transform: uppercase; }
+.shipping-columns { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
+.shipping-panel { padding: clamp(2rem, 5vw, 4.5rem) clamp(1.35rem, 4.2vw, 4.5rem); }
+.shipping-panel--packing { background: var(--cream); }
+.shipping-panel--rates { background: #fff; }
+.shipping-panel h2, .shipping-returns h2 { margin: 0 0 2rem; font-size: clamp(1.25rem, 2vw, 1.75rem); line-height: 1.15; text-transform: uppercase; }
+.shipping-panel h3 { margin: 1.8rem 0 .35rem; font-size: 1.02rem; line-height: 1.2; text-transform: uppercase; }
+.shipping-panel h2 + h3 { margin-top: 0; }
+.shipping-panel p, .shipping-panel li, .shipping-returns p { margin: 0 0 .85rem; font-size: clamp(.875rem, 1.1vw, 1rem); line-height: 1.48; white-space: pre-line; }
+.shipping-panel p:last-child { margin-bottom: 0; }
+.shipping-highlight { color: var(--orange-deep); font-weight: 700; }
+.shipping-aftercare { display: grid; grid-template-columns: 1fr 1fr; }
+.shipping-returns { display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; }
+.shipping-returns__copy { padding: clamp(2rem, 5vw, 4.2rem); background: #fff; }
+.shipping-returns__photo { position: relative; min-height: 0; overflow: hidden; }
+.shipping-returns img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.shipping-returns a { color: inherit; text-underline-offset: .15em; }
+.shipping-panel--warranty { background: #e7e5e2; }
+.shipping-panel--warranty h2 { color: #55514d; }
+.shipping-panel--warranty h3 { font-size: .93rem; }
+.shipping-outro { display: grid; min-height: 11rem; place-items: center; padding: 2.5rem var(--content-gutter); background: var(--cream); text-align: center; }
+.shipping-outro p { margin: 0; font-size: clamp(1.05rem, 2vw, 1.5rem); font-weight: 700; line-height: 1.35; text-transform: uppercase; }
+.shipping-material { min-height: clamp(9rem, 20vw, 17rem); background: url('/images/rudimenterre/shipping-material.jpeg') center / cover no-repeat; }
+@media (max-width: 760px) {
+  .shipping-hero { aspect-ratio: auto; min-height: 25rem; }
+  .shipping-hero > img { object-position: 34% center; }
+  .shipping-columns, .shipping-aftercare { grid-template-columns: 1fr; }
+  .shipping-panel { padding: 2.5rem var(--content-gutter); }
+  .shipping-panel h2 { margin-bottom: 1.5rem; }
+  .shipping-returns { grid-template-rows: auto 25rem; }
+  .shipping-returns__copy { padding: 2.5rem var(--content-gutter); }
+}

@@ -105,9 +105,9 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
 .brand-mark { display: inline-block; margin-left: .18em; font-size: .52em; font-weight: 400; line-height: 1; vertical-align: top; transform: translateY(.12em); }
 .brand img { max-width: 10rem; max-height: 2.5rem; }
 .header-menu { display: flex; align-items: center; gap: clamp(.9rem, 1.8vw, 1.75rem); font-size: clamp(.75rem, .95vw, .88rem); white-space: nowrap; }
-.header-menu a, .header-actions a { position: relative; }
-.header-menu a::after, .header-actions a::after { content: ''; position: absolute; inset: auto 0 -.35rem; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .25s; }
-.header-menu a:hover::after, .header-menu a[aria-current='page']::after, .header-actions a:hover::after { transform: scaleX(1); transform-origin: left; }
+.header-menu a, .header-actions a, .site-footer__nav a, .footer-meta a { position: relative; }
+.header-menu a::after, .header-actions a::after, .site-footer__nav a::after, .footer-meta a::after { content: ''; position: absolute; inset: auto 0 -.35rem; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .25s; }
+.header-menu a:hover::after, .header-menu a[aria-current='page']::after, .header-actions a:hover::after, .site-footer__nav a:is(:hover, :focus-visible)::after, .footer-meta a:is(:hover, :focus-visible)::after { transform: scaleX(1); transform-origin: left; }
 .header-documentation { position: relative; }
 .header-documentation summary { position: relative; display: flex; align-items: center; gap: .45rem; color: #fff; cursor: pointer; list-style: none; }
 .header-documentation summary::-webkit-details-marker { display: none; }
@@ -155,39 +155,35 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
 .footer-brand {
   padding-bottom: clamp(3rem, 4.5vw, 4.5rem);
 }
-.footer-brand p {
-  margin: 0;
-  font-size: clamp(1.35rem, 2vw, 2rem);
-  font-weight: 600;
-  line-height: 1;
-}
+.footer-brand .brand { font-size: clamp(1.35rem, 2vw, 2rem); }
 .site-footer__nav {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(3rem, 9vw, 9rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(2.5rem, 5vw, 5.5rem);
   align-items: start;
 }
 .footer-column {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(1.15rem, 1.65vw, 1.65rem);
-  font-size: clamp(.95rem, 1.35vw, 1.35rem);
+  gap: clamp(1rem, 1.4vw, 1.4rem);
+  font-size: clamp(.95rem, 1.05vw, 1.1rem);
   font-weight: 300;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 .footer-column p {
-  margin: 0 0 .15rem;
-  font: inherit;
+  margin: 0 0 .7rem;
+  color: var(--cream);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: -.015em;
+  line-height: 1.15;
   text-transform: uppercase;
-}
-.site-footer a:hover {
-  text-decoration: underline;
-  text-underline-offset: .25em;
 }
 .site-footer__cta {
   --button-hover-border: var(--cream);
   justify-self: end;
+  margin-top: clamp(2rem, 3vw, 3rem);
   min-width: clamp(13rem, 19vw, 18rem);
   min-height: clamp(3.3rem, 4.6vw, 4.4rem);
   padding-inline: 2rem;
@@ -290,7 +286,11 @@ html:has(.overlay.expanded) { overflow: hidden; }
 .cart-main--aside .cart-empty a { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; padding: .7rem 1.3rem; border: 1px solid var(--ink); border-radius: 999px; font-size: .9rem; text-decoration: none; }
 .cart-main--aside button:focus-visible, .cart-main--aside a:focus-visible, .cart-main--aside summary:focus-visible, .cart-main--aside input:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
+  .site-footer__nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1080px) {
   .site-header { grid-template-columns: 1fr auto; }
   .header-menu--desktop, .header-actions > a:not(.locale-switch) { display: none; }
   .menu-toggle { display: block; }
@@ -303,7 +303,7 @@ html:has(.overlay.expanded) { overflow: hidden; }
     padding: 4.5rem var(--content-gutter) 2.5rem;
   }
   .footer-brand { padding-bottom: 3.5rem; }
-  .footer-brand p { font-size: 1.5rem; }
+  .footer-brand .brand { font-size: 1.5rem; }
   .site-footer__nav {
     grid-template-columns: 1fr;
     gap: 3rem;

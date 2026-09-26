@@ -9,6 +9,7 @@ import steamStyles from '~/pages/steam/Page.css?url';
 import thermalStyles from '~/pages/thermal/Page.css?url';
 import gardenStyles from '~/pages/garden/Page.css?url';
 import juryStyles from '~/pages/jury/Page.css?url';
+import shippingStyles from '~/pages/shipping/Page.css?url';
 import {makingStyles} from '~/pages/making/Page';
 import {EditorialPage} from './Renderer';
 import {
@@ -30,6 +31,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     garden: data.locale === 'fr' ? gardenStyles : editorialStyles,
     jury: juryStyles,
     making: makingStyles,
+    shipping: shippingStyles,
   };
   return [
     {tagName: 'link', rel: 'stylesheet', href: specialStyles[data.content.id] || editorialStyles},

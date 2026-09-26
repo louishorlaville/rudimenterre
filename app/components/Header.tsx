@@ -75,7 +75,6 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
       <nav className="header-actions" aria-label={locale === 'fr' ? 'Outils' : 'Utilities'}>
         <Link className="locale-switch" to={localizedPath(pathname, locale === 'fr' ? 'en' : 'fr')} hrefLang={locale === 'fr' ? 'en-CA' : 'fr-CA'}>{locale === 'fr' ? 'EN' : 'FR'}</Link>
         <NavLink prefetch="intent" to={`/${locale}/account`}><Suspense fallback={copy.signIn}><Await resolve={isLoggedIn} errorElement={copy.signIn}>{(loggedIn) => loggedIn ? copy.account : copy.signIn}</Await></Suspense></NavLink>
-        <Link className="button button--orange header-cta" prefetch="intent" to={pagePath(locale, 'adopt')}>{copy.adopt}</Link>
         <CartToggle cart={cart} label={copy.cart} locale={locale} />
         <button className="menu-toggle" onClick={() => open('mobile')} aria-label={copy.menu}><span /><span /></button>
       </nav>
@@ -88,40 +87,49 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
   const locale = localeFromPathname(pathname);
   const copy = UI_COPY[locale];
   const {close} = useAside();
-  const documentationLinks = [
+  const howItWorks = [
+    {label: locale === 'fr' ? 'Vapeur-étuvée' : 'Steam cooking', to: pagePath(locale, 'steam')},
+    {label: locale === 'fr' ? 'Thermique' : 'Thermal cooking', to: pagePath(locale, 'thermal')},
     {label: locale === 'fr' ? 'Distillation' : 'Distillation', to: pagePath(locale, 'distillation')},
-    {label: locale === 'fr' ? 'Vapeur Étuvée' : 'Steam cooking', to: pagePath(locale, 'steam')},
-    {label: locale === 'fr' ? 'Thermique' : 'Thermal', to: pagePath(locale, 'thermal')},
-    {label: locale === 'fr' ? 'Visite Guidée Potager' : 'Guided kitchen garden tour', to: pagePath(locale, 'garden')},
-    {label: locale === 'fr' ? 'Atlas des Cocottes à poile' : 'Cocottes à poile atlas', to: `/${locale}/pages/atlas-des-cocottes-a-poile`},
   ];
-  const links = [
-    {label: copy.project, to: pagePath(locale, 'project')},
-    {label: locale === 'fr' ? 'Les ateliers' : 'Workshops', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`},
-    {label: locale === 'fr' ? 'Service Chef' : 'Chef service', to: `/${locale}/pages/service-decouverte-pro`},
-    {label: locale === 'fr' ? 'Édition limitée' : 'Limited edition', to: pagePath(locale, 'adopt')},
+  const kitchenLinks = [
+    {label: locale === 'fr' ? 'Potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
-    ...(viewport === 'mobile' ? [{label: copy.adopt, to: pagePath(locale, 'adopt'), cta: true}] : []),
+    {label: locale === 'fr' ? 'Les ateliers' : 'Workshops', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`},
   ];
   return (
     <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>
-      <NavLink onClick={close} to={links[0].to} prefetch="intent">{links[0].label}</NavLink>
-      <details
-        className="header-documentation"
-        onMouseEnter={viewport === 'desktop' ? (event) => {event.currentTarget.open = true;} : undefined}
-        onMouseLeave={viewport === 'desktop' ? (event) => {event.currentTarget.open = false;} : undefined}
-      >
-        <summary data-active={documentationLinks.some((item) => pathname === item.to) || undefined}>
-          Documentation<span aria-hidden="true" />
-        </summary>
-        <div className="header-documentation__menu">
-          {documentationLinks.map((item) => (
-            <NavLink className="header-documentation__link" key={item.to} onClick={(event) => {event.currentTarget.closest('details')?.removeAttribute('open'); close();}} to={item.to} prefetch="intent"><span>{item.label}</span></NavLink>
-          ))}
-        </div>
-      </details>
-      {links.slice(1).map((item) => <NavLink className={item.cta ? 'button button--orange header-cta' : undefined} key={item.to} onClick={close} to={item.to} prefetch="intent">{item.label}</NavLink>)}
+      <NavLink onClick={close} to={`/${locale}/collections/all`} prefetch="intent">{locale === 'fr' ? 'Le Cuicui' : 'Cuicui'}</NavLink>
+      <HeaderSubmenu label={locale === 'fr' ? 'Comment ça marche' : 'How it works'} links={howItWorks} pathname={pathname} onNavigate={close} viewport={viewport} />
+      <HeaderSubmenu label={locale === 'fr' ? 'En cuisine' : 'In the kitchen'} links={kitchenLinks} pathname={pathname} onNavigate={close} viewport={viewport} />
+      <NavLink onClick={close} to={pagePath(locale, 'project')} prefetch="intent">{copy.project}</NavLink>
+      <NavLink className="button button--orange header-cta" onClick={close} to={pagePath(locale, 'adopt')} prefetch="intent">{copy.adopt}</NavLink>
     </nav>
+  );
+}
+
+function HeaderSubmenu({label, links, pathname, onNavigate, viewport}: {
+  label: string;
+  links: Array<{label: string; to: string}>;
+  pathname: string;
+  onNavigate: () => void;
+  viewport: 'desktop' | 'mobile';
+}) {
+  return (
+    <details
+      className="header-documentation"
+      onMouseEnter={viewport === 'desktop' ? (event) => {event.currentTarget.open = true;} : undefined}
+      onMouseLeave={viewport === 'desktop' ? (event) => {event.currentTarget.open = false;} : undefined}
+    >
+      <summary data-active={links.some((item) => pathname === item.to) || undefined}>
+        {label}<span aria-hidden="true" />
+      </summary>
+      <div className="header-documentation__menu">
+        {links.map((item) => (
+          <NavLink className="header-documentation__link" key={item.to} onClick={(event) => {event.currentTarget.closest('details')?.removeAttribute('open'); onNavigate();}} to={item.to} prefetch="intent"><span>{item.label}</span></NavLink>
+        ))}
+      </div>
+    </details>
   );
 }
 
