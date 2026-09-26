@@ -3273,3 +3273,44 @@
 .home-professional-banner {
   display: none;
 }
+
+/* Keep the outer rhythm consistent across each top-level homepage section. */
+.home > :is(section, .home-section-divider) {
+  margin-block: clamp(1.5rem, 3vw, 3rem);
+}
+
+@media (max-width: 760px) {
+  .home > :is(section, .home-section-divider) {
+    margin-block: 1.25rem;
+  }
+}
+
+/* Keep every homepage divider on the same, tighter internal spacing. */
+.home .home-section-divider,
+.home .home-section-divider--practice,
+.home .home-section-divider--video,
+.home .benefit-scroll__divider {
+  padding-block: clamp(1.5rem, 3vw, 3rem);
+}
+
+@media (max-width: 760px) {
+  .home .home-section-divider,
+  .home .home-section-divider--practice,
+  .home .home-section-divider--video,
+  .home .benefit-scroll__divider {
+    padding-block: 1.5rem;
+  }
+}
+
+.home > .home-icon-strip--food {
+  margin-bottom: 0;
+}
+
+.home > .home-icon-strip--food + .practice-grid {
+  margin-top: 0;
+}
+
+/* The video section's built-in bottom padding made the following divider sit lower. */
+.home .home-video-feature {
+  padding-bottom: 0;
+}
