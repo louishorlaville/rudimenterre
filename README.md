@@ -27,6 +27,6 @@ Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pu
 
 ## Deployment
 
-Connect this GitHub repository in the Hydrogen channel. Map `main` to production and use branch previews for review. Before launch, connect the storefront domain to Oxygen, connect `checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN` in Oxygen.
+Connect this GitHub repository in the Hydrogen channel and map `main` to the Oxygen production environment. The `dev` branch deploys to Oxygen preview; pushes to either branch trigger a deployment. Add the storefront's Oxygen deployment token as the GitHub Actions secret `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`. Protect both branches so changes arrive through reviewed pull requests, and require the `PR checks` status check before merging. Before launch, connect the storefront domain to Oxygen, connect `checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN` in Oxygen.
 
 Production remains blocked until the bilingual content review, real-store checkout tests, domain/market setup and accessibility review are complete. See [`guides/launch-checklist.md`](guides/launch-checklist.md).
