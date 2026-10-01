@@ -154,16 +154,12 @@ function AccountMenu({locale}: {locale: AccountContext['locale']}) {
       className="account-nav"
       aria-label={fr ? 'Navigation du compte' : 'Account navigation'}
       data-indicator-ready={indicator ? '' : undefined}
-      onClick={(event) => {
-        const link =
-          event.target instanceof Element ? event.target.closest('a') : null;
-        if (link && navRef.current?.contains(link)) positionIndicator(link);
-      }}
     >
       <NavLink
         to={accountPath(locale, '/account/orders')}
         defaultShouldRevalidate={false}
         prefetch="intent"
+        onClick={(event) => positionIndicator(event.currentTarget)}
       >
         {fr ? 'Commandes' : 'Orders'}
       </NavLink>
@@ -171,6 +167,7 @@ function AccountMenu({locale}: {locale: AccountContext['locale']}) {
         to={accountPath(locale, '/account/profile')}
         defaultShouldRevalidate={false}
         prefetch="intent"
+        onClick={(event) => positionIndicator(event.currentTarget)}
       >
         {fr ? 'Mon profil' : 'My profile'}
       </NavLink>
@@ -178,6 +175,7 @@ function AccountMenu({locale}: {locale: AccountContext['locale']}) {
         to={accountPath(locale, '/account/addresses')}
         defaultShouldRevalidate={false}
         prefetch="intent"
+        onClick={(event) => positionIndicator(event.currentTarget)}
       >
         {fr ? 'Adresses' : 'Addresses'}
       </NavLink>
