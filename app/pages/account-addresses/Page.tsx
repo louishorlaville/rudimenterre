@@ -483,8 +483,21 @@ export function AddressForm({
           required={required}
           maxLength={maxLength}
           pattern={pattern}
+          title={name === 'phoneNumber'
+            ? fr
+              ? 'Entrez un numéro avec son indicatif, par exemple +1 514 833-9722.'
+              : 'Enter a number with its country code, for example +1 514 833-9722.'
+            : undefined}
+          aria-describedby={name === 'phoneNumber' ? `${id}-hint` : undefined}
           aria-label={label}
         />
+        {name === 'phoneNumber' ? (
+          <small id={`${id}-hint`}>
+            {fr
+              ? 'Indicatif du pays recommandé. Espaces et tirets acceptés, par ex. : +1 514 833-9722.'
+              : 'Country code recommended. Spaces and hyphens are accepted, e.g. +1 514 833-9722.'}
+          </small>
+        ) : null}
       </div>
     );
   };
@@ -577,13 +590,13 @@ export function AddressForm({
           {field(
             'phoneNumber',
             fr ? 'Téléphone' : 'Phone',
-            '+1 613 555-0111',
+            fr ? 'Ex. : +1 514 833-9722' : 'e.g. +1 514 833-9722',
             'tel',
             address?.phoneNumber,
             false,
             undefined,
             'tel',
-            '^\\+?[1-9]\\d{3,14}$',
+            '^\\+?[0-9\\s().-]{7,20}$',
           )}
         </div>
         <label
