@@ -11,7 +11,6 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -62,7 +61,6 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
     {
       rel: 'preload',
       href: '/fonts/tangerine-regular.ttf',
@@ -160,6 +158,8 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
   const rootData = useRouteLoaderData<RootLoader>('root');
+  const faviconUrl = rootData?.header?.shop.brand?.logo?.image?.url ??
+    'https://rudimenterre.com/cdn/shop/files/favicon_32x32.png?v=1744030862';
 
   return (
     <html lang={rootData?.locale ?? 'fr'}>
@@ -170,6 +170,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
+        <link rel="icon" href={faviconUrl} />
       </head>
       <body>
         {children}
