@@ -137,6 +137,10 @@
 }
 /* Mockup-derived homepage */
 .home-opening {
+  --hero-height: max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh)));
+  --hero-circle-size: clamp(15rem, 25vw, 26rem);
+  /* Match the circle's 48% center plus its radius, including before hydration. */
+  --hero-banner-height: calc(var(--hero-height) * .48 + var(--hero-circle-size) / 2);
   position: relative;
   /* The fixed banner hands off to the next section during this block.
      Prevent browser scroll anchoring from nudging that handoff. */
@@ -146,7 +150,7 @@
   position: relative;
   height: calc(
     var(--hero-height, max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))))
-    + var(--banner-travel, max(0px, calc(100svh - var(--header-height) - clamp(19rem, 38vw, 34rem)), calc(max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))) - clamp(112px, 16svh, 168px))))
+    + var(--banner-travel, max(0px, calc(100svh - var(--header-height) - var(--hero-banner-height)), calc(max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))) - clamp(112px, 16svh, 168px))))
   );
   background: var(--cream);
 }
@@ -171,7 +175,7 @@
   z-index: 0;
   top: 48%;
   left: 73%;
-  width: clamp(15rem, 25vw, 26rem);
+  width: var(--hero-circle-size);
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--white);
@@ -213,7 +217,7 @@
   top: var(--banner-top, var(--header-height));
   left: 0;
   width: 100%;
-  height: clamp(19rem, 38vw, 34rem);
+  height: var(--hero-banner-height);
   overflow: hidden;
   pointer-events: none;
   transform: translate3d(0, var(--banner-shift, 0px), 0);
@@ -237,8 +241,8 @@
 .home-opening__content {
   position: relative;
   z-index: 4;
-  margin-top: calc(0px - var(--banner-travel, max(0px, calc(100svh - var(--header-height) - clamp(19rem, 38vw, 34rem)), calc(max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))) - clamp(112px, 16svh, 168px)))) - var(--intro-lift, clamp(112px, 16svh, 168px)));
-  margin-bottom: var(--banner-travel, max(0px, calc(100svh - var(--header-height) - clamp(19rem, 38vw, 34rem)), calc(max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))) - clamp(112px, 16svh, 168px))));
+  margin-top: calc(0px - var(--banner-travel, max(0px, calc(100svh - var(--header-height) - var(--hero-banner-height)), calc(max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))) - clamp(112px, 16svh, 168px)))) - var(--intro-lift, clamp(112px, 16svh, 168px)));
+  margin-bottom: var(--banner-travel, max(0px, calc(100svh - var(--header-height) - var(--hero-banner-height)), calc(max(32rem, calc(100svh - var(--header-height) - min(180px, 20svh))) - clamp(112px, 16svh, 168px))));
   transform: translate3d(0, var(--content-hold, 0px), 0);
   will-change: transform;
 }

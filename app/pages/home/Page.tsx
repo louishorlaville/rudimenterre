@@ -158,6 +158,7 @@ export default function Homepage() {
       const introLift = window.innerWidth <= 760
         ? Math.max(80, Math.min(112, viewportHeight * .12))
         : Math.max(112, Math.min(168, viewportHeight * .16));
+      opening.style.setProperty('--hero-height', `${heroHeight}px`);
       const bannerHeight = banner.getBoundingClientRect().height;
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
       const travel = Math.max(
@@ -172,7 +173,6 @@ export default function Homepage() {
         trackTop: track.getBoundingClientRect().top + window.scrollY,
       };
 
-      track.style.setProperty('--hero-height', `${heroHeight}px`);
       track.style.setProperty('--banner-travel', `${travel}px`);
       opening.style.setProperty('--banner-travel', `${travel}px`);
       opening.style.setProperty('--banner-height', `${bannerHeight}px`);
@@ -208,10 +208,16 @@ export default function Homepage() {
     };
 
     measureAndUpdate();
+    // Styles can settle after hydration; refresh the initial geometry then too.
+    const resizeObserver = new ResizeObserver(measureAndUpdate);
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (header) resizeObserver.observe(header);
+    resizeObserver.observe(banner);
     window.addEventListener('scroll', scheduleBannerUpdate, {passive: true});
     window.addEventListener('resize', measureAndUpdate);
     return () => {
       cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
       window.removeEventListener('scroll', scheduleBannerUpdate);
       window.removeEventListener('resize', measureAndUpdate);
     };
