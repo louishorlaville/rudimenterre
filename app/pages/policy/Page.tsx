@@ -1,6 +1,8 @@
 ﻿import {Link, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
+import {useLocation} from 'react-router';
+import {localeFromPathname} from '~/lib/i18n';
 
 type SelectedPolicies = keyof Pick<
   Shop,
@@ -8,7 +10,7 @@ type SelectedPolicies = keyof Pick<
 >;
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.policy.title ?? ''}`}];
+  return [{title: `${data?.policy.title ?? ''} | Rudimenterre`}];
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
@@ -43,18 +45,22 @@ export async function loader({params, context}: Route.LoaderArgs) {
 
 export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
+  const {pathname} = useLocation();
+  const locale = localeFromPathname(pathname);
+  const fr = locale === 'fr';
 
   return (
-    <div className="policy">
-      <br />
-      <br />
-      <div>
-        <Link to="/policies">← Back to Policies</Link>
-      </div>
-      <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: policy.body}} />
-    </div>
+    <article className="policy" aria-labelledby="policy-title">
+      <header className="policy__header">
+        <Link className="policy__back" to={`/${locale}/policies`}>
+          <span aria-hidden="true">←</span>
+          {fr ? 'Toutes les politiques' : 'All policies'}
+        </Link>
+        <p className="eyebrow">Rudimenterre · {fr ? 'Informations légales' : 'Legal information'}</p>
+        <h1 id="policy-title">{policy.title}</h1>
+      </header>
+      <div className="policy__body" dangerouslySetInnerHTML={{__html: policy.body}} />
+    </article>
   );
 }
 
