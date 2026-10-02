@@ -131,6 +131,7 @@ export async function action({request, context}: Route.ActionArgs) {
 
           return {
             error: null,
+            addressId,
             createdAddress: data?.customerAddressCreate?.customerAddress,
             defaultAddress,
           };
@@ -185,6 +186,7 @@ export async function action({request, context}: Route.ActionArgs) {
 
           return {
             error: null,
+            addressId,
             updatedAddress: address,
             defaultAddress,
           };
@@ -452,6 +454,8 @@ export function AddressForm({
   const {state, formMethod} = useNavigation();
   const action = useActionData<ActionResponse>();
   const error = action?.error?.[addressId];
+  const saved = action?.addressId === addressId && !action.error &&
+    (Boolean(action.createdAddress) || Boolean(action.updatedAddress));
   const isDefaultAddress = defaultAddress?.id === addressId;
   const generatedId = useId();
   const fr = locale === 'fr';
@@ -616,6 +620,13 @@ export function AddressForm({
         {error ? (
           <p className="account-form-error" role="alert">
             <small>{error}</small>
+          </p>
+        ) : null}
+        {saved && state === 'idle' ? (
+          <p className="account-form-success" role="status">
+            <small>
+              {fr ? 'Vos informations ont bien été enregistrées.' : 'Your information has been saved.'}
+            </small>
           </p>
         ) : null}
         {children({

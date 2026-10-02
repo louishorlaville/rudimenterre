@@ -294,6 +294,13 @@
   margin: 1rem 0;
   color: var(--clay);
 }
+.account-form-success {
+  margin: 1rem 0;
+  padding: 0.8rem 1rem;
+  border-left: 3px solid var(--green);
+  background: rgba(63, 123, 36, 0.08);
+  color: var(--green);
+}
 
 .account .order-search-form {
   margin: 0 0 1.5rem;
