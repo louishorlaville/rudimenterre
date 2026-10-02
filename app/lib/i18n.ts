@@ -13,7 +13,8 @@ export function isStorefrontLocale(value?: string): value is StorefrontLocale {
 }
 
 export function localeFromPathname(pathname: string): StorefrontLocale {
-  const locale = pathname.split('/')[1]?.toLowerCase();
+  // React Router requests /en.data when navigating to the English homepage.
+  const locale = pathname.replace(/\.data$/, '').split('/')[1]?.toLowerCase();
   return isStorefrontLocale(locale) ? locale : DEFAULT_LOCALE;
 }
 
