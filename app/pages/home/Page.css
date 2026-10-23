@@ -189,9 +189,63 @@
   z-index: 6;
   width: clamp(19rem, 28vw, 27rem);
   max-height: min(68svh, 35rem);
-  object-fit: contain;
-  filter: drop-shadow(0 1.5rem 1.1rem rgba(54, 35, 21, .16));
+  aspect-ratio: 1209 / 1300;
   animation: hero-object-reveal .9s .08s cubic-bezier(.22, 1, .36, 1) both;
+}
+.home-intro__product > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.home-intro__smoke {
+  position: absolute;
+  left: 61%;
+  top: 11.1%;
+  width: 14%;
+  height: 28%;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+.home-intro__smoke::before {
+  content: '';
+  position: absolute;
+  bottom: -1%;
+  left: 37%;
+  width: 26%;
+  height: 38%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(255, 255, 251, .6), rgba(234, 235, 228, .22) 35%, transparent 70%);
+  filter: blur(.8px);
+}
+.home-intro__smoke > span {
+  --steam-drift: 12%;
+  position: absolute;
+  bottom: 0;
+  left: 17.5%;
+  width: 65%;
+  height: 45%;
+  border-radius: 42% 58% 65% 35%;
+  background:
+    radial-gradient(ellipse at 38% 68%, rgba(255, 255, 251, .6), transparent 55%),
+    radial-gradient(ellipse at 62% 38%, rgba(245, 246, 239, .45), transparent 60%),
+    radial-gradient(ellipse at 48% 48%, rgba(158, 167, 160, .22), transparent 68%);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: cuicui-smoke-rise 1.4s linear infinite;
+}
+.home-intro__smoke > span:nth-child(2) { --steam-drift: -18%; animation-duration: 1.6s; animation-delay: -.37s; }
+.home-intro__smoke > span:nth-child(3) { --steam-drift: 22%; animation-duration: 1.25s; animation-delay: -.62s; }
+.home-intro__smoke > span:nth-child(4) { --steam-drift: -12%; animation-duration: 1.8s; animation-delay: -.95s; }
+.home-intro__smoke > span:nth-child(5) { --steam-drift: 8%; animation-duration: 1.45s; animation-delay: -1.19s; }
+@keyframes cuicui-smoke-rise {
+  0% { opacity: 0; filter: blur(.6px); transform: translate(0, 0) scale(.22, .55); }
+  12% { opacity: .8; filter: blur(.8px); transform: translate(0, -25%) scale(.38, .9); }
+  38% { opacity: .65; filter: blur(1.5px); transform: translate(var(--steam-drift), -100%) scale(.9, 1.3) rotate(-4deg); }
+  68% { opacity: .35; filter: blur(3px); transform: translate(calc(var(--steam-drift) * -.4), -205%) scale(1.8, 1.8) rotate(7deg); }
+  100% { opacity: 0; filter: blur(5px); transform: translate(var(--steam-drift), -310%) scale(2.7, 2.2) rotate(-3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-intro__smoke { display: none; }
+  .home-intro__smoke > span { animation: none; }
 }
 .home-hero__copy {
   grid-column: 1;
