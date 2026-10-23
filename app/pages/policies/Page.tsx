@@ -2,6 +2,7 @@
 import type {Route} from '../../routes/+types/($locale).policies._index';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
 import {localeFromPathname} from '~/lib/i18n';
+import {policyTitle} from '~/lib/policy-titles';
 
 export const meta: Route.MetaFunction = ({data}) => [
   {title: `${data?.locale === 'en' ? 'Policies' : 'Politiques'} | Rudimenterre`},
@@ -29,7 +30,13 @@ export async function loader({context, request}: Route.LoaderArgs) {
     throw new Response('No policies found', {status: 404});
   }
 
-  return {policies, locale};
+  return {
+    policies: policies.map((policy) => ({
+      ...policy,
+      title: policyTitle(policy.handle, locale, policy.title),
+    })),
+    locale,
+  };
 }
 
 export default function Policies() {

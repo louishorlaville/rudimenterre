@@ -1,4 +1,5 @@
 import {Link, useLocation} from 'react-router';
+import {Brand} from './Brand';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {pagePath} from '~/lib/editorial-content';
 import {localeFromPathname} from '~/lib/i18n';
@@ -14,14 +15,7 @@ export function Footer(_props: {
   return (
     <footer className="site-footer">
       <div className="footer-brand">
-        <Link className="brand" to={`/${locale}`}>
-          <span className="brand-word" aria-label="RUDIMENTERRE">
-            {'RUDIMENTERRE'.split('').map((letter, index) => (
-              <span className="brand-letter" key={`${letter}-${index}`} aria-hidden="true">{letter}</span>
-            ))}
-          </span>
-          <sup className="brand-mark" aria-hidden="true">®</sup>
-        </Link>
+        <Brand locale={locale} />
       </div>
 
       <nav className="site-footer__nav" aria-label={fr ? 'Plan du site' : 'Sitemap'}>
@@ -40,21 +34,11 @@ export function Footer(_props: {
           <Link to={`/${locale}/pages/ateliers-cuissons-rudimenterre`}>{fr ? 'Les ateliers' : 'Workshops'}</Link>
         </div>
 
-        <div className="footer-column">
-          <p>{fr ? 'Pour les professionnels' : 'For professionals'}</p>
-          <Link to={`/${locale}/pages/service-decouverte-pro`}>{fr ? 'Service Chef' : 'Chef service'}</Link>
-          <Link to={`/${locale}/pages/revendeurs`}>{fr ? 'Revendeurs' : 'Retailers'}</Link>
-          <Link to={`/${locale}/pages/espace-professionnel`}>{fr ? 'Espace professionnel' : 'Professional area'}</Link>
-          <Link to={`/${locale}/pages/partenaires`}>{fr ? 'Partenaires' : 'Partners'}</Link>
-        </div>
-
         <div className="footer-column footer-column--contact">
           <p>{fr ? 'Aide et contact' : 'Help and contact'}</p>
           <Link to={`/${locale}/pages/contacts`}>{fr ? 'Contacts' : 'Contact'}</Link>
           <Link to={pagePath(locale, 'shipping')}>{fr ? 'Tarifs, livraison et garanties' : 'Pricing, shipping and warranty'}</Link>
           <Link to={`/${locale}/pages/presse-medias`}>{fr ? 'Presse médias' : 'Press and media'}</Link>
-          <a href="https://www.instagram.com/rudimenterre/reels/" target="_blank" rel="noreferrer">Instagram</a>
-          <a href="https://www.youtube.com/watch?si=sXF2pn_40MSpdkS_&v=xsQz-xmP88Q&feature=youtu.be" target="_blank" rel="noreferrer">YouTube</a>
         </div>
       </nav>
 
@@ -62,10 +46,27 @@ export function Footer(_props: {
         {fr ? 'Adoptez' : 'Adopt'}
       </Link>
 
+      <nav className="footer-social" aria-label={fr ? 'Réseaux sociaux' : 'Social media'}>
+        {[
+          {label: 'Instagram', href: 'https://www.instagram.com/rudimenterre/reels/'},
+          {label: 'YouTube', href: 'https://www.youtube.com/@rudimenterre'},
+        ].map(({label, href}) => (
+          <a key={label} href={href} target="_blank" rel="noreferrer">
+            {label}
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M4 12 12 4M4 4h8v8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        ))}
+      </nav>
+
       <div className="footer-meta">
         <span>© {new Date().getFullYear()} Rudimenterre</span>
+        <Link to={`/${locale}/policies`}>
+          {fr ? 'Politiques légales' : 'Legal policies'}
+        </Link>
         <Link to={`/${locale}/policies/privacy-policy`}>
-          {fr ? 'Confidentialité' : 'Privacy'}
+          {fr ? 'Politique de confidentialité' : 'Privacy policy'}
         </Link>
         <Link to={`/${locale}/policies/terms-of-service`}>
           {fr ? 'Conditions' : 'Terms'}

@@ -1,4 +1,5 @@
 import type {CustomerAccount} from '@shopify/hydrogen';
+import {CUSTOMER_PHONE_QUERY} from '../graphql/customer-account/CustomerPhoneQuery.js';
 
 // The customer ID always comes from the authenticated Customer Account API.
 // Address recipients can differ from the account owner: only replace an existing
@@ -25,15 +26,7 @@ export async function syncCustomerPhone({
         phoneNumber?: {phoneNumber: string} | null;
         defaultAddress?: {id: string} | null;
       };
-    }>(`#graphql
-      query CustomerPhoneForAddress {
-        customer {
-          id
-          phoneNumber { phoneNumber }
-          defaultAddress { id }
-        }
-      }
-    `);
+    }>(CUSTOMER_PHONE_QUERY);
     const customer = data?.customer;
     if (errors?.length || !customer?.id) return false;
     if (customer.phoneNumber?.phoneNumber && customer.defaultAddress?.id !== addressId) {

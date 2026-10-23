@@ -9,5 +9,9 @@ import '@total-typescript/ts-reset';
 declare global {
   interface Env {
     SHOPIFY_ADMIN_API_ACCESS_TOKEN?: string;
+    RESEND_API_KEY?: string;
+    RESEND_FROM_EMAIL?: string;
+    UPSTASH_REDIS_REST_URL?: string;
+    UPSTASH_REDIS_REST_TOKEN?: string;
   }
 }
