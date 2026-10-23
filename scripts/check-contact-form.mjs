@@ -119,6 +119,20 @@ try {
   await submit({name: 'Albert\r\nPierre'});
   assert.equal(calls[0].body.subject, '[Site web] Nouveau message - Albert Pierre');
 
+  const unicodeMessage = '中'.repeat(5000);
+  assert.equal((await submit({name: '中'.repeat(100), message: unicodeMessage})).success, true,
+    'URL encoding must not reject valid Unicode fields at their character limits');
+  assert.ok(calls[0].body.text.endsWith(unicodeMessage));
+  assert.equal(redisCalls.length, 1);
+  assert.equal((await submit({message: '中'.repeat(5001)})).status, 400,
+    'decoded messages still have a 5,000-character limit');
+  assert.equal(redisCalls.length, 0);
+  assert.equal(calls.length, 0);
+  assert.equal((await submit({message: 'a'.repeat(64_001)})).status, 413,
+    'oversized encoded requests are rejected before reserving an attempt');
+  assert.equal(redisCalls.length, 0);
+  assert.equal(calls.length, 0);
+
   for (const fields of [
     {email: ''}, {email: 'invalid'}, {email: 'a@example.com\r\nBcc: attacker@example.com'},
     {message: '  '}, {message: 'a'.repeat(5001)}, {name: 'a'.repeat(101)}, {website: 'spam'},

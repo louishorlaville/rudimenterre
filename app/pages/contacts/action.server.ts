@@ -121,7 +121,8 @@ export async function action({request, context, params}: ActionFunctionArgs) {
   let form: FormData;
   try {
     const body = await request.text();
-    if (body.length > 32_000) return data({error: invalid}, {status: 413});
+    // Allow percent-encoding expansion before checking decoded field lengths.
+    if (body.length > 64_000) return data({error: invalid}, {status: 413});
     form = await new Request(request.url, {
       method: 'POST', headers: request.headers, body,
     }).formData();
