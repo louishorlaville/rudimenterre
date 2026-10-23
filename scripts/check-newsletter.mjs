@@ -21,6 +21,7 @@ async function submit(fields = {}, options = {}) {
       ...(options.method === 'GET' ? {} : {body: form}),
     }), params: {locale: options.locale ?? 'fr'}, context: {env: options.env ?? env},
   });
+  assert.doesNotMatch(result.data.error ?? '', /SHOPIFY_|RESEND_|UPSTASH_|Redis|Resend|GraphQL|configuration:|rate-limiter|shopify-request|test-only/);
   return {status: result.init?.status ?? 200, headers: result.init?.headers, ...result.data};
 }
 globalThis.fetch = async (url, request) => {

@@ -33,10 +33,12 @@ globalThis.fetch = async (url, options) => {
 };
 const preferences = {subscribed: true, interests: ['workshops'], language: 'en'};
 async function submit(fields = {}, options = {}) {
-  return newsletterAction({request: new Request('https://shop.example/en/account/profile/newsletter', {
+  const result = await newsletterAction({request: new Request('https://shop.example/en/account/profile/newsletter', {
     method: 'POST', headers: {Origin: options.origin ?? 'https://shop.example'},
     body: new URLSearchParams({language: 'en', subscribed: 'yes', ...fields}),
   }), params: {locale: 'en'}, context: options.context ?? context});
+  assert.doesNotMatch(result.data.error ?? '', /Shopify|Newsletter consent|Newsletter preferences|origin\)|validation\)|shopify-request/);
+  return result;
 }
 try {
   reset();
