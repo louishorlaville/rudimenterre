@@ -290,6 +290,50 @@
 .account-profile form > .account-button {
   margin-top: 1.25rem;
 }
+.account-newsletter {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(23, 23, 23, 0.18);
+}
+.account-newsletter .account-checkbox {
+  min-height: 2.75rem;
+  margin-top: 0 !important;
+  line-height: 1.5;
+}
+.account-newsletter-hint {
+  max-width: 60ch;
+  margin: .5rem 0 1.5rem;
+  line-height: 1.6;
+  font-size: .9rem;
+}
+.account-newsletter-topics {
+  margin: 0 0 1.5rem;
+  padding: 1rem 0 0;
+  border: 0;
+}
+.account-newsletter-topics legend {
+  padding: 0;
+}
+.account-newsletter-topics:disabled {
+  opacity: .6;
+}
+.account-newsletter-topics:disabled .account-checkbox {
+  cursor: default;
+}
+.account-newsletter select {
+  max-width: 100%;
+  min-height: 3.15rem;
+  padding: .75rem .9rem;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  color: var(--ink);
+  background: var(--white);
+  font: inherit;
+}
+.account-newsletter select:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
 .account-form-error {
   margin: 1rem 0;
   color: var(--clay);

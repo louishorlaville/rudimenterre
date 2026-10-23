@@ -7,7 +7,7 @@ import {randomUUID} from 'node:crypto';
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 assert.ok(url && token, 'Configure Upstash REST credentials in .env first');
-const source = readFileSync(new URL('../app/pages/contacts/action.server.ts', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../app/lib/form-rate-limit.server.js', import.meta.url), 'utf8');
 const script = source.match(/const RESERVE_ATTEMPT = `([\s\S]*?)`;/)?.[1];
 assert.ok(script, 'Rate limit script not found');
 const prefix = `contacts:test:${randomUUID()}`;

@@ -27,7 +27,7 @@ export async function loader({request, context}: Route.LoaderArgs) {
 
   searchPromise.catch((error: Error) => {
     console.error(error);
-    return {term: '', result: null, error: error.message};
+    return {term: '', result: null, error: 'La recherche est indisponible. Veuillez réessayer.'};
   });
 
   return await searchPromise;
@@ -244,7 +244,7 @@ async function regularSearch({
   );
 
   const error = errors
-    ? errors.map(({message}: {message: string}) => message).join(', ')
+    ? (new URL(request.url).pathname.startsWith('/en') ? 'Search is unavailable. Please try again.' : 'La recherche est indisponible. Veuillez réessayer.')
     : undefined;
 
   return {type: 'regular', term, error, result: {total, items}};

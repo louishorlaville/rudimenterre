@@ -16,6 +16,18 @@ Bilingual, French-first storefront built with Shopify Hydrogen, React Router, Ty
 
 Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request.
 
+### Test customer accounts locally
+
+Stop the existing local server, then run `npm run dev:accounts`. Complete the
+Shopify CLI login if prompted. Open the HTTPS `*.tryhydrogen.dev` tunnel URL
+printed in the terminal, then visit `/fr/account/profile` or `/en/account/profile`.
+Customer Account API OAuth does not work on plain localhost in this Hydrogen
+version. Use the tunnel for the entire login and profile session; each restart
+can generate a different URL. The flag registers the development tunnel with
+Shopify. Newsletter preferences also require the server-side Admin API credentials
+described in the newsletter setup guide. Production uses its configured HTTPS
+domain and does not need a development tunnel.
+
 ## Shopify configuration
 
 - Publish the flagship product and its inventory to the Hydrogen sales channel.
@@ -54,6 +66,16 @@ loopback identity if Oxygen's header is absent. Client forwarding headers are ig
 Run `node --env-file=.env scripts/check-contact-redis.mjs` to verify the real Redis
 script using isolated temporary keys, including concurrent requests and rolling
 hour expiry, without sending emails. Test keys are removed after the check.
+
+## Newsletter
+
+The bilingual newsletter form saves subscribers, marketing consent and interest tags
+to Shopify Customers. Configure `SHOPIFY_ADMIN_CLIENT_ID` and
+`SHOPIFY_ADMIN_CLIENT_SECRET` for an installed app in the same Shopify organization
+with `write_customers` and customer email access, plus the shared Upstash
+configuration. See [newsletter setup](guides/newsletter-setup.md) for activation,
+segments and Shopify Messaging sender setup. Run `node scripts/check-newsletter.mjs`
+for mocked subscription checks.
 
 ## Deployment
 
