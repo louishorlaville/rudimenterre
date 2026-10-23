@@ -3,6 +3,7 @@ import type {Route} from '../../routes/+types/($locale).policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
 import {useLocation} from 'react-router';
 import {localeFromPathname} from '~/lib/i18n';
+import {policyTitle} from '~/lib/policy-titles';
 
 type SelectedPolicies = keyof Pick<
   Shop,
@@ -13,7 +14,7 @@ export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `${data?.policy.title ?? ''} | Rudimenterre`}];
 };
 
-export async function loader({params, context}: Route.LoaderArgs) {
+export async function loader({params, context, request}: Route.LoaderArgs) {
   if (!params.handle) {
     throw new Response('No handle was passed in', {status: 404});
   }
@@ -40,7 +41,8 @@ export async function loader({params, context}: Route.LoaderArgs) {
     throw new Response('Could not find the policy', {status: 404});
   }
 
-  return {policy};
+  const locale = localeFromPathname(new URL(request.url).pathname);
+  return {policy: {...policy, title: policyTitle(policy.handle, locale, policy.title)}};
 }
 
 export default function Policy() {

@@ -25,6 +25,36 @@ Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pu
 - Create the `editorial_page` metaobject definition described in [`guides/shopify-content-model.md`](guides/shopify-content-model.md).
 - Configure Shopify Customer Privacy regions and localized banner copy.
 
+## Contact form
+
+The `/pages/contacts` form sends messages to `info@rudimenterre.com` through Resend.
+Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in your local `.env` and in Oxygen's
+environment variables. The sender must belong to a domain verified in Resend.
+The visitor's email is used as Reply-To. The API key stays on the server.
+Without these settings, submissions return an error and keep the visitor's text.
+Run `node scripts/check-contact-form.mjs` to check validation and mocked sending.
+
+### Contact rate limits
+
+Create an Upstash Redis database and copy its REST URL and writable REST token
+into `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in `.env` and Oxygen.
+Restart local development after changing `.env`, and redeploy Oxygen after setting
+production variables. Use a separate database for local/preview and production.
+All production workers must share the database and `SESSION_SECRET`.
+
+Before each Resend call, an atomic Redis script reserves one attempt per 60 seconds,
+up to five per rolling hour, per trusted `oxygen-buyer-ip`. Limits cover all languages
+and email addresses. Refusals return 429 and `Retry-After`, keeping the form text.
+Failed Resend attempts also count. Missing configuration, missing trusted IP, and
+Redis outages block sending (503); protection is never silently bypassed.
+The IP is HMAC-hashed with `SESSION_SECRET`; only the hash and timestamps are stored,
+with a one-hour expiry. Changing `SESSION_SECRET` resets identities. People sharing
+a public IP share limits; different IPs have independent limits. Localhost uses a
+loopback identity if Oxygen's header is absent. Client forwarding headers are ignored.
+Run `node --env-file=.env scripts/check-contact-redis.mjs` to verify the real Redis
+script using isolated temporary keys, including concurrent requests and rolling
+hour expiry, without sending emails. Test keys are removed after the check.
+
 ## Deployment
 
 Connect this GitHub repository in the Hydrogen channel and map `main` to the Oxygen production environment. The `dev` branch deploys to Oxygen preview; pushes to either branch trigger a deployment. Add the storefront's Oxygen deployment token as the GitHub Actions secret `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`. Protect both branches so changes arrive through reviewed pull requests, and require the `PR checks` status check before merging. Before launch, connect the storefront domain to Oxygen, connect `checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN` in Oxygen.

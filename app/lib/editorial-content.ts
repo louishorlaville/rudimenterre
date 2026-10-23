@@ -191,6 +191,7 @@ export const pagePath = (locale: StorefrontLocale, id: EditorialPageId) => `/${l
 export const alternatePagePath = (locale: StorefrontLocale, id: EditorialPageId) => pagePath(locale === 'fr' ? 'en' : 'fr', id);
 export function localizedPath(pathname: string, target: StorefrontLocale) {
   const parts = pathname.split('/').filter(Boolean);
+  if (parts[0] !== 'fr' && parts[0] !== 'en') parts.unshift('fr');
   const current: StorefrontLocale = parts[0] === 'en' ? 'en' : 'fr';
   const page = parts[1] ? getPageBySlug(current, parts[1]) : null;
   if (page) return pagePath(target, page.id);
