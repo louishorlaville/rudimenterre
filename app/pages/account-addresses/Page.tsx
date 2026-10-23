@@ -11,8 +11,11 @@ import {
   type Fetcher,
 } from 'react-router';
 import type {Route} from '../../routes/+types/($locale).account.addresses';
-import {useId} from 'react';
+import {useEffect, useId, useState} from 'react';
 import type {AccountContext, AccountLocale} from '~/pages/account/context';
+
+const ADDRESS_FIELDS = ['firstName', 'lastName', 'company', 'address1', 'address2',
+  'city', 'zoneCode', 'zip', 'territoryCode', 'phoneNumber'] as const;
 
 export type ActionResponse = {
   addressId?: string | null;
@@ -103,11 +106,11 @@ function NewAddressForm({locale}: {locale: AccountLocale}) {
       defaultAddress={null}
       locale={locale}
     >
-      {({stateForMethod}) => (
+      {({stateForMethod, hasChanges}) => (
         <div className="account-form-actions">
           <button
             className="account-button account-button--orange"
-            disabled={stateForMethod('POST') !== 'idle'}
+            disabled={stateForMethod('POST') !== 'idle' || !hasChanges}
             formMethod="POST"
             type="submit"
           >
@@ -143,11 +146,11 @@ function ExistingAddresses({
           defaultAddress={defaultAddress}
           locale={locale}
         >
-          {({stateForMethod}) => (
+          {({stateForMethod, hasChanges}) => (
             <div className="account-form-actions">
               <button
                 className="account-button account-button--orange"
-                disabled={stateForMethod('PUT') !== 'idle'}
+                disabled={stateForMethod('PUT') !== 'idle' || !hasChanges}
                 formMethod="PUT"
                 type="submit"
               >
@@ -194,6 +197,7 @@ export function AddressForm({
   locale: AccountLocale;
   children: (props: {
     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
+    hasChanges: boolean;
   }) => React.ReactNode;
 }) {
   const {state, formMethod} = useNavigation();
@@ -202,6 +206,13 @@ export function AddressForm({
   const saved = action?.addressId === addressId && !action.error &&
     (Boolean(action.createdAddress) || Boolean(action.updatedAddress));
   const isDefaultAddress = defaultAddress?.id === addressId;
+  const savedValues = JSON.stringify(Object.fromEntries(ADDRESS_FIELDS.map((name) => [name, address[name] ?? ''])));
+  const [values, setValues] = useState<Record<string, string>>(() => JSON.parse(savedValues) as Record<string, string>);
+  const [makeDefault, setMakeDefault] = useState(isDefaultAddress);
+  useEffect(() => setValues(JSON.parse(savedValues) as Record<string, string>), [savedValues]);
+  useEffect(() => setMakeDefault(isDefaultAddress), [isDefaultAddress]);
+  const hasChanges = makeDefault !== isDefaultAddress ||
+    ADDRESS_FIELDS.some((name) => values[name] !== (address[name] ?? ''));
   const generatedId = useId();
   const fr = locale === 'fr';
   const field = (
@@ -228,7 +239,9 @@ export function AddressForm({
           type={type}
           autoComplete={autoComplete}
           placeholder={placeholder}
-          defaultValue={value ?? ''}
+          value={values[name] ?? value ?? ''}
+          onChange={(event) => setValues((previous) => ({...previous, [name]: event.target.value}))}
+          disabled={state !== 'idle'}
           required={required}
           maxLength={maxLength}
           pattern={pattern}
@@ -353,7 +366,9 @@ export function AddressForm({
           htmlFor={`${generatedId}-defaultAddress`}
         >
           <input
-            defaultChecked={isDefaultAddress}
+            checked={makeDefault}
+            onChange={(event) => setMakeDefault(event.target.checked)}
+            disabled={state !== 'idle'}
             id={`${generatedId}-defaultAddress`}
             name="defaultAddress"
             type="checkbox"
@@ -385,6 +400,7 @@ export function AddressForm({
         ) : null}
         {children({
           stateForMethod: (method) => (formMethod === method ? state : 'idle'),
+          hasChanges,
         })}
       </fieldset>
     </Form>

@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
+  useLocation,
 } from 'react-router';
 import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
@@ -205,26 +206,17 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  let errorMessage = 'Une erreur inattendue est survenue.';
-  let errorStatus = 500;
-
-  if (isRouteErrorResponse(error)) {
-    errorMessage = error?.data?.message ?? error.data;
-    errorStatus = error.status;
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
-  }
+  const fr = localeFromPathname(useLocation().pathname) === 'fr';
+  const notFound = isRouteErrorResponse(error) && error.status === 404;
 
   return (
     <div className="route-error" role="alert">
       <p className="eyebrow">Rudimenterre</p>
-      <h1>{errorStatus === 404 ? 'Page introuvable' : 'Quelque chose a changé.'}</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
-      )}
+      <h1>{notFound ? (fr ? 'Page introuvable' : 'Page not found') : (fr ? 'Une erreur est survenue' : 'Something went wrong')}</h1>
+      <p>{notFound
+        ? (fr ? 'Cette page n’est plus disponible.' : 'This page is no longer available.')
+        : (fr ? 'Veuillez réessayer dans quelques instants.' : 'Please try again in a few moments.')}</p>
+      <a href={fr ? '/fr' : '/en'}>{fr ? 'Revenir à l’accueil' : 'Back to home'}</a>
     </div>
   );
 }

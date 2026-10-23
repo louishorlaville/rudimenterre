@@ -11,6 +11,7 @@ import {
 export async function action({request, context}: Route.ActionArgs) {
   const {customerAccount} = context;
   const fr = new URL(request.url).pathname.split('/')[1] !== 'en';
+  const unavailable = fr ? 'La modification de l’adresse n’a pas pu aboutir. Veuillez réessayer.' : 'The address change could not be completed. Please try again.';
 
   try {
     const form = await request.formData();
@@ -114,14 +115,14 @@ export async function action({request, context}: Route.ActionArgs) {
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
-              {error: {[addressId]: error.message}},
+              {error: {[addressId]: unavailable}},
               {
                 status: 400,
               },
             );
           }
           return data(
-            {error: {[addressId]: error}},
+            {error: {[addressId]: unavailable}},
             {
               status: 400,
             },
@@ -176,14 +177,14 @@ export async function action({request, context}: Route.ActionArgs) {
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
-              {error: {[addressId]: error.message}},
+              {error: {[addressId]: unavailable}},
               {
                 status: 400,
               },
             );
           }
           return data(
-            {error: {[addressId]: error}},
+            {error: {[addressId]: unavailable}},
             {
               status: 400,
             },
@@ -224,14 +225,14 @@ export async function action({request, context}: Route.ActionArgs) {
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
-              {error: {[addressId]: error.message}},
+              {error: {[addressId]: unavailable}},
               {
                 status: 400,
               },
             );
           }
           return data(
-            {error: {[addressId]: error}},
+            {error: {[addressId]: unavailable}},
             {
               status: 400,
             },
@@ -257,14 +258,14 @@ export async function action({request, context}: Route.ActionArgs) {
   } catch (error: unknown) {
     if (error instanceof Error) {
       return data(
-        {error: error.message},
+        {error: unavailable},
         {
           status: 400,
         },
       );
     }
     return data(
-      {error},
+      {error: unavailable},
       {
         status: 400,
       },

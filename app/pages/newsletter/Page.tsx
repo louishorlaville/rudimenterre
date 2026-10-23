@@ -1,7 +1,8 @@
 import {useState} from 'react';
-import {Link, useLocation, useSearchParams, type MetaFunction} from 'react-router';
+import {Link, useFetcher, useLocation, useSearchParams, type MetaFunction} from 'react-router';
 import {localeFromPathname} from '~/lib/i18n';
 import styles from './Page.css?url';
+import type {action} from './action.server';
 
 export const links = () => [{rel: 'stylesheet', href: styles}];
 
@@ -16,15 +17,11 @@ export default function NewsletterPage() {
   const locale = localeFromPathname(useLocation().pathname);
   const fr = locale === 'fr';
   const [searchParams] = useSearchParams();
-  // Preview feedback only in development; no subscription endpoint is connected.
+  const fetcher = useFetcher<typeof action>();
   const preview = import.meta.env.DEV ? searchParams.get('preview') : null;
-  const sending = preview === 'sending';
-  const success = preview === 'success';
+  const sending = fetcher.state !== 'idle' || preview === 'sending';
+  const success = (!sending && fetcher.data?.success) || preview === 'success';
   const [invalid, setInvalid] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const unavailable = fr
-    ? 'L’inscription n’est pas encore disponible. Aucun courriel ne sera envoyé ni enregistré.'
-    : 'Sign-up is not available yet. No email address will be sent or saved.';
 
   return (
     <article className="newsletter-page" aria-labelledby="newsletter-title">
@@ -48,14 +45,19 @@ export default function NewsletterPage() {
 
           {preview && <p className="newsletter-preview">{fr ? 'Aperçu de développement — aucune inscription réelle.' : 'Development preview — no real subscription.'}</p>}
 
-          <form className="newsletter-form" onSubmit={(event) => {
-            event.preventDefault();
-            setSubmitted(true);
-          }} aria-describedby="newsletter-availability">
+          <fetcher.Form className="newsletter-form" method="post" onSubmit={(event) => {
+            if (preview) event.preventDefault();
+          }}>
+            <div hidden aria-hidden="true">
+              <label htmlFor="newsletter-website">Website</label>
+              <input id="newsletter-website" name="website" tabIndex={-1} autoComplete="off" />
+            </div>
             <div className="newsletter-email">
               <label htmlFor="newsletter-email">{fr ? 'Votre adresse courriel' : 'Your email address'}</label>
               <input
                 id="newsletter-email"
+                name="email"
+                maxLength={254}
                 type="email"
                 autoComplete="email"
                 placeholder={fr ? 'vous@exemple.com' : 'you@example.com'}
@@ -64,7 +66,7 @@ export default function NewsletterPage() {
                 aria-invalid={invalid || preview === 'invalid' || undefined}
                 aria-describedby={invalid || preview === 'invalid' ? 'newsletter-email-error' : undefined}
                 onInvalid={() => setInvalid(true)}
-                onChange={() => {setInvalid(false); setSubmitted(false);}}
+                onChange={() => setInvalid(false)}
               />
               {(invalid || preview === 'invalid') && <p className="newsletter-error" id="newsletter-email-error" role="alert">{fr ? 'Saisissez une adresse courriel valide.' : 'Enter a valid email address.'}</p>}
             </div>
@@ -77,7 +79,7 @@ export default function NewsletterPage() {
                 ['news', fr ? 'Nouvelles du Cuicui' : 'Cuicui news'],
               ].map(([id, label]) => (
                 <label className="newsletter-interest" key={id}>
-                  <input type="checkbox" value={id} />
+                  <input type="checkbox" name="interests" value={id} />
                   <span>{label}</span>
                 </label>
               ))}
@@ -87,15 +89,13 @@ export default function NewsletterPage() {
             <button className="button newsletter-submit" type="submit" disabled={sending || success} aria-busy={sending}>
               {sending ? (fr ? 'Inscription en cours…' : 'Signing up…') : (fr ? 'Je m’inscris' : 'Sign me up')}
             </button>
-            <p className="newsletter-availability" id="newsletter-availability" role="status">{submitted ? unavailable : (fr ? 'Les inscriptions ouvriront bientôt. Aucun courriel n’est enregistré pour le moment.' : 'Sign-ups will open soon. No email addresses are currently saved.')}</p>
-
-            {preview === 'error' && <p className="newsletter-error" role="alert">{fr ? 'L’inscription n’a pas pu aboutir. Veuillez réessayer.' : 'Sign-up failed. Please try again.'}</p>}
+            {!sending && (fetcher.data?.error || preview === 'error') && <p className="newsletter-error" role="alert">{fetcher.data?.error || (fr ? 'L’inscription n’a pas pu aboutir. Veuillez réessayer.' : 'Sign-up failed. Please try again.')}</p>}
             {success && <p className="newsletter-success" role="status">{fr ? 'Merci ! Vous êtes sur la liste. À bientôt dans votre boîte courriel.' : 'Thank you! You’re on the list. See you in your inbox.'}</p>}
 
             <p className="newsletter-consent">{fr ? 'En vous inscrivant, vous acceptez de recevoir les nouvelles de Rudimenterre. Désinscription possible à tout moment. Consultez notre ' : 'By signing up, you agree to receive news from Rudimenterre. Unsubscribe at any time. Read our '}
               <Link to={`/${locale}/policies/privacy-policy`}>{fr ? 'politique de confidentialité' : 'privacy policy'}</Link>.
             </p>
-          </form>
+          </fetcher.Form>
         </div>
       </section>
     </article>
