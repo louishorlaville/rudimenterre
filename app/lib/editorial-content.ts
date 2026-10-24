@@ -2,7 +2,7 @@ import type {StorefrontLocale} from './i18n';
 
 export type EditorialPageId =
   | 'project' | 'steam' | 'garden' | 'making' | 'thermal'
-  | 'distillation' | 'creator' | 'jury' | 'adopt' | 'shipping';
+  | 'distillation' | 'creator' | 'jury' | 'adopt' | 'shipping' | 'vadrouille';
 
 export type EditorialSection = {
   title: string;
@@ -35,6 +35,7 @@ export const PAGE_SLUGS: Record<EditorialPageId, string> = {
   jury: 'jury',
   adopt: 'adoptez',
   shipping: 'tarifs-livraison-garanties',
+  vadrouille: 'cuicui-en-vadrouille',
 };
 
 const LEGACY_EN_SLUGS: Partial<Record<EditorialPageId, string>> = {
@@ -53,6 +54,7 @@ const LEGACY_EN_SLUGS: Partial<Record<EditorialPageId, string>> = {
 const img = (name: string) => `/images/rudimenterre/${name}`;
 
 const FR: Record<EditorialPageId, EditorialPageContent> = {
+  vadrouille: {id:'vadrouille', eyebrow:'', title:'Le Cuicui en vadrouille', intro:'Sorties, rencontres et revue de presse du Cuicui.', seoDescription:'Retrouvez le Cuicui en vadrouille : événements, passages à la télévision, prix et revue de presse Rudimenterre.', heroImage:img('vadrouille/hero.webp'), sections:[]},
   project: {id:'project', eyebrow:'Le projet', title:'Le projet Rudimenterre', intro:'Un Cuicui made in France', seoDescription:'Le projet Rudimenterre et son relais de cuissons saines et durables.', heroImage:img('project.webp'), sections:[
     {title:'Le projet', body:'Imaginé au Canada, après 3 ans de recherche et de fabrication pour tester le marché, l’intérêt que suscite le Cuicui montre que ce nouveau Potager-là nous sourit.', tone:'white'},
     {title:'Le concept', body:'Rudimenterre incarne dans une vision futuriste et visionnaire un objet et une solution simple pour redonner sens et goût à notre alimentation : le Cuicui.', tone:'cream'},
@@ -108,6 +110,7 @@ const FR: Record<EditorialPageId, EditorialPageContent> = {
 };
 
 const EN_OVERRIDES: Record<EditorialPageId, Pick<EditorialPageContent,'eyebrow'|'title'|'intro'|'seoDescription'>> = {
+  vadrouille:{eyebrow:'',title:'Cuicui on the road',intro:'Cuicui outings, gatherings and press coverage.',seoDescription:'Follow Cuicui on the road: events, television appearances, awards and Rudimenterre press coverage.'},
   project:{eyebrow:'The project',title:'The Rudimenterre project',intro:'A Cuicui made in France',seoDescription:'The Rudimenterre project and its healthy, sustainable cooking relay.'},
   steam:{eyebrow:'Cooking method',title:'Steam cooking',intro:'Gentle steam, flavour and intelligent water use.',seoDescription:'Discover the Cuicui steam-cooking cycle.'},
   garden:{eyebrow:'Guided visit',title:'The medieval kitchen garden revisited',intro:'What did a kitchen garden once mean?',seoDescription:'From the medieval kitchen garden to Cuicui.'},
@@ -121,6 +124,7 @@ const EN_OVERRIDES: Record<EditorialPageId, Pick<EditorialPageContent,'eyebrow'|
 };
 
 const EN_SECTIONS: Record<EditorialPageId, Array<{title:string;body:string;bullets?:string[]}>> = {
+  vadrouille:[],
   project:[
     {title:'The project',body:'Imagined in Canada after three years of research and prototyping, Cuicui is now preparing for a new chapter made in France.'},
     {title:'The concept',body:'Rudimenterre offers a simple, forward-looking way to bring meaning and pleasure back to everyday food.'},

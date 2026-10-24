@@ -852,7 +852,7 @@ export default function Homepage() {
       <div className="home-discover__grid">
         {[
           {tone: 'forest', image: 'home-discover-award.png', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
-          {tone: 'blue', image: 'home-discover-kit.png', to: '#home-cuicui-news', title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
+          {tone: 'blue', image: 'home-discover-kit.png', to: pagePath(locale, 'vadrouille'), title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
           {tone: 'mint', image: 'project-flag.png', crop: {viewBox: '205 663 1090 1119', width: 1512, height: 2016}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui 100% français' : 'The Rudimenterre project\nA 100% French Cuicui'},
           {tone: 'white', image: 'home-discover-making.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
           {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
@@ -979,6 +979,9 @@ export default function Homepage() {
           </p>
         </article>
       </div>
+      <Link className="button button--dark" to={pagePath(locale, 'vadrouille')}>
+        {fr ? 'Voir les sorties et la revue de presse' : 'See outings and press coverage'}
+      </Link>
     </section>
 
     <section className="home-project-banner" aria-labelledby="home-project-banner-title">

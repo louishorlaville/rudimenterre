@@ -40,15 +40,11 @@
   .home-discover__card:is(:hover, :focus-visible) .home-discover__arrow { transform: translateX(8px); }
 }
 @media (min-width: 761px) {
-  .home-discover__grid { gap: 1px; padding: 1px; }
-  .home-discover__card { aspect-ratio: 1.05; padding: clamp(22px, 2.2vw, 34px); gap: 18px; grid-template-rows: minmax(120px, 1fr) minmax(max-content, auto) 28px; font-size: clamp(18px, 1.5vw, 23px); }
-  .home-discover__illustration { padding: 12px 0 20px; }
-  .home-discover__illustration :is(img, svg) { max-height: 180px; }
-  .home-discover__card h3 { min-height: 3.9em; line-height: 1.3; letter-spacing: -.015em; text-wrap: pretty; }
-  .home-discover__arrow { width: 36px; height: 28px; }
-}
-@media (min-width: 761px) and (max-width: 900px) {
-  .home-discover__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-discover { padding-block: 20px; }
+  .home-discover__heading { margin-bottom: 18px; }
+  .home-discover__grid { max-width: min(1040px, calc(max(480px, 100svh - var(--header-height) - 124px) * 1.4)); }
+  .home-discover__card { aspect-ratio: .94; padding: 14px; gap: 8px; grid-template-rows: minmax(0, 1fr) minmax(max-content, 3.3em) 24px; font-size: clamp(12px, 1vw, 16px); }
+  .home-discover__arrow { width: 48px; height: 24px; }
 }
 @media (max-width: 760px) {
   .home-discover { padding-block: 24px; }

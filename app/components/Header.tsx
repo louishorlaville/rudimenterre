@@ -47,7 +47,7 @@ export function HeaderMenu({viewport}: {viewport: 'desktop' | 'mobile'; menu?: H
   const kitchenLinks = [
     {label: locale === 'fr' ? 'Potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
-    {label: locale === 'fr' ? 'Les ateliers' : 'Workshops', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`},
+    {label: locale === 'fr' ? 'Le Cuicui en vadrouille' : 'Cuicui on the road', to: pagePath(locale, 'vadrouille')},
   ];
   return (
     <nav className={`header-menu header-menu--${viewport}`} aria-label={copy.menu}>
