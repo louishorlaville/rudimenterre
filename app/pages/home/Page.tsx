@@ -851,23 +851,23 @@ export default function Homepage() {
       </header>
       <div className="home-discover__grid">
         {[
-          {tone: 'forest', image: '', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
-          {tone: 'blue', image: 'home-kitchen-plate-cuicui.png', to: '#home-cuicui-news', title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
-          {tone: 'mint', image: '', to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui 100% français' : 'The Rudimenterre project\nA 100% French Cuicui'},
-          {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
-          {tone: 'sage', image: 'home-kitchen-plate-cuicui.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
-          {tone: 'charcoal', image: 'home-kitchen-plate-casserole.png', to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Pour les chefs du futur\nServices pro' : 'For the chefs of the future\nProfessional services'},
+          {tone: 'forest', image: 'home-discover-award.png', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
+          {tone: 'blue', image: 'home-discover-kit.png', to: '#home-cuicui-news', title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
+          {tone: 'mint', image: 'project-flag.png', crop: {viewBox: '205 663 1090 1119', width: 1512, height: 2016}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui 100% français' : 'The Rudimenterre project\nA 100% French Cuicui'},
+          {tone: 'white', image: 'home-discover-making.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
+          {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
+          {tone: 'charcoal', image: 'home-discover-professional.png', crop: {viewBox: '1060 911 1939 1835', width: 4032, height: 3024}, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
         ].map((card) => (
           <Link key={card.tone} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
             <div className="home-discover__illustration" aria-hidden="true">
-              {card.image ? <img src={`/images/rudimenterre/${card.image}`} alt="" loading="lazy" /> : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                  {card.tone === 'forest' ? <path d="M8 3h8v6a4 4 0 0 1-8 0V3ZM8 5H5v2a4 4 0 0 0 4 4m7-6h3v2a4 4 0 0 1-4 4m-3 2v5m-4 3h8m-7 0v-3h6v3" /> : <path d="M5 21V3m0 1c5-4 9 4 14 0v11c-5 4-9-4-14 0" />}
+              {card.crop ? (
+                <svg viewBox={card.crop.viewBox} focusable="false">
+                  <image href={`/images/rudimenterre/${card.image}`} width={card.crop.width} height={card.crop.height} />
                 </svg>
-              )}
+              ) : <img src={`/images/rudimenterre/${card.image}`} alt="" loading="lazy" />}
             </div>
             <h3>{card.title}</h3>
-            <svg className="home-discover__arrow" viewBox="0 0 32 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M3 12h25m-8-8 8 8-8 8" /></svg>
+            <img className="home-discover__arrow" src="/images/rudimenterre/handdrawn-arrow.png" alt="" aria-hidden="true" loading="lazy" />
           </Link>
         ))}
       </div>
