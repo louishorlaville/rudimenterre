@@ -182,12 +182,14 @@ export default function Homepage() {
     };
 
     const updateBanner = () => {
+      frame = 0;
       if (window.innerWidth <= 760) {
         // A short image drift keeps the mobile opening in normal document flow.
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         banner.style.setProperty('--mobile-banner-shift', `${reduced ? 0 : Math.min(24, Math.max(0, window.scrollY) * .08)}px`);
         return;
       }
+      if (CSS.supports('animation-timeline: scroll(root block)') && CSS.supports('animation-range: 0px 100vh')) return;
       // Keep scroll updates transform-only. Changing the opening block's
       // layout during scrolling lets scroll anchoring move the next section.
       const scrollProgress = Math.max(
@@ -199,7 +201,7 @@ export default function Homepage() {
       opening.style.setProperty('--content-hold', `${contentHold}px`);
     };
     const scheduleBannerUpdate = () => {
-      cancelAnimationFrame(frame);
+      if (frame) return;
       frame = requestAnimationFrame(updateBanner);
     };
     const measureAndUpdate = () => {
@@ -400,7 +402,7 @@ export default function Homepage() {
         <div className="home-intro__product">
           <img src="/images/rudimenterre/home-hero-uncapped.webp" width="1209" height="1300" alt={fr ? 'Le Cuicui Rudimenterre sans bouchon' : 'The Rudimenterre Cuicui with its chimney uncapped'} />
           <div className="home-intro__smoke" aria-hidden="true">
-            <span /><span /><span /><span /><span />
+            <span /><span /><span /><span /><span /><span /><span /><span />
           </div>
         </div>
         <section className="home-intro">
