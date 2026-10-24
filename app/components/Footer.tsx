@@ -31,7 +31,7 @@ export function Footer(_props: {
           <p>{fr ? 'En cuisine' : 'In the kitchen'}</p>
           <Link to={pagePath(locale, 'creator')}>{fr ? 'La recette' : 'The recipe'}</Link>
           <Link to={pagePath(locale, 'garden')}>{fr ? 'Potager' : 'Kitchen garden'}</Link>
-          <Link to={`/${locale}/pages/ateliers-cuissons-rudimenterre`}>{fr ? 'Les ateliers' : 'Workshops'}</Link>
+          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
         </div>
 
         <div className="footer-column footer-column--contact">

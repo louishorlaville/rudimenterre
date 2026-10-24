@@ -1,3 +1,4 @@
+import {VadrouillePage} from '~/pages/vadrouille/Page';
 import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 import {AdoptPage} from '~/pages/adopt/Page';
@@ -18,6 +19,7 @@ export function EditorialPage(props: {
 }) {
   const {content, locale, heroImage} = props;
   switch (content.id) {
+    case 'vadrouille': return <VadrouillePage {...props} />;
     case 'adopt': return <AdoptPage locale={locale} />;
     case 'creator': return <RecipePage locale={locale} heroImage={heroImage} />;
     case 'steam': return <SteamPage locale={locale} heroImage={heroImage} />;
