@@ -1,5 +1,6 @@
 import {redirect, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).$page';
+import vadrouilleStyles from '~/pages/vadrouille/Page.css?url';
 import editorialStyles from './Page.css?url';
 import projectStyles from '~/pages/project/Page.css?url';
 import distillationStyles from '~/pages/distillation/Page.css?url';
@@ -23,6 +24,7 @@ import {isStorefrontLocale} from '~/lib/i18n';
 export const meta: Route.MetaFunction = ({data}) => {
   if (!data) return [];
   const specialStyles: Partial<Record<typeof data.content.id, string>> = {
+    vadrouille: vadrouilleStyles,
     project: projectStyles,
     distillation: data.locale === 'fr' ? distillationStyles : editorialStyles,
     adopt: adoptStyles,
