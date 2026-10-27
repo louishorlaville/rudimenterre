@@ -22,7 +22,7 @@ assert.ok(deployments.length > 0, 'No deployment owner found');
 const owners = [...new Set(deployments.map(({workflow}) => workflow.file))];
 assert.deepEqual(
   owners,
-  ['oxygen-deployment-1000179878.yml'],
+  ['oxygen-deployment.yml'],
   'All Oxygen deployments must use the single storefront workflow; retire competing workflows after merging',
 );
 const workflow = deployments[0].workflow;

@@ -1,4 +1,4 @@
-name: Storefront 1000179878
+name: Deploy to Oxygen
 on:
   push:
     branches:

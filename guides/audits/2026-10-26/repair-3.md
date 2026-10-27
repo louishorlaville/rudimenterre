@@ -42,7 +42,8 @@ was performed.
 
 ## Resulting policy
 
-`.github/workflows/oxygen-deployment-1000179878.yml` is the sole deployment owner.
+`.github/workflows/oxygen-deployment.yml` is the sole deployment owner (renamed
+from Shopify's generated `oxygen-deployment-1000179878.yml`).
 The overlapping `oxygen-production.yml` is removed. The existing generated
 workflow's pinned actions and storefront-specific secret are retained; floating
 `lts/*` is replaced with Node 22, matching PR checks.

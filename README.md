@@ -97,7 +97,7 @@ for mocked subscription checks.
 
 ## Deployment
 
-The single deployment owner is `.github/workflows/oxygen-deployment-1000179878.yml`
+The single deployment owner is `.github/workflows/oxygen-deployment.yml`
 for storefront `1000179878` on `rudimenterre.myshopify.com`. The confirmed Oxygen
 mapping is `main` → Production, `dev` → the dedicated Dev environment, and pushes
 to other repository branches (including PR branches) → Preview. Production and
