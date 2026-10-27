@@ -1,4 +1,5 @@
-import {Link, useFetcher, type Fetcher} from 'react-router';
+import {localeFromPathname} from '~/lib/i18n';
+import {Link, useLocation, useFetcher, type Fetcher} from 'react-router';
 import {Image, Money} from '~/components/CommerceMedia';
 import React, {useRef, useEffect} from 'react';
 import {
@@ -24,6 +25,7 @@ type SearchResultsPredictiveArgs = Pick<
 > & {
   state: Fetcher['state'];
   closeSearch: () => void;
+  error?: string;
 };
 
 type PartialPredictiveSearchResult<
@@ -70,6 +72,7 @@ export function SearchResultsPredictive({
     state: fetcher.state,
     term,
     total,
+    error: fetcher.data?.error,
   });
 }
 
@@ -85,6 +88,7 @@ function SearchResultsPredictiveArticles({
   articles,
   closeSearch,
 }: PartialPredictiveSearchResult<'articles'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!articles.length) return null;
 
   return (
@@ -93,7 +97,7 @@ function SearchResultsPredictiveArticles({
       <ul>
         {articles.map((article) => {
           const articleUrl = urlWithTrackingParams({
-            baseUrl: `/blogs/${article.blog.handle}/${article.handle}`,
+            baseUrl: `/${locale}/blogs/${article.blog.handle}/${article.handle}`,
             trackingParams: article.trackingParameters,
             term: term.current ?? '',
           });
@@ -126,6 +130,7 @@ function SearchResultsPredictiveCollections({
   collections,
   closeSearch,
 }: PartialPredictiveSearchResult<'collections'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!collections.length) return null;
 
   return (
@@ -134,7 +139,7 @@ function SearchResultsPredictiveCollections({
       <ul>
         {collections.map((collection) => {
           const collectionUrl = urlWithTrackingParams({
-            baseUrl: `/collections/${collection.handle}`,
+            baseUrl: `/${locale}/collections/${collection.handle}`,
             trackingParams: collection.trackingParameters,
             term: term.current,
           });
@@ -167,6 +172,7 @@ function SearchResultsPredictivePages({
   pages,
   closeSearch,
 }: PartialPredictiveSearchResult<'pages'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!pages.length) return null;
 
   return (
@@ -175,7 +181,7 @@ function SearchResultsPredictivePages({
       <ul>
         {pages.map((page) => {
           const pageUrl = urlWithTrackingParams({
-            baseUrl: `/pages/${page.handle}`,
+            baseUrl: `/${locale}/pages/${page.handle}`,
             trackingParams: page.trackingParameters,
             term: term.current,
           });
@@ -200,6 +206,7 @@ function SearchResultsPredictiveProducts({
   products,
   closeSearch,
 }: PartialPredictiveSearchResult<'products'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!products.length) return null;
 
   return (
@@ -208,7 +215,7 @@ function SearchResultsPredictiveProducts({
       <ul>
         {products.map((product) => {
           const productUrl = urlWithTrackingParams({
-            baseUrl: `/products/${product.handle}`,
+            baseUrl: `/${locale}/products/${product.handle}`,
             trackingParams: product.trackingParameters,
             term: term.current,
           });

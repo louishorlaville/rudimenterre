@@ -1,4 +1,5 @@
-﻿import {Link, useLoaderData} from 'react-router';
+import {localeFromPathname} from '~/lib/i18n';
+import {Link, useLocation, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs._index';
 import {getPaginationVariables} from '~/components/Pagination';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -53,6 +54,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
+  const locale = localeFromPathname(useLocation().pathname);
   return (
     <div className="blogs">
       <h1>Blogs</h1>
@@ -63,7 +65,7 @@ export default function Blogs() {
               className="blog"
               key={blog.handle}
               prefetch="intent"
-              to={`/blogs/${blog.handle}`}
+              to={`/${locale}/blogs/${blog.handle}`}
             >
               <h2>{blog.title}</h2>
             </Link>

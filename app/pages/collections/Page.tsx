@@ -1,4 +1,5 @@
-﻿import {useLoaderData, Link} from 'react-router';
+import {localeFromPathname} from '~/lib/i18n';
+import {useLoaderData, useLocation, Link} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).collections._index';
 import collectionStyles from './Page.css?url';
 
@@ -77,11 +78,12 @@ function CollectionItem({
   collection: CollectionFragment;
   index: number;
 }) {
+  const locale = localeFromPathname(useLocation().pathname);
   return (
     <Link
       className="collection-item"
       key={collection.id}
-      to={`/collections/${collection.handle}`}
+      to={`/${locale}/collections/${collection.handle}`}
       prefetch="intent"
     >
       {collection?.image && (

@@ -16,6 +16,8 @@ Bilingual, French-first storefront built with Shopify Hydrogen, React Router, Ty
 
 Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request. After building, run `npm run check:route-manifest` and `npm run check:framework`. The latter exercises the patched manifest handler, bilingual rendering, cart operations, OAuth URL/CSRF handling and sitemaps against the built worker with synthetic APIs; it does not contact Shopify or write live data.
 
+Run `npm run check:catalog` for offline FR/EN catalog/search links, regular/predictive search recovery, pending cart buttons, product JSON rendering and policy link regressions. It uses installed TypeScript and synthetic integrations, needs no build or credentials, and runs in PR checks. Browser and real-provider acceptance remain separate.
+
 Hydrogen 2026.10.2 uses React 19 and React Router 7.18.4. Core services live in `app/lib`, React bindings come from `@shopify/hydrogen/react`, and `server.ts` dispatches Shopify cart/account endpoints before the page router. `npm run codegen` generates the named GraphQL operation contracts and route types. `typecheck` also validates branded GraphQL documents against the bundled schemas without downloading schemas.
 
 ### Test customer accounts locally

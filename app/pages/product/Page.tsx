@@ -27,7 +27,22 @@ function readProductDetails(value?: string | null): ProductDetails {
   if (!value) return {};
   try {
     const parsed = JSON.parse(value);
-    return parsed && typeof parsed === 'object' ? parsed : {};
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+      return {};
+    const fields = parsed as Record<string, unknown>;
+    const details: ProductDetails = {};
+    for (const key of [
+      'eyebrow',
+      'subtitle',
+      'galleryCaption',
+      'dimensions',
+      'description',
+      'characteristics',
+      'delivery',
+    ] as const) {
+      if (typeof fields[key] === 'string') details[key] = fields[key];
+    }
+    return details;
   } catch {
     return {};
   }

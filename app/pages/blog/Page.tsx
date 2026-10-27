@@ -1,4 +1,5 @@
-﻿import {Link, useLoaderData} from 'react-router';
+import {localeFromPathname} from '~/lib/i18n';
+import {Link, useLocation, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs.$blogHandle._index';
 import {Image} from '~/components/CommerceMedia';
 import {getPaginationVariables} from '~/components/Pagination';
@@ -90,6 +91,7 @@ function ArticleItem({
   article: ArticleItemFragment;
   loading?: HTMLImageElement['loading'];
 }) {
+  const locale = localeFromPathname(useLocation().pathname);
   const publishedAt = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -97,7 +99,7 @@ function ArticleItem({
   }).format(new Date(article.publishedAt!));
   return (
     <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
+      <Link to={`/${locale}/blogs/${article.blog.handle}/${article.handle}`}>
         {article.image && (
           <div className="blog-article-image">
             <Image
