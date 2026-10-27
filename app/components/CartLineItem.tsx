@@ -1,6 +1,8 @@
-import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
+import type {CartLineUpdateInput} from '@shopify/hydrogen';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
-import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
+import {CartForm} from '~/components/CartForm';
+import {Image, Money} from '~/components/CommerceMedia';
+import {type OptimisticCartLine} from '~/lib/cart-types';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
@@ -33,22 +35,23 @@ export function CartLineItem({
   pendingLineIds: ReadonlySet<string>;
 }) {
   const {id, merchandise} = line;
-  const {product, image, selectedOptions} = merchandise;
-  const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
+  const selectedOptions = merchandise?.selectedOptions ?? [];
+  const product = merchandise?.product;
+  const image = merchandise?.image;
+  const lineItemUrl = useVariantUrl(product?.handle ?? '', selectedOptions);
   const {close} = useAside();
+  if (!product?.title || !merchandise?.price)
+    return (
+      <li className="cart-line" role="status">
+        {locale === 'fr' ? 'Ajout en cours…' : 'Adding item…'}
+      </li>
+    );
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
   const visibleOptions = selectedOptions.filter(
     (option) => option.value !== 'Default Title',
   );
-  const unitPrice = line.cost?.amountPerQuantity ?? merchandise.price;
-  const displayedPrice =
-    line.isOptimistic || pendingLineIds.has(id)
-      ? {
-          ...unitPrice,
-          amount: multiplyMoney(unitPrice.amount, line.quantity),
-        }
-      : line.cost?.totalAmount;
+  const displayedPrice = line.cost?.totalAmount;
 
   return (
     <li key={id} className="cart-line">
@@ -82,6 +85,13 @@ export function CartLineItem({
             price={displayedPrice}
             label={locale === 'fr' ? 'Prix' : 'Price'}
           />
+          <p className="cart-line-unit-price">
+            <span className="sr-only">
+              {locale === 'fr' ? 'Prix unitaire × quantité : ' : 'Unit price × quantity: '}
+            </span>
+            <Money data={line.cost?.amountPerQuantity ?? merchandise.price} />
+            {' × '}{line.quantity}
+          </p>
           {visibleOptions.length > 0 && (
             <ul className="cart-line-options">
               {visibleOptions.map((option) => (
@@ -93,7 +103,7 @@ export function CartLineItem({
               ))}
             </ul>
           )}
-          <CartLineQuantity line={line} locale={locale} layout={layout} />
+          <CartLineQuantity line={line} locale={locale} />
         </div>
       </div>
 
@@ -121,36 +131,22 @@ export function CartLineItem({
   );
 }
 
-function multiplyMoney(amount: string, quantity: number) {
-  const decimals = amount.split('.')[1]?.length ?? 0;
-  return (Number(amount) * quantity).toFixed(decimals);
-}
-
-/**
- * Provides the controls to update the quantity of a line item in the cart.
- * These controls are disabled when the line item is new, and the server
- * hasn't yet responded that it was successfully added to the cart.
- */
 function CartLineQuantity({
   line,
   locale,
-  layout,
 }: {
   line: CartLine;
   locale: StorefrontLocale;
-  layout: CartLayout;
 }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity, isOptimistic} = line;
+  const {id: lineId, quantity} = line;
+  const isOptimistic = lineId.startsWith('optimistic:');
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
     <div className="cart-line-quantity">
-      <small>
-        {locale === 'fr' ? 'Quantité' : 'Quantity'}
-        {layout === 'page' ? ` : ${quantity}` : ''}
-      </small>
+      <small>{locale === 'fr' ? 'Quantité' : 'Quantity'}</small>
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
         <button
           aria-label={
@@ -159,17 +155,15 @@ function CartLineQuantity({
               : `Decrease quantity of ${line.merchandise.product.title}`
           }
           disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
+          name="intent"
+          value="set"
         >
           <span aria-hidden="true">&#8722;</span>
         </button>
       </CartLineUpdateButton>
-      {layout === 'aside' && (
-        <span className="cart-line-quantity-value" aria-live="polite">
-          {quantity}
-        </span>
-      )}
+      <span className="cart-line-quantity-value" aria-live="polite">
+        {quantity}
+      </span>
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
           aria-label={
@@ -177,8 +171,8 @@ function CartLineQuantity({
               ? `Augmenter la quantité de ${line.merchandise.product.title}`
               : `Increase quantity of ${line.merchandise.product.title}`
           }
-          name="increase-quantity"
-          value={nextQuantity}
+          name="intent"
+          value="set"
           disabled={!!isOptimistic}
         >
           <span aria-hidden="true">&#43;</span>
@@ -214,7 +208,13 @@ function CartLineRemoveButton({
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button className="cart-line-remove" disabled={disabled} type="submit">
+      <button
+        className="cart-line-remove"
+        disabled={disabled}
+        type="submit"
+        name="intent"
+        value="remove"
+      >
         {locale === 'fr' ? 'Retirer' : 'Remove'}
       </button>
     </CartForm>

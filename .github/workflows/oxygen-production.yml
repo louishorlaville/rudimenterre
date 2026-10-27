@@ -31,6 +31,6 @@ jobs:
         run: npm ci
 
       - name: Deploy to Oxygen Production
-        run: npx shopify hydrogen deploy --env-branch main
+        run: npm run deploy -- --env-branch main
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN }}

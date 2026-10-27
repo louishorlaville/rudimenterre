@@ -1,0 +1,36 @@
+
+> rudimenterre-storefront@2026.4.5 lint
+> eslint --no-error-on-unmatched-pattern .
+
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\app\components\Brand.tsx
+  51:47  warning  Do not use Array index in keys  react/no-array-index-key
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\app\components\HomeReviews.tsx
+  161:22  warning  Do not use Array index in keys  react/no-array-index-key
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\app\pages\policy\Page.tsx
+  1:35  warning  'C:\Users\LouisHorlaville\Documents\Website\node_modules\.pnpm\react-router@7.16.0_react-d_7d08647b988f448a45f58982770dd3f0\node_modules\react-router\dist\development\index.d.ts' imported multiple times  import/no-duplicates
+  4:27  warning  'C:\Users\LouisHorlaville\Documents\Website\node_modules\.pnpm\react-router@7.16.0_react-d_7d08647b988f448a45f58982770dd3f0\node_modules\react-router\dist\development\index.d.ts' imported multiple times  import/no-duplicates
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\app\pages\thermal\Page.tsx
+  134:128  warning  Do not use Array index in keys  react/no-array-index-key
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\scripts\check-contact-form.mjs
+  157:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\scripts\check-customer-phone.mjs
+  106:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\scripts\check-encoding.mjs
+  25:1  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\scripts\check-i18n.mjs
+  17:1  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+C:\Users\LouisHorlaville\Documents\Website\tmp\audit-snapshot\scripts\check-newsletter.mjs
+  74:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+✖ 10 problems (0 errors, 10 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

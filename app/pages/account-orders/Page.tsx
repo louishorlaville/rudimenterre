@@ -6,11 +6,9 @@
 } from 'react-router';
 import type {Route} from '../../routes/+types/($locale).account.orders._index';
 import {useRef} from 'react';
-import {
-  Money,
-  getPaginationVariables,
-  flattenConnection,
-} from '@shopify/hydrogen';
+import {flattenConnection} from '@shopify/hydrogen';
+import {Money} from '~/components/CommerceMedia';
+import {getPaginationVariables} from '~/components/Pagination';
 import {
   buildOrderSearchQuery,
   parseOrderFilters,

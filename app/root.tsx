@@ -1,4 +1,8 @@
-import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
+import {ShopifyScripts} from '@shopify/hydrogen/react';
+import {CartProvider} from '~/lib/cart';
+import {AnalyticsTracker} from '~/components/Analytics';
+import {routeTemplates} from '~/lib/shopify-routes';
+import {useNonce} from '~/lib/nonce';
 import {
   Outlet,
   useRouteError,
@@ -10,6 +14,7 @@ import {
   ScrollRestoration,
   useRouteLoaderData,
   useLocation,
+  useNavigate,
 } from 'react-router';
 import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
@@ -34,7 +39,11 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   // revalidate when manually revalidating via useRevalidator
   if (currentUrl.toString() === nextUrl.toString()) return true;
 
-  if (localeFromPathname(currentUrl.pathname) !== localeFromPathname(nextUrl.pathname)) return true;
+  if (
+    localeFromPathname(currentUrl.pathname) !==
+    localeFromPathname(nextUrl.pathname)
+  )
+    return true;
 
   // Defaulting to no revalidation for root loader data to improve performance.
   // When using this feature, you risk your UI getting out of sync with your server.
@@ -86,27 +95,25 @@ export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const [criticalData, initialCart] = await Promise.all([
+    loadCriticalData(args),
+    deferredData.cart,
+  ]);
 
   const {storefront, env} = args.context;
 
   return {
     ...deferredData,
     ...criticalData,
+    cart: initialCart,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     locale: localeFromPathname(new URL(args.request.url).pathname),
-    shop: getShopAnalytics({
-      storefront,
-      publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
-    }),
-    consent: {
-      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
-      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: true,
-      // localize the privacy banner
-      country: args.context.storefront.i18n.country,
-      language: args.context.storefront.i18n.language,
+    shop: {
+      shopId: criticalData.header.shop.id,
+      storefrontId: env.PUBLIC_STOREFRONT_ID ?? '',
+      myshopifyDomain: env.PUBLIC_STORE_DOMAIN,
     },
+    i18n: storefront.i18n,
   };
 }
 
@@ -160,8 +167,10 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  const navigate = useNavigate();
   const rootData = useRouteLoaderData<RootLoader>('root');
-  const faviconUrl = rootData?.header?.shop.brand?.logo?.image?.url ??
+  const faviconUrl =
+    rootData?.header?.shop.brand?.logo?.image?.url ??
     'https://rudimenterre.com/cdn/shop/files/favicon_32x32.png?v=1744030862';
 
   return (
@@ -171,6 +180,23 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+        {rootData && (
+          <ShopifyScripts
+            shop={rootData.shop}
+            i18n={{
+              ...rootData.i18n,
+              currency: rootData.i18n.country === 'FR' ? 'EUR' : 'CAD',
+            }}
+            routes={routeTemplates}
+            navigate={navigate}
+            consent={{mode: 'default-banner'}}
+            analytics={{
+              channel: rootData.shop.storefrontId ? 'hydrogen' : 'headless',
+            }}
+            shopifyAnalytics={Boolean(rootData.shop.storefrontId)}
+            nonce={nonce}
+          />
+        )}
         <Meta />
         <Links />
         <link rel="icon" href={faviconUrl} />
@@ -192,15 +218,12 @@ export default function App() {
   }
 
   return (
-    <Analytics.Provider
-      cart={data.cart}
-      shop={data.shop}
-      consent={data.consent}
-    >
+    <CartProvider initialData={{cart: data.cart}}>
+      <AnalyticsTracker />
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>
-    </Analytics.Provider>
+    </CartProvider>
   );
 }
 
@@ -212,11 +235,27 @@ export function ErrorBoundary() {
   return (
     <div className="route-error" role="alert">
       <p className="eyebrow">Rudimenterre</p>
-      <h1>{notFound ? (fr ? 'Page introuvable' : 'Page not found') : (fr ? 'Une erreur est survenue' : 'Something went wrong')}</h1>
-      <p>{notFound
-        ? (fr ? 'Cette page n’est plus disponible.' : 'This page is no longer available.')
-        : (fr ? 'Veuillez réessayer dans quelques instants.' : 'Please try again in a few moments.')}</p>
-      <a href={fr ? '/fr' : '/en'}>{fr ? 'Revenir à l’accueil' : 'Back to home'}</a>
+      <h1>
+        {notFound
+          ? fr
+            ? 'Page introuvable'
+            : 'Page not found'
+          : fr
+            ? 'Une erreur est survenue'
+            : 'Something went wrong'}
+      </h1>
+      <p>
+        {notFound
+          ? fr
+            ? 'Cette page n’est plus disponible.'
+            : 'This page is no longer available.'
+          : fr
+            ? 'Veuillez réessayer dans quelques instants.'
+            : 'Please try again in a few moments.'}
+      </p>
+      <a href={fr ? '/fr' : '/en'}>
+        {fr ? 'Revenir à l’accueil' : 'Back to home'}
+      </a>
     </div>
   );
 }

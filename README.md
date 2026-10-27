@@ -8,25 +8,36 @@ Bilingual, French-first storefront built with Shopify Hydrogen, React Router, Ty
 
 ## Local development
 
-1. Install dependencies with `npm install`.
+1. Use Node.js 22.12+ (22.x) or 24.x and install the locked dependencies with `npm ci`.
 2. Install the Hydrogen sales channel on the client store.
 3. Run `npx shopify hydrogen link` and choose the client storefront.
 4. Run `npx shopify hydrogen env pull` to replace the local Mock Shop settings.
 5. Start the site with `npm run dev`.
 
-Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request.
+Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request. After building, run `npm run check:route-manifest` and `npm run check:framework`. The latter exercises the patched manifest handler, bilingual rendering, cart operations, OAuth URL/CSRF handling and sitemaps against the built worker with synthetic APIs; it does not contact Shopify or write live data.
+
+Hydrogen 2026.10.2 uses React 19 and React Router 7.18.4. Core services live in `app/lib`, React bindings come from `@shopify/hydrogen/react`, and `server.ts` dispatches Shopify cart/account endpoints before the page router. `npm run codegen` generates the named GraphQL operation contracts and route types. `typecheck` also validates branded GraphQL documents against the bundled schemas without downloading schemas.
 
 ### Test customer accounts locally
 
-Stop the existing local server, then run `npm run dev:accounts`. Complete the
-Shopify CLI login if prompted. Open the HTTPS `*.tryhydrogen.dev` tunnel URL
-printed in the terminal, then visit `/fr/account/profile` or `/en/account/profile`.
-Customer Account API OAuth does not work on plain localhost in this Hydrogen
-version. Use the tunnel for the entire login and profile session; each restart
-can generate a different URL. The flag registers the development tunnel with
-Shopify. Newsletter preferences also require the server-side Admin API credentials
-described in the newsletter setup guide. Production uses its configured HTTPS
-domain and does not need a development tunnel.
+Set `SHOP_ID` to the numeric shop ID and `PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID`
+to the Customer Account API client ID. A legacy `PUBLIC_CUSTOMER_ACCOUNT_API_URL`
+can supply the shop ID as a compatibility fallback, but is not used as the API origin.
+Stop the existing server, then run `npm run dev:accounts` (alias of `dev:https`).
+Hydrogen's local HTTPS plugin provisions a trusted development certificate with
+mkcert; this can prompt for operating-system certificate trust. Open
+`https://local.tryhydrogen.dev:5173` and register that origin's
+`/account/authorize` callback in the Shopify Customer Account API settings.
+Use the actual printed port if 5173 is occupied. This is local HTTPS, not the old
+CLI tunnel, and plain HTTP cannot complete customer OAuth. Use designated test
+customers and isolated services before testing account writes.
+
+Hydrogen 2026.10.2 has an upstream development-module mismatch when account and
+cart handlers share buyer-identity synchronization. The development server uses
+Shopify's documented fallback without that synchronization; production builds,
+including `npm run preview`, retain it. Validate login/refresh/logout and checkout
+identity against a built preview. Newsletter preferences also require the
+server-side Admin API credentials described in the newsletter setup guide.
 
 ## Shopify configuration
 

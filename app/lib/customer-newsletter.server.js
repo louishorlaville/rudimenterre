@@ -1,7 +1,7 @@
 import {getShopifyAdminToken} from './shopify-admin-token.server.js';
 
 /** @typedef {{subscribed: boolean, interests: string[], language: 'fr' | 'en'}} NewsletterPreferences */
-/** @typedef {{env: Env, customerAccount: Pick<import('@shopify/hydrogen').CustomerAccount, 'query' | 'handleAuthStatus'>}} NewsletterContext */
+/** @typedef {{env: Env, customerAccount: Pick<import('./customer-account.server').CustomerAccount, 'query' | 'handleAuthStatus'>}} NewsletterContext */
 
 const interests = ['recipes', 'workshops', 'news'];
 const managedTags = ['newsletter:language:fr', 'newsletter:language:en',

@@ -1,0 +1,5 @@
+
+> rudimenterre-storefront@2026.4.5 check:route-manifest
+> node scripts/check-route-manifest.mjs
+
+Verified 22 page routes in the build manifest

@@ -14,8 +14,18 @@ import type {Route} from '../../routes/+types/($locale).account.addresses';
 import {useEffect, useId, useState} from 'react';
 import type {AccountContext, AccountLocale} from '~/pages/account/context';
 
-const ADDRESS_FIELDS = ['firstName', 'lastName', 'company', 'address1', 'address2',
-  'city', 'zoneCode', 'zip', 'territoryCode', 'phoneNumber'] as const;
+const ADDRESS_FIELDS = [
+  'firstName',
+  'lastName',
+  'company',
+  'address1',
+  'address2',
+  'city',
+  'zoneCode',
+  'zip',
+  'countryCode',
+  'phoneNumber',
+] as const;
 
 export type ActionResponse = {
   addressId?: string | null;
@@ -90,7 +100,7 @@ function NewAddressForm({locale}: {locale: AccountLocale}) {
     address2: '',
     city: '',
     company: '',
-    territoryCode: '',
+    countryCode: undefined,
     firstName: '',
     id: 'new',
     lastName: '',
@@ -203,15 +213,27 @@ export function AddressForm({
   const {state, formMethod} = useNavigation();
   const action = useActionData<ActionResponse>();
   const error = action?.error?.[addressId];
-  const saved = action?.addressId === addressId && !action.error &&
+  const saved =
+    action?.addressId === addressId &&
+    !action.error &&
     (Boolean(action.createdAddress) || Boolean(action.updatedAddress));
   const isDefaultAddress = defaultAddress?.id === addressId;
-  const savedValues = JSON.stringify(Object.fromEntries(ADDRESS_FIELDS.map((name) => [name, address[name] ?? ''])));
-  const [values, setValues] = useState<Record<string, string>>(() => JSON.parse(savedValues) as Record<string, string>);
+  const savedValues = JSON.stringify(
+    Object.fromEntries(
+      ADDRESS_FIELDS.map((name) => [name, address[name] ?? '']),
+    ),
+  );
+  const [values, setValues] = useState<Record<string, string>>(
+    () => JSON.parse(savedValues) as Record<string, string>,
+  );
   const [makeDefault, setMakeDefault] = useState(isDefaultAddress);
-  useEffect(() => setValues(JSON.parse(savedValues) as Record<string, string>), [savedValues]);
+  useEffect(
+    () => setValues(JSON.parse(savedValues) as Record<string, string>),
+    [savedValues],
+  );
   useEffect(() => setMakeDefault(isDefaultAddress), [isDefaultAddress]);
-  const hasChanges = makeDefault !== isDefaultAddress ||
+  const hasChanges =
+    makeDefault !== isDefaultAddress ||
     ADDRESS_FIELDS.some((name) => values[name] !== (address[name] ?? ''));
   const generatedId = useId();
   const fr = locale === 'fr';
@@ -240,16 +262,20 @@ export function AddressForm({
           autoComplete={autoComplete}
           placeholder={placeholder}
           value={values[name] ?? value ?? ''}
-          onChange={(event) => setValues((previous) => ({...previous, [name]: event.target.value}))}
+          onChange={(event) =>
+            setValues((previous) => ({...previous, [name]: event.target.value}))
+          }
           disabled={state !== 'idle'}
           required={required}
           maxLength={maxLength}
           pattern={pattern}
-          title={name === 'phoneNumber'
-            ? fr
-              ? 'Entrez un numéro avec son indicatif, par exemple +1 514 833-9722.'
-              : 'Enter a number with its country code, for example +1 514 833-9722.'
-            : undefined}
+          title={
+            name === 'phoneNumber'
+              ? fr
+                ? 'Entrez un numéro avec son indicatif, par exemple +1 514 833-9722.'
+                : 'Enter a number with its country code, for example +1 514 833-9722.'
+              : undefined
+          }
           aria-describedby={name === 'phoneNumber' ? `${id}-hint` : undefined}
           aria-label={label}
         />
@@ -341,11 +367,11 @@ export function AddressForm({
             true,
           )}
           {field(
-            'territoryCode',
+            'countryCode',
             fr ? 'Pays (code)' : 'Country code',
             fr ? 'Ex. CA ou FR' : 'e.g. CA or US',
             'country',
-            address?.territoryCode,
+            address?.countryCode,
             true,
             2,
           )}
@@ -385,7 +411,9 @@ export function AddressForm({
         {saved && state === 'idle' ? (
           <p className="account-form-success" role="status">
             <small>
-              {fr ? 'Votre adresse a bien été enregistrée.' : 'Your address has been saved.'}
+              {fr
+                ? 'Votre adresse a bien été enregistrée.'
+                : 'Your address has been saved.'}
             </small>
           </p>
         ) : null}

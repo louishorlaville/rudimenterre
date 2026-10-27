@@ -36,6 +36,8 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
   }
 
   const result = await cart.updateDiscountCodes([code]);
+  if (!result.cart || result.errors?.length)
+    throw new Response('Discount unavailable', {status: 502});
   const headers = cart.setCartId(result.cart.id);
 
   // Using set-cookie on a 303 redirect will not work if the domain origin have port number (:3000)

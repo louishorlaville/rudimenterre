@@ -1,11 +1,17 @@
 import {fileURLToPath} from 'node:url';
 import {defineConfig, loadEnv} from 'vite';
-import {hydrogen} from '@shopify/hydrogen/vite';
+import {localHttps} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
 import {reactRouter} from '@react-router/dev/vite';
 
 export default defineConfig(({mode}) => ({
-  plugins: [hydrogen(), oxygen({env: loadEnv(mode, fileURLToPath(new URL('.', import.meta.url)), '')}), reactRouter()],
+  plugins: [
+    localHttps({enabled: process.env.npm_lifecycle_event === 'dev:https'}),
+    ...oxygen({
+      env: loadEnv(mode, fileURLToPath(new URL('.', import.meta.url)), ''),
+    }),
+    reactRouter(),
+  ],
   resolve: {
     alias: {
       // Vite's native tsconfig path resolver does not cover JavaScript
@@ -32,6 +38,11 @@ export default defineConfig(({mode}) => ({
        * @see https://vitejs.dev/config/dep-optimization-options
        */
       include: [
+        'react',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+        'react-dom',
+        'react-dom/server',
         'react-router > set-cookie-parser',
         'react-router > cookie',
         'react-router',

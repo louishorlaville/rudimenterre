@@ -44,3 +44,6 @@ jobs:
 
       - name: Check route manifest
         run: npm run check:route-manifest
+
+      - name: Check patched framework and migrated integrations
+        run: npm run check:framework

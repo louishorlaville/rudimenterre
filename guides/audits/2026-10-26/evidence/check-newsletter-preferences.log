@@ -1,0 +1,10 @@
+Newsletter preferences failed { status: 403, diagnostic: 'origin' }
+Newsletter preferences failed { status: 400, diagnostic: 'validation' }
+Newsletter preferences failed { status: 400, diagnostic: 'validation' }
+Newsletter preferences failed { status: 400, diagnostic: 'validation' }
+Newsletter preferences failed { status: 502, diagnostic: 'shopify-request' }
+Newsletter preferences failed { status: 502, diagnostic: 'Newsletter preferences unavailable' }
+Newsletter preferences failed { status: 502, diagnostic: 'Newsletter preferences save failed' }
+Newsletter preferences failed { status: 502, diagnostic: 'Newsletter preferences save failed' }
+Newsletter preferences failed { status: 502, diagnostic: 'Newsletter consent save failed' }
+Newsletter preference checks passed (mocked; no customer data changed).

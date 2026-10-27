@@ -1,4 +1,4 @@
-import type {CustomerAccount} from '@shopify/hydrogen';
+import type {CustomerAccount} from './customer-account.server';
 import {CUSTOMER_PHONE_QUERY} from '../graphql/customer-account/CustomerPhoneQuery.js';
 
 // The customer ID always comes from the authenticated Customer Account API.
@@ -29,7 +29,10 @@ export async function syncCustomerPhone({
     }>(CUSTOMER_PHONE_QUERY);
     const customer = data?.customer;
     if (errors?.length || !customer?.id) return false;
-    if (customer.phoneNumber?.phoneNumber && customer.defaultAddress?.id !== addressId) {
+    if (
+      customer.phoneNumber?.phoneNumber &&
+      customer.defaultAddress?.id !== addressId
+    ) {
       return true;
     }
 
@@ -43,27 +46,31 @@ export async function syncCustomerPhone({
 
     const token = env.SHOPIFY_ADMIN_API_ACCESS_TOKEN;
     const domain = env.PUBLIC_STORE_DOMAIN;
-    if (!token || !/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(domain)) return false;
+    if (!token || !/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(domain))
+      return false;
 
-    const response = await fetch(`https://${domain}/admin/api/2026-07/graphql.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': token,
-      },
-      signal: AbortSignal.timeout(10000),
-      body: JSON.stringify({
-        query: `mutation SyncCustomerPhone($input: CustomerInput!) {
+    const response = await fetch(
+      `https://${domain}/admin/api/2026-07/graphql.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': token,
+        },
+        signal: AbortSignal.timeout(10000),
+        body: JSON.stringify({
+          query: `mutation SyncCustomerPhone($input: CustomerInput!) {
           customerUpdate(input: $input) {
             customer { id phone }
             userErrors { field message }
           }
         }`,
-        variables: {input: {id: customer.id, phone}},
-      }),
-    });
+          variables: {input: {id: customer.id, phone}},
+        }),
+      },
+    );
     if (!response.ok) return false;
-    const result = await response.json() as {
+    const result = (await response.json()) as {
       errors?: unknown[];
       data?: {
         customerUpdate?: {
@@ -73,8 +80,12 @@ export async function syncCustomerPhone({
       };
     };
     const updated = result.data?.customerUpdate;
-    return !result.errors?.length && !updated?.userErrors?.length &&
-      updated?.customer?.id === customer.id && updated.customer.phone === phone;
+    return (
+      !result.errors?.length &&
+      !updated?.userErrors?.length &&
+      updated?.customer?.id === customer.id &&
+      updated.customer.phone === phone
+    );
   } catch {
     // The address is already saved; a contact-phone failure must not lose it or
     // encourage duplicate address creation. The caller displays a partial-save notice.

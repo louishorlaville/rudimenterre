@@ -1,5 +1,4 @@
 import {AddToCartButton} from './AddToCartButton';
-import {useAside} from './Aside';
 import {useState} from 'react';
 import type {ProductFragment} from 'storefrontapi.generated';
 
@@ -10,7 +9,6 @@ export function ProductForm({
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
   locale?: string;
 }) {
-  const {open} = useAside();
   const [quantity, setQuantity] = useState(1);
 
   return (
@@ -45,7 +43,6 @@ export function ProductForm({
       </div>
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => open('cart')}
         lines={
           selectedVariant
             ? [{merchandiseId: selectedVariant.id, quantity, selectedVariant}]

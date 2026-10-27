@@ -1,4 +1,3 @@
-import type {HydrogenSession} from '@shopify/hydrogen';
 import {
   createCookieSessionStorage,
   type SessionStorage,
@@ -10,7 +9,7 @@ import {
  * Feel free to customize it to your needs, add helper methods, or
  * swap out the cookie-based implementation with something else!
  */
-export class AppSession implements HydrogenSession {
+export class AppSession {
   public isPending = false;
 
   #sessionStorage;
@@ -28,6 +27,9 @@ export class AppSession implements HydrogenSession {
         httpOnly: true,
         path: '/',
         sameSite: 'lax',
+        secure:
+          new URL(request.url).protocol === 'https:' ||
+          Boolean(import.meta.env?.PROD),
         secrets,
       },
     });

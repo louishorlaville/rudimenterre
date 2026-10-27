@@ -5,7 +5,8 @@ import collectionStyles from './Page.css?url';
 export function links() {
   return [{rel: 'stylesheet', href: collectionStyles}];
 }
-import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import {getPaginationVariables} from '~/components/Pagination';
+import {Image} from '~/components/CommerceMedia';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
