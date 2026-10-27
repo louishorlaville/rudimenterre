@@ -330,10 +330,17 @@ try {
     assert.ok((await item.text()).includes('Audit fixture'));
     const page = await request(`/${locale}/cart`);
     assert.equal(page.status, 200);
-    assert.equal(
-      (await request(`/${locale}/unknown-fixture-path`)).status,
-      404,
+    const missing = await request(`/${locale}/unknown-fixture-path`);
+    assert.equal(missing.status, 404);
+    const missingHtml = await missing.text();
+    assert.ok(missingHtml.includes(`<html lang="${locale}"`));
+    assert.ok(
+      missingHtml.includes(
+        locale === 'fr' ? 'Page introuvable' : 'Page not found',
+      ),
     );
+    assert.ok(missingHtml.includes(`href="/${locale}/adoptez"`));
+    assert.ok(missingHtml.includes('aria-labelledby="route-error-title"'));
     const profile = await request(`/${locale}/account/profile`);
     assert.equal(profile.status, 302);
     assert.match(profile.headers.get('Location'), /\/account\/login\?/);

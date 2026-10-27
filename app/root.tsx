@@ -168,13 +168,14 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
   const navigate = useNavigate();
+  const {pathname} = useLocation();
   const rootData = useRouteLoaderData<RootLoader>('root');
   const faviconUrl =
     rootData?.header?.shop.brand?.logo?.image?.url ??
     'https://rudimenterre.com/cdn/shop/files/favicon_32x32.png?v=1744030862';
 
   return (
-    <html lang={rootData?.locale ?? 'fr'}>
+    <html lang={rootData?.locale ?? localeFromPathname(pathname)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -231,31 +232,72 @@ export function ErrorBoundary() {
   const error = useRouteError();
   const fr = localeFromPathname(useLocation().pathname) === 'fr';
   const notFound = isRouteErrorResponse(error) && error.status === 404;
+  const home = fr ? '/fr' : '/en';
 
   return (
-    <div className="route-error" role="alert">
-      <p className="eyebrow">Rudimenterre</p>
-      <h1>
-        {notFound
-          ? fr
-            ? 'Page introuvable'
-            : 'Page not found'
-          : fr
-            ? 'Une erreur est survenue'
-            : 'Something went wrong'}
-      </h1>
-      <p>
-        {notFound
-          ? fr
-            ? 'Cette page n’est plus disponible.'
-            : 'This page is no longer available.'
-          : fr
-            ? 'Veuillez réessayer dans quelques instants.'
-            : 'Please try again in a few moments.'}
-      </p>
-      <a href={fr ? '/fr' : '/en'}>
-        {fr ? 'Revenir à l’accueil' : 'Back to home'}
-      </a>
+    <div className="route-error">
+      <header className="route-error__header">
+        <a
+          className="route-error__brand"
+          href={home}
+          aria-label={fr ? 'Rudimenterre — accueil' : 'Rudimenterre — home'}
+        >
+          Rudimenterre<sup aria-hidden="true">®</sup>
+        </a>
+        <span className="route-error__status">
+          {notFound ? '404' : fr ? 'Erreur' : 'Error'}
+        </span>
+      </header>
+      <main className="route-error__main" aria-labelledby="route-error-title">
+        <div className="route-error__copy">
+          <h1 id="route-error-title">
+            {notFound
+              ? fr
+                ? 'Page introuvable'
+                : 'Page not found'
+              : fr
+                ? 'Une erreur est survenue'
+                : 'Something went wrong'}
+          </h1>
+          <p className="route-error__description">
+            {notFound
+              ? fr
+                ? 'Cette page n’est pas disponible. Revenez à l’accueil ou poursuivez la découverte du Cuicui.'
+                : 'This page is no longer available. Return home or keep exploring the Cuicui.'
+              : fr
+                ? 'Veuillez réessayer dans quelques instants.'
+                : 'Please try again in a few moments.'}
+          </p>
+          <div className="route-error__actions">
+            <a className="button button--dark" href={home}>
+              {fr ? 'Revenir à l’accueil' : 'Back to home'}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
+                <path d="M4 12h15m-6-6 6 6-6 6" />
+              </svg>
+            </a>
+            {notFound && (
+              <a className="route-error__discover" href={`${home}/adoptez`}>
+                {fr ? 'Découvrir le Cuicui' : 'Discover the Cuicui'}
+              </a>
+            )}
+          </div>
+        </div>
+        <img
+          className="route-error__image"
+          src="/images/rudimenterre/home-adopt-still-life.jpeg"
+          alt=""
+          width={724}
+          height={1086}
+        />
+      </main>
     </div>
   );
 }

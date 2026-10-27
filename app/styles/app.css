@@ -254,9 +254,8 @@ button.reset { border: 0; background: transparent; cursor: pointer; }
 html:has(.overlay.expanded) { overflow: hidden; }
 
 /* Commerce and utility routes */
-.page, .search, .route-error { width: min(100% - 2 * var(--content-gutter), var(--content-max)); margin-inline: auto; padding: clamp(3rem, 7vw, 7rem) 0; }
+.page, .search { width: min(100% - 2 * var(--content-gutter), var(--content-max)); margin-inline: auto; padding: clamp(3rem, 7vw, 7rem) 0; }
 
-.route-error h1 { font-size: clamp(3.5rem, 7vw, 7rem); margin-bottom: 2.5rem; }
 .policy { width: min(calc(100% - 2 * var(--page-gutter)), 70rem); margin-inline: auto; padding: clamp(2rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 7rem); color: var(--ink); }
 .policy__header { padding-bottom: clamp(2rem, 4vw, 3.5rem); border-bottom: 1px solid var(--ink); }
 .policy__back { display: inline-flex; align-items: center; gap: .65rem; min-height: 2.75rem; margin-bottom: clamp(2rem, 5vw, 4rem); font-size: .9rem; text-decoration: underline; text-underline-offset: .25em; }
@@ -292,8 +291,30 @@ html:has(.overlay.expanded) { overflow: hidden; }
   .policies__link:is(:hover, :focus-visible) > span,
   .policies__link:is(:hover, :focus-visible) .policies__arrow { transform: none; }
 }
-.route-error { min-height: 65vh; }
-.route-error pre { white-space: pre-wrap; }
+/* Standalone recovery page: also works when the root loader cannot render. */
+.route-error { width: min(calc(100% - 2 * var(--page-gutter)), 76rem); min-height: 100svh; margin-inline: auto; padding-bottom: clamp(2rem, 5vw, 4rem); }
+.route-error__header { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 6rem; border-bottom: 1px solid var(--ink); }
+.route-error__brand { display: inline-flex; align-items: baseline; gap: .2rem; padding-block: .75rem; font-size: 1.3rem; letter-spacing: -.02em; }
+.route-error__brand sup { font-size: .65em; }
+.route-error__status { font-size: .9rem; font-variant-numeric: tabular-nums; }
+.route-error__main { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 7vw, 7rem); min-height: calc(100svh - 10rem); padding-top: clamp(2rem, 5vw, 4rem); }
+.route-error__copy { padding-block: 1rem; }
+.route-error h1 { max-width: 12ch; font-size: clamp(2.75rem, 5.5vw, 5rem); line-height: 1.04; text-wrap: balance; overflow-wrap: anywhere; }
+.route-error__description { max-width: 38ch; margin-top: 1.5rem; font-size: 1.05rem; line-height: 1.7; }
+.route-error__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem; margin-top: 2rem; }
+.route-error__actions .button { --button-hover-bg: var(--cream); --button-hover-color: var(--ink); --button-hover-border: var(--ink); gap: .8rem; min-height: 3.25rem; padding: .85rem 1.25rem; border-width: 2px; font-size: 1rem; font-weight: 400; letter-spacing: 0; text-transform: none; text-align: center; }
+.route-error__actions svg { flex-shrink: 0; }
+.route-error__discover { display: inline-flex; align-items: center; min-height: 2.75rem; text-decoration: underline; text-underline-offset: .3em; text-decoration-thickness: 1px; }
+.route-error__discover:hover { text-decoration-thickness: 2px; }
+.route-error__image { width: 100%; height: clamp(24rem, 65svh, 40rem); object-fit: cover; object-position: center 42%; }
+@media (max-width: 700px) {
+  .route-error__header { min-height: 5rem; }
+  .route-error__main { grid-template-columns: minmax(0, 1fr); gap: 2rem; min-height: auto; padding-top: 2.5rem; }
+  .route-error h1 { font-size: clamp(2.75rem, 10vw, 4rem); }
+  .route-error__copy { padding: 0; }
+  .route-error__description { font-size: 1rem; }
+  .route-error__image { height: 16rem; object-position: center 40%; }
+}
 
 /* Cart components also appear in the site-wide cart drawer. */
 .cart-line { padding: 1.25rem 0; border-bottom: 1px solid rgba(23,34,25,.2); }
