@@ -1,7 +1,7 @@
 /** @type {{domain: string, clientId: string, secret: string, token: string, expiresAt: number} | undefined} */
 let cached;
 
-/** @param {Env} env */
+/** @param {Pick<Env, 'PUBLIC_STORE_DOMAIN' | 'SHOPIFY_ADMIN_API_ACCESS_TOKEN' | 'SHOPIFY_ADMIN_CLIENT_ID' | 'SHOPIFY_ADMIN_CLIENT_SECRET'>} env */
 export async function getShopifyAdminToken(env) {
   const domain = env.PUBLIC_STORE_DOMAIN;
   if (!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(domain)) throw new Error('Invalid Shopify domain');

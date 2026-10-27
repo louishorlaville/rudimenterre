@@ -1,3 +1,4 @@
+import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 
 const image = (name: string) => `/images/rudimenterre/thermal-${name}.webp`;
@@ -69,19 +70,19 @@ const advice = {
   ],
 };
 
-export function ThermalPage({locale}: {locale: StorefrontLocale}) {
+export function ThermalPage({content, locale, heroImage}: {content: EditorialPageContent; locale: StorefrontLocale; heroImage?: {url: string; altText?: string | null} | null}) {
   const fr = locale === 'fr';
   return <article className="thermal-page">
     <header className="thermal-hero">
-      <img src={image('hero')} alt="Thermomètre posé sur un Cuicui" width="2400" height="983" fetchPriority="high" />
+      <img src={heroImage?.url || image('hero')} alt={heroImage?.altText || (fr ? 'Thermomètre posé sur un Cuicui' : 'Thermometer on a Cuicui')} width="2400" height="983" fetchPriority="high" />
       <div className="thermal-hero__copy">
-        <h1>{fr ? 'EXPÉRIENCES THERMIQUES' : 'THERMAL EXPERIMENTS'}</h1>
-        <p>{fr ? 'MOINS D’ÉNERGIE, PLUS D’AUTONOMIE' : 'LESS ENERGY, MORE AUTONOMY'}</p>
+        <h1>{content.heroOverrides?.title || (fr ? 'EXPÉRIENCES THERMIQUES' : 'THERMAL EXPERIMENTS')}</h1>
+        <p>{content.heroOverrides?.eyebrow || (fr ? 'MOINS D’ÉNERGIE, PLUS D’AUTONOMIE' : 'LESS ENERGY, MORE AUTONOMY')}</p>
       </div>
     </header>
 
     <section className="thermal-intro">
-      <h2>{fr ? 'ET SI DEMAIN LA CUISSON DES ALIMENTS DEMANDAIT MOINS D’ÉNERGIE ?' : 'WHAT IF COOKING REQUIRED LESS ENERGY TOMORROW?'}</h2>
+      <h2>{content.heroOverrides?.intro || (fr ? 'ET SI DEMAIN LA CUISSON DES ALIMENTS DEMANDAIT MOINS D’ÉNERGIE ?' : 'WHAT IF COOKING REQUIRED LESS ENERGY TOMORROW?')}</h2>
       <p>{fr ? <>Pourrions-nous facilement cuire des mijotés avec les moyens du bord, sans électricité ?<br />Et bien avec le Cuicui, c’est possible !</> : <>Could we still cook a stew with whatever we have to hand, without electricity?<br />With Cuicui, we can.</>}</p>
     </section>
 

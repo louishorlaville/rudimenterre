@@ -21,6 +21,8 @@ export type EditorialPageContent = {
   seoDescription: string;
   heroImage: string;
   heroPosition?: string;
+  // Preserve each layout's rich fallback copy when a CMS field is absent.
+  heroOverrides?: Partial<Pick<EditorialPageContent, 'eyebrow' | 'title' | 'intro'>>;
   sections: EditorialSection[];
 };
 

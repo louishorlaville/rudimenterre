@@ -13,8 +13,8 @@ export function ShippingPage({content, locale, heroImage}: {
       <img src={heroImage?.url || content.heroImage} alt={heroImage?.altText || (fr ? 'Cuicui et ses éléments en céramique et fibres naturelles' : 'Cuicui and its ceramic pieces and natural fibres')} />
       <div className="shipping-hero__shade" />
       <div className="shipping-hero__copy">
-        <h1 id={titleId}>{content.title}{' '}<span>{fr ? 'des séries limitées' : 'of limited series'}</span></h1>
-        <span>{fr ? <>L’expédition des prochains Cuicuis français se fera<br />depuis la France, conditions à venir.</> : <>Upcoming Cuicui pieces made in France will ship from France.<br />Shipping terms to follow.</>}</span>
+        <h1 id={titleId}>{content.title}{' '}<span>{content.heroOverrides?.eyebrow || (fr ? 'des séries limitées' : 'of limited series')}</span></h1>
+        <span>{content.heroOverrides?.intro || (fr ? <>L’expédition des prochains Cuicuis français se fera<br />depuis la France, conditions à venir.</> : <>Upcoming Cuicui pieces made in France will ship from France.<br />Shipping terms to follow.</>)}</span>
       </div>
     </header>
 

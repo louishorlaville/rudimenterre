@@ -17,15 +17,15 @@ export function EditorialPage(props: {
   locale: StorefrontLocale;
   heroImage?: {url: string; altText?: string | null} | null;
 }) {
-  const {content, locale, heroImage} = props;
+  const {content, locale} = props;
   switch (content.id) {
     case 'vadrouille': return <VadrouillePage {...props} />;
-    case 'adopt': return <AdoptPage locale={locale} />;
-    case 'creator': return <RecipePage locale={locale} heroImage={heroImage} />;
-    case 'steam': return <SteamPage locale={locale} heroImage={heroImage} />;
+    case 'adopt': return <AdoptPage {...props} />;
+    case 'creator': return <RecipePage {...props} />;
+    case 'steam': return <SteamPage {...props} />;
     case 'project': return <ProjectPage {...props} />;
-    case 'distillation': return locale === 'fr' ? <DistillationPage /> : <DistillationFallbackPage {...props} />;
-    case 'garden': return <GardenPage locale={locale} />;
+    case 'distillation': return locale === 'fr' ? <DistillationPage {...props} /> : <DistillationFallbackPage {...props} />;
+    case 'garden': return <GardenPage {...props} />;
     case 'making': return <MakingPage {...props} />;
     case 'thermal': return <ThermalPage {...props} />;
     case 'jury': return <JuryPage {...props} />;

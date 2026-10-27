@@ -4,7 +4,7 @@ import makingStyles from './Page.css?url';
 
 export {makingStyles};
 
-export function MakingPage({locale, heroImage}: {
+export function MakingPage({content, locale, heroImage}: {
   content: EditorialPageContent;
   locale: StorefrontLocale;
   heroImage?: {url: string; altText?: string | null} | null;
@@ -15,7 +15,7 @@ export function MakingPage({locale, heroImage}: {
     <header className="making-hero">
       <img src={heroImage?.url || '/images/rudimenterre/making.webp'} alt={heroImage?.altText || ''} />
       <div className="making-hero__shade" />
-      <h1>{fr ? 'Fabrication et entretien' : 'Making and care'}</h1>
+      <h1>{content.heroOverrides?.title || (fr ? 'Fabrication et entretien' : 'Making and care')}</h1>
     </header>
 
     <section className="making-band making-band--material" aria-labelledby="making-material-title">

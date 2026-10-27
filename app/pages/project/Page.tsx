@@ -16,15 +16,15 @@ export function ProjectPage({content, locale, heroImage}: {
           src={heroImage?.url || content.heroImage}
           alt={heroImage?.altText || ''}
         />
-        <h1>{fr ? 'LE PROJET RUDIMENTERRE' : 'THE RUDIMENTERRE PROJECT'}</h1>
+        <h1>{content.heroOverrides?.title || (fr ? 'LE PROJET RUDIMENTERRE' : 'THE RUDIMENTERRE PROJECT')}</h1>
       </header>
 
       <section className="project-intro" aria-labelledby="project-intro-title">
         <div className="project-heading">
           <img src="/images/rudimenterre/project-flag.png" alt="" aria-hidden="true" />
           <div>
-            <h2 id="project-intro-title">{fr ? 'LE PROJET' : 'THE PROJECT'}</h2>
-            <p>{fr ? 'UN CUICUI MADE IN FRANCE' : 'A CUICUI MADE IN FRANCE'}</p>
+            <h2 id="project-intro-title">{content.heroOverrides?.eyebrow || (fr ? 'LE PROJET' : 'THE PROJECT')}</h2>
+            <p>{content.heroOverrides?.intro || (fr ? 'UN CUICUI MADE IN FRANCE' : 'A CUICUI MADE IN FRANCE')}</p>
           </div>
           <img className="project-heading__flag--right" src="/images/rudimenterre/project-flag.png" alt="" aria-hidden="true" />
         </div>

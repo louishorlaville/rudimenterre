@@ -1,15 +1,16 @@
+import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 
 const image = (name: string) => `/images/rudimenterre/garden/${name}`;
 
-export function GardenPage({locale}: {locale: StorefrontLocale}) {
+export function GardenPage({content, locale}: {content: EditorialPageContent; locale: StorefrontLocale; heroImage?: {url: string; altText?: string | null} | null}) {
   const fr = locale === 'fr';
 
   return (
     <article className="garden-page">
       <header className="garden-intro">
-        <h1>{fr ? 'VISITE GUIDÉE' : 'A GUIDED TOUR'}</h1>
-        <p>{fr ? 'CONNAISSEZ-VOUS LA SIGNIFICATION D’UN POTAGER EN CUISINE ?' : 'DO YOU KNOW WHAT A KITCHEN GARDEN ONCE MEANT?'}</p>
+        <h1>{content.heroOverrides?.title || (fr ? 'VISITE GUIDÉE' : 'A GUIDED TOUR')}</h1>
+        <p>{content.heroOverrides?.intro || (fr ? 'CONNAISSEZ-VOUS LA SIGNIFICATION D’UN POTAGER EN CUISINE ?' : 'DO YOU KNOW WHAT A KITCHEN GARDEN ONCE MEANT?')}</p>
       </header>
 
       <section className="garden-history" aria-label={fr ? 'Du potager médiéval au Cuicui' : 'From the medieval kitchen garden to Cuicui'}>

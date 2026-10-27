@@ -18,6 +18,8 @@ Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pu
 
 Run `npm run check:catalog` for offline FR/EN catalog/search links, regular/predictive search recovery, pending cart buttons, product JSON rendering and policy link regressions. It uses installed TypeScript and synthetic integrations, needs no build or credentials, and runs in PR checks. Browser and real-provider acceptance remain separate.
 
+Run `npm run check:editorial`, `npm run check:customer-phone` and `npm run check:admin-token` for editorial field/fallback rendering and mocked account phone, address partial-save and token-renewal regressions. All three run in PR checks without provider access. The account scripts explicitly enable Node TypeScript stripping (supported by the declared Node 22.12+/24 runtimes).
+
 Hydrogen 2026.10.2 uses React 19 and React Router 7.18.4. Core services live in `app/lib`, React bindings come from `@shopify/hydrogen/react`, and `server.ts` dispatches Shopify cart/account endpoints before the page router. `npm run codegen` generates the named GraphQL operation contracts and route types. `typecheck` also validates branded GraphQL documents against the bundled schemas without downloading schemas.
 
 ### Test customer accounts locally
@@ -40,6 +42,8 @@ Shopify's documented fallback without that synchronization; production builds,
 including `npm run preview`, retain it. Validate login/refresh/logout and checkout
 identity against a built preview. Newsletter preferences also require the
 server-side Admin API credentials described in the newsletter setup guide.
+
+Address saves synchronize the account contact phone using the same server-side Admin credentials as newsletter preferences: `SHOPIFY_ADMIN_CLIENT_ID` plus `SHOPIFY_ADMIN_CLIENT_SECRET`, or legacy `SHOPIFY_ADMIN_API_ACCESS_TOKEN` when neither client credential is configured. See [Admin setup](guides/newsletter-setup.md). An incomplete client-credential pair fails rather than silently using a legacy token. Token/provider failure preserves the saved address and shows a phone-sync warning. Other recipients cannot replace an existing account phone unless the saved address is the default; blank phone fields never clear the account phone.
 
 Session cookies use `Secure`, `HttpOnly` and `SameSite=Lax`. Only HTTP loopback
 requests (`localhost`, `127.0.0.1`, `[::1]`) in `vite dev` omit `Secure`; tunnel

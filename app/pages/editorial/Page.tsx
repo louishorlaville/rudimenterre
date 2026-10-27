@@ -74,13 +74,19 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     } | null;
   }>;
   const field = (key: string) => fields.find((item) => item.key === key);
+  const text = (key: string) => {
+    const value = field(key)?.value;
+    return value?.trim() ? value : undefined;
+  };
+  const heroOverrides = {eyebrow: text('eyebrow'), title: text('title'), intro: text('intro')};
   const content = {
     ...fallback,
-    eyebrow: field('eyebrow')?.value || fallback.eyebrow,
-    title: field('title')?.value || fallback.title,
-    intro: field('intro')?.value || fallback.intro,
+    heroOverrides,
+    eyebrow: heroOverrides.eyebrow || fallback.eyebrow,
+    title: heroOverrides.title || fallback.title,
+    intro: heroOverrides.intro || fallback.intro,
     seoDescription:
-      field('seo_description')?.value || fallback.seoDescription,
+      text('seo_description') || fallback.seoDescription,
   };
   const media = field('hero_media')?.reference;
   const heroImage =

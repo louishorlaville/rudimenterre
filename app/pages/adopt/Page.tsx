@@ -1,16 +1,17 @@
+import type {EditorialPageContent} from '~/lib/editorial-content';
 import {Link} from 'react-router';
 import type {StorefrontLocale} from '~/lib/i18n';
 
-export function AdoptPage({locale}: {locale: StorefrontLocale}) {
+export function AdoptPage({content, locale, heroImage}: {content: EditorialPageContent; locale: StorefrontLocale; heroImage?: {url: string; altText?: string | null} | null}) {
   const fr = locale === 'fr';
   return (
     <article className="adopt-page">
       <header className="adopt-hero">
-        <img src="/images/rudimenterre/adopt-banner.jpeg" alt="" fetchPriority="high" />
+        <img src={heroImage?.url || '/images/rudimenterre/adopt-banner.jpeg'} alt={heroImage?.altText || ''} fetchPriority="high" />
         <div className="adopt-hero__copy">
-          <h1>{fr ? 'Adoptez' : 'Adopt'}</h1>
-          <p>{fr ? 'Un Cuicui, un nouveau mode de cuisiner savoureux et bienfaisant' : 'A Cuicui, a new, flavourful and beneficial way of cooking'}</p>
-          <p className="adopt-hero__choice">{fr ? 'Vous avez le choix :' : 'The choice is yours:'}</p>
+          <h1>{content.heroOverrides?.title || (fr ? 'Adoptez' : 'Adopt')}</h1>
+          <p>{content.heroOverrides?.intro || (fr ? 'Un Cuicui, un nouveau mode de cuisiner savoureux et bienfaisant' : 'A Cuicui, a new, flavourful and beneficial way of cooking')}</p>
+          <p className="adopt-hero__choice">{content.heroOverrides?.eyebrow || (fr ? 'Vous avez le choix :' : 'The choice is yours:')}</p>
         </div>
       </header>
       <div className="adopt-choices">

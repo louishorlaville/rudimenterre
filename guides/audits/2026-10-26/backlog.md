@@ -10,6 +10,8 @@ Snapshot: `6ef8fa40082e3f96f6e09db96df7381275178ca7`. Date: 2026-10-26. Reports 
 
 **Repair update 4:** Batch 4 / CQ-1 through CQ-6 is implemented locally: localized catalog/search links, correct article URLs, recovered search errors, validated product details and subscription policy support. The pending cart-button fix from batch 1 is retained and regression-tested. See [repair-4.md](repair-4.md) for checks and remaining browser/provider acceptance. Historical findings below are preserved.
 
+**Repair update 5:** Batch 5 / AR-03 and AR-02 is implemented locally: account phone sync reuses renewable Admin credentials with the existing legacy fallback; editorial CMS fields reach the owner-approved existing slots, with page exceptions documented. Mocked phone/address, token and bilingual editorial regressions are retained in PR checks. See [repair-5.md](repair-5.md) for validation and remaining preview acceptance. Historical findings below are preserved.
+
 ## Priority and validation rules
 
 Severity measures demonstrated impact/likelihood, not the amount of cleanup desired. Critical: immediate severe compromise/outage supported by evidence; High: material exploitable security/reliability exposure; Medium: bounded functional, privacy, delivery or maintainability defect; Low: conditional edge case, documentation gap or hardening. Confidence is evidentiary confidence, separate from severity. Optional style/architecture preferences are not defects.
