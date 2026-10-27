@@ -6,6 +6,8 @@ Snapshot: `6ef8fa40082e3f96f6e09db96df7381275178ca7`. Date: 2026-10-26. Reports 
 
 **Repair update 2:** Batch 2 / SEC-2, SEC-4 and SEC-3 is implemented locally: shared localized return-path validation, final account response privacy policy and an explicit secure-cookie development exception. See [repair-2.md](repair-2.md) for validation and remaining preview checks. Historical findings below are preserved.
 
+**Repair update 3:** Batch 3 / AR-01 repository changes are implemented locally with one storefront workflow and explicit Production/Dev/Preview targets. The owner and read-only CLI confirmed the environment mappings; remote Actions history was inspected. Both main/dev branches are currently unprotected with required status checks off. Enabling their rules, token-scope inspection and rollout require administrative follow-up. See [repair-3.md](repair-3.md).
+
 ## Priority and validation rules
 
 Severity measures demonstrated impact/likelihood, not the amount of cleanup desired. Critical: immediate severe compromise/outage supported by evidence; High: material exploitable security/reliability exposure; Medium: bounded functional, privacy, delivery or maintainability defect; Low: conditional edge case, documentation gap or hardening. Confidence is evidentiary confidence, separate from severity. Optional style/architecture preferences are not defects.

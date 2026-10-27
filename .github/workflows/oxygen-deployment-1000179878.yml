@@ -1,5 +1,12 @@
 name: Storefront 1000179878
-on: [push]
+on:
+  push:
+    branches:
+      - '**'
+
+concurrency:
+  group: oxygen-1000179878-${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/dev' && 'development' || 'preview' }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -16,8 +23,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: "lts/*"
-          check-latest: true
+          node-version: 22
 
       - name: Cache node modules
         id: cache-npm
@@ -35,7 +41,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build and Publish to Oxygen
-        run: npm run deploy
+      - name: Check deployment ownership
+        run: npm run check:deployment-workflow
+
+      - name: Build and publish production
+        if: github.ref == 'refs/heads/main'
+        run: npm run deploy -- --env-branch main
+        env:
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000179878 }}
+
+      - name: Build and publish development
+        if: github.ref == 'refs/heads/dev'
+        run: npm run deploy -- --env-branch dev
+        env:
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000179878 }}
+
+      - name: Build and publish preview
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'
+        run: npm run deploy -- --preview
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000179878 }}

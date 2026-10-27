@@ -16,7 +16,8 @@
     "check:route-manifest": "node scripts/check-route-manifest.mjs",
     "dev:https": "vite dev",
     "deploy": "shopify hydrogen deploy --build-command \"npm run build\" --assets-dir dist/client --worker-dir dist/server",
-    "check:framework": "node scripts/check-framework-migration.mjs"
+    "check:framework": "node scripts/check-framework-migration.mjs",
+    "check:deployment-workflow": "node scripts/check-deployment-workflow.mjs"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {

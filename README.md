@@ -97,6 +97,33 @@ for mocked subscription checks.
 
 ## Deployment
 
-Connect this GitHub repository in the Hydrogen channel and map `main` to the Oxygen production environment. The `dev` branch deploys to Oxygen preview; pushes to either branch trigger a deployment. Add the storefront's Oxygen deployment token as the GitHub Actions secret `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`. Protect both branches so changes arrive through reviewed pull requests, and require the `PR checks` status check before merging. Before launch, connect the storefront domain to Oxygen, connect `checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN` in Oxygen.
+The single deployment owner is `.github/workflows/oxygen-deployment-1000179878.yml`
+for storefront `1000179878` on `rudimenterre.myshopify.com`. The confirmed Oxygen
+mapping is `main` → Production, `dev` → the dedicated Dev environment, and pushes
+to other repository branches (including PR branches) → Preview. Production and
+Dev use explicit `--env-branch main` / `--env-branch dev`; other branches use
+`--preview`. Tags do not deploy. A PR event runs checks without a second deployment.
+
+All targets use the existing GitHub secret `OXYGEN_DEPLOYMENT_TOKEN_1000179878`,
+passed to the CLI as `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`. The separate production
+workflow is removed, and the legacy `oxygen-preview.yml` must stay removed when
+merging into `main`. The generic repository secret `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`
+is no longer used by these workflows; do not delete or rotate secrets without
+checking other consumers. Publication is serialized separately for Production,
+Dev and Preview, without canceling a deployment already in progress. CI uses
+Node 22 for both checks and deployments.
+
+Run `npm run check:deployment-workflow` to validate the workflow event/target
+matrix without contacting Shopify. Both PR checks and the deployment job run it.
+Protect `main` and `dev` so changes arrive through reviewed pull requests, and
+require the `PR checks` status before merging. The read-only inspection on
+2026-10-26 found both branches unprotected, with required status checks off;
+an administrator must enable these rules before launch and confirm token
+permissions. See
+[deployment ownership and verification](guides/audits/2026-10-26/repair-3.md).
+
+Before launch, connect the storefront domain to Oxygen, connect
+`checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN`
+in Oxygen.
 
 Production remains blocked until the bilingual content review, real-store checkout tests, domain/market setup and accessibility review are complete. See [`guides/launch-checklist.md`](guides/launch-checklist.md).

@@ -33,6 +33,9 @@ jobs:
       - name: Check text encoding
         run: npm run check:encoding
 
+      - name: Check deployment ownership
+        run: npm run check:deployment-workflow
+
       - name: Lint
         run: npm run lint
 
