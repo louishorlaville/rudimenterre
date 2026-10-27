@@ -4,6 +4,8 @@ Snapshot: `6ef8fa40082e3f96f6e09db96df7381275178ca7`. Date: 2026-10-26. Reports 
 
 **Repair update:** Batch 1 / SEC-1 is implemented in the working tree with Hydrogen 2026.10.2, React Router 7.18.4 and React 19. Local validation and remaining integration gates are recorded in [repair-1.md](repair-1.md). The snapshot findings below remain the historical audit record; no deployment or live customer-account round trip has been performed.
 
+**Repair update 2:** Batch 2 / SEC-2, SEC-4 and SEC-3 is implemented locally: shared localized return-path validation, final account response privacy policy and an explicit secure-cookie development exception. See [repair-2.md](repair-2.md) for validation and remaining preview checks. Historical findings below are preserved.
+
 ## Priority and validation rules
 
 Severity measures demonstrated impact/likelihood, not the amount of cleanup desired. Critical: immediate severe compromise/outage supported by evidence; High: material exploitable security/reliability exposure; Medium: bounded functional, privacy, delivery or maintainability defect; Low: conditional edge case, documentation gap or hardening. Confidence is evidentiary confidence, separate from severity. Optional style/architecture preferences are not defects.

@@ -9,6 +9,7 @@ export function links() {
 import type {CartResult as CartQueryDataReturn} from '~/lib/cart.server';
 import {CartForm} from '~/components/CartForm';
 import {CartMain} from '~/components/CartMain';
+import {getSafeReturnPath} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({params}) => {
   return [
@@ -88,7 +89,7 @@ export async function action({request, context}: Route.ActionArgs) {
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
     status = 303;
-    headers.set('Location', redirectTo);
+    headers.set('Location', getSafeReturnPath(request, redirectTo, '/cart'));
   }
 
   return data(

@@ -39,6 +39,13 @@ including `npm run preview`, retain it. Validate login/refresh/logout and checko
 identity against a built preview. Newsletter preferences also require the
 server-side Admin API credentials described in the newsletter setup guide.
 
+Session cookies use `Secure`, `HttpOnly` and `SameSite=Lax`. Only HTTP loopback
+requests (`localhost`, `127.0.0.1`, `[::1]`) in `vite dev` omit `Secure`; tunnel
+hosts and all production builds keep it even if the worker sees HTTP. The worker
+sets `Cache-Control: private, no-store` and `Oxygen-Cache-Control: no-store` on
+account documents, data, actions, redirects and errors. `npm run check:framework`
+also runs the mocked redirect, account-privacy and OAuth cookie regression checks.
+
 ## Shopify configuration
 
 - Publish the flagship product and its inventory to the Hydrogen sales channel.

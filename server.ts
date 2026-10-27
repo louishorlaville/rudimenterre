@@ -9,6 +9,7 @@ export default {
     env: Env,
     executionContext: ExecutionContext,
   ): Promise<Response> {
+    let response: Response;
     try {
       const context = await createHydrogenRouterContext(
         request,
@@ -31,7 +32,7 @@ export default {
             : []),
         ],
       });
-      let response = shopifyRoute
+      response = shopifyRoute
         ? await shopifyRoute
         : await createRequestHandler(serverBuild, process.env.NODE_ENV)(
             request,
@@ -42,14 +43,27 @@ export default {
       if (context.session.isPending)
         response.headers.append('Set-Cookie', await context.session.commit());
       context.requestContext.applyResponseHeaders(response.headers);
-      return response;
     } catch (error) {
-      if (error instanceof Response) return error;
-      console.error(error);
-      return new Response('An unexpected error occurred', {
-        status: 500,
-        headers: {'Cache-Control': 'no-store'},
-      });
+      if (error instanceof Response) response = error;
+      else {
+        console.error(error);
+        response = new Response('An unexpected error occurred', {
+          status: 500,
+          headers: {'Cache-Control': 'no-store'},
+        });
+      }
     }
+    // Apply after routing and error handling, including early action rejections.
+    let pathname = new URL(request.url).pathname;
+    try {
+      pathname = decodeURIComponent(pathname);
+    } catch {
+      /* Keep the raw path. */
+    }
+    if (/^\/(?:fr\/|en\/)?account(?:\/|\.data$|$)/i.test(pathname)) {
+      response.headers.set('Cache-Control', 'private, no-store');
+      response.headers.set('Oxygen-Cache-Control', 'no-store');
+    }
+    return response;
   },
 };

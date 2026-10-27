@@ -4,6 +4,15 @@ import {
   type Session,
 } from 'react-router';
 
+export function isSessionCookieSecure(request: Request, development: boolean) {
+  const url = new URL(request.url);
+  return !(
+    development &&
+    url.protocol === 'http:' &&
+    ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+  );
+}
+
 /**
  * This is a custom session implementation for your Hydrogen shop.
  * Feel free to customize it to your needs, add helper methods, or
@@ -27,9 +36,7 @@ export class AppSession {
         httpOnly: true,
         path: '/',
         sameSite: 'lax',
-        secure:
-          new URL(request.url).protocol === 'https:' ||
-          Boolean(import.meta.env?.PROD),
+        secure: isSessionCookieSecure(request, Boolean(import.meta.env?.DEV)),
         secrets,
       },
     });

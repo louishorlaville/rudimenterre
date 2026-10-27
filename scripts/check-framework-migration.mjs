@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync, readdirSync} from 'node:fs';
 import {buildClientSchema, parse, validate} from 'graphql';
 import {createCookieSessionStorage} from 'react-router';
+import {checkSecurityBoundaries} from './check-security-boundaries.mjs';
 
 const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
 const routerPackages = [
@@ -107,6 +108,62 @@ globalThis.caches = {
 globalThis.fetch = async (url, init) => {
   if (
     String(url) ===
+    'https://test-store.myshopify.com/admin/api/2026-07/graphql.json'
+  ) {
+    assert.equal(
+      new Headers(init.headers).get('X-Shopify-Access-Token'),
+      'synthetic-admin-token',
+    );
+    const body = JSON.parse(init.body);
+    const id = 'gid://shopify/Customer/1';
+    if (body.query.includes('query NewsletterPreferences'))
+      return Response.json({
+        data: {
+          customer: {
+            id,
+            tags: [],
+            emailMarketingConsent: {marketingState: 'UNSUBSCRIBED'},
+          },
+        },
+      });
+    if (body.query.includes('mutation AddNewsletterPreferences'))
+      return Response.json({data: {tagsAdd: {node: {id}, userErrors: []}}});
+    if (body.query.includes('mutation NewsletterPreferenceConsent'))
+      return Response.json({
+        data: {
+          customerEmailMarketingConsentUpdate: {
+            customer: {
+              id,
+              emailMarketingConsent: {
+                marketingState:
+                  body.variables.input.emailMarketingConsent.marketingState,
+              },
+            },
+            userErrors: [],
+          },
+        },
+      });
+    throw new Error('Unexpected synthetic Admin operation');
+  }
+  if (String(url) === 'https://shopify.com/authentication/123/oauth/token') {
+    const form = new URLSearchParams(init.body);
+    assert.equal(form.get('client_id'), 'synthetic-client');
+    const claims = {
+      aud: 'synthetic-client',
+      iss: 'https://shopify.com/authentication/123',
+      nonce: form.get('code'),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    };
+    const idToken = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.stringify(claims)).toString('base64url')}.fixture`;
+    return Response.json({
+      access_token: 'synthetic-customer-access-token',
+      refresh_token: 'synthetic-refresh-token',
+      expires_in: 3600,
+      id_token: idToken,
+    });
+  }
+  if (
+    String(url) ===
     'https://shopify.com/123/account/customer/api/2026-10/graphql'
   ) {
     const body = JSON.parse(init.body);
@@ -129,7 +186,23 @@ globalThis.fetch = async (url, init) => {
         pageInfo: {hasPreviousPage: false, hasNextPage: false},
       },
     };
-    return Response.json({data: {customer}});
+    const order = {
+      id: 'gid://shopify/Order/1',
+      name: '#FIXTURE',
+      confirmationNumber: 'TEST',
+      processedAt: '2026-10-26T00:00:00Z',
+      statusPageUrl: 'https://shop.example/fixture',
+      fulfillments: {nodes: []},
+      lineItems: {nodes: []},
+      discountApplications: {nodes: []},
+      shippingAddress: null,
+      subtotal: variant.price,
+      totalPrice: variant.price,
+      totalTax: variant.price,
+    };
+    return Response.json({
+      data: {customer, order, customerUpdate: {customer, userErrors: []}},
+    });
   }
   assert.match(
     String(url),
@@ -414,6 +487,15 @@ try {
     },
   });
   const customerCookie = (await storage.commitSession(session)).split(';')[0];
+  await checkSecurityBoundaries({
+    request,
+    worker,
+    env,
+    execution,
+    customerCookie,
+    cartCookie: cookie,
+    storage,
+  });
   for (const locale of ['fr', 'en']) {
     for (const page of ['profile', 'addresses', 'orders']) {
       const response = await request(`/${locale}/account/${page}`, {

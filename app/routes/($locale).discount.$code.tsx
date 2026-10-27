@@ -1,5 +1,6 @@
 ﻿import {redirect} from 'react-router';
 import type {Route} from './+types/($locale).discount.$code';
+import {getSafeReturnPath} from '~/lib/redirect';
 
 /**
  * Automatically applies a discount found on the url
@@ -18,18 +19,19 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
 
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
-  let redirectParam =
-    searchParams.get('redirect') || searchParams.get('return_to') || '/';
-
-  if (redirectParam.includes('//')) {
-    // Avoid redirecting to external URLs to prevent phishing attacks
-    redirectParam = '/';
-  }
+  const redirectParam = getSafeReturnPath(
+    request,
+    searchParams.get('redirect') || searchParams.get('return_to'),
+  );
 
   searchParams.delete('redirect');
   searchParams.delete('return_to');
 
-  const redirectUrl = `${redirectParam}?${searchParams}`;
+  const destination = new URL(redirectParam, url.origin);
+  searchParams.forEach((value, key) =>
+    destination.searchParams.append(key, value),
+  );
+  const redirectUrl = `${destination.pathname}${destination.search}${destination.hash}`;
 
   if (!code) {
     return redirect(redirectUrl);
@@ -40,9 +42,6 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
     throw new Response('Discount unavailable', {status: 502});
   const headers = cart.setCartId(result.cart.id);
 
-  // Using set-cookie on a 303 redirect will not work if the domain origin have port number (:3000)
-  // If there is no cart id and a new cart id is created in the progress, it will not be set in the cookie
-  // on localhost:3000
   return redirect(redirectUrl, {
     status: 303,
     headers,
