@@ -1,16 +1,20 @@
-﻿import {useLoaderData, data, type HeadersFunction} from 'react-router';
+﻿import {useParams, data, type HeadersFunction} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).cart';
 import cartStyles from './Page.css?url';
+import {Link} from 'react-router';
 
 export function links() {
   return [{rel: 'stylesheet', href: cartStyles}];
 }
-import type {CartQueryDataReturn} from '@shopify/hydrogen';
-import {CartForm} from '@shopify/hydrogen';
+import type {CartResult as CartQueryDataReturn} from '~/lib/cart.server';
+import {CartForm} from '~/components/CartForm';
 import {CartMain} from '~/components/CartMain';
+import {getSafeReturnPath} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({params}) => {
-  return [{title: `${params.locale === 'en' ? 'Cart' : 'Panier'} — Rudimenterre`}];
+  return [
+    {title: `${params.locale === 'en' ? 'Cart' : 'Panier'} — Rudimenterre`},
+  ];
 };
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
@@ -31,13 +35,13 @@ export async function action({request, context}: Route.ActionArgs) {
 
   switch (action) {
     case CartForm.ACTIONS.LinesAdd:
-      result = await cart.addLines(inputs.lines);
+      result = await cart.addLines(inputs.lines ?? []);
       break;
     case CartForm.ACTIONS.LinesUpdate:
-      result = await cart.updateLines(inputs.lines);
+      result = await cart.updateLines(inputs.lines ?? []);
       break;
     case CartForm.ACTIONS.LinesRemove:
-      result = await cart.removeLines(inputs.lineIds);
+      result = await cart.removeLines(inputs.lineIds ?? []);
       break;
     case CartForm.ACTIONS.DiscountCodesUpdate: {
       const formDiscountCode = inputs.discountCode;
@@ -48,7 +52,7 @@ export async function action({request, context}: Route.ActionArgs) {
       ) as string[];
 
       // Combine discount codes already applied on cart
-      discountCodes.push(...inputs.discountCodes);
+      discountCodes.push(...(inputs.discountCodes ?? []));
 
       result = await cart.updateDiscountCodes(discountCodes);
       break;
@@ -79,13 +83,13 @@ export async function action({request, context}: Route.ActionArgs) {
   }
 
   const cartId = result?.cart?.id;
-  const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
+  const headers = cartId ? cart.setCartId(cartId) : new Headers();
   const {cart: cartResult, errors, warnings} = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
     status = 303;
-    headers.set('Location', redirectTo);
+    headers.set('Location', getSafeReturnPath(request, redirectTo, '/cart'));
   }
 
   return data(
@@ -106,14 +110,24 @@ export async function loader({context}: Route.LoaderArgs) {
   return await cart.get();
 }
 
-export default function Cart({params}: Route.ComponentProps) {
-  const cart = useLoaderData<typeof loader>();
+export default function Cart() {
+  const params = useParams();
 
   return (
     <div className="cart">
-      <p className="eyebrow">Rudimenterre</p>
-      <h1>{params.locale === 'en' ? 'Your cart' : 'Votre panier'}</h1>
-      <CartMain layout="page" cart={cart} />
+      <header className="cart-heading">
+        <h1>{params.locale === 'en' ? 'Your cart' : 'Votre panier'}</h1>
+        <Link
+          className="cart-continue"
+          to={`/${params.locale === 'en' ? 'en' : 'fr'}/adoptez`}
+        >
+          {params.locale === 'en'
+            ? 'Continue shopping'
+            : 'Continuer mes achats'}
+          <span aria-hidden="true"> →</span>
+        </Link>
+      </header>
+      <CartMain layout="page" />
     </div>
   );
 }

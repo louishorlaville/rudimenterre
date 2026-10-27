@@ -8,25 +8,43 @@ Bilingual, French-first storefront built with Shopify Hydrogen, React Router, Ty
 
 ## Local development
 
-1. Install dependencies with `npm install`.
+1. Use Node.js 22.12+ (22.x) or 24.x and install the locked dependencies with `npm ci`.
 2. Install the Hydrogen sales channel on the client store.
 3. Run `npx shopify hydrogen link` and choose the client storefront.
 4. Run `npx shopify hydrogen env pull` to replace the local Mock Shop settings.
 5. Start the site with `npm run dev`.
 
-Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request.
+Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request. After building, run `npm run check:route-manifest` and `npm run check:framework`. The latter exercises the patched manifest handler, bilingual rendering, cart operations, OAuth URL/CSRF handling and sitemaps against the built worker with synthetic APIs; it does not contact Shopify or write live data.
+
+Hydrogen 2026.10.2 uses React 19 and React Router 7.18.4. Core services live in `app/lib`, React bindings come from `@shopify/hydrogen/react`, and `server.ts` dispatches Shopify cart/account endpoints before the page router. `npm run codegen` generates the named GraphQL operation contracts and route types. `typecheck` also validates branded GraphQL documents against the bundled schemas without downloading schemas.
 
 ### Test customer accounts locally
 
-Stop the existing local server, then run `npm run dev:accounts`. Complete the
-Shopify CLI login if prompted. Open the HTTPS `*.tryhydrogen.dev` tunnel URL
-printed in the terminal, then visit `/fr/account/profile` or `/en/account/profile`.
-Customer Account API OAuth does not work on plain localhost in this Hydrogen
-version. Use the tunnel for the entire login and profile session; each restart
-can generate a different URL. The flag registers the development tunnel with
-Shopify. Newsletter preferences also require the server-side Admin API credentials
-described in the newsletter setup guide. Production uses its configured HTTPS
-domain and does not need a development tunnel.
+Set `SHOP_ID` to the numeric shop ID and `PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID`
+to the Customer Account API client ID. A legacy `PUBLIC_CUSTOMER_ACCOUNT_API_URL`
+can supply the shop ID as a compatibility fallback, but is not used as the API origin.
+Stop the existing server, then run `npm run dev:accounts` (alias of `dev:https`).
+Hydrogen's local HTTPS plugin provisions a trusted development certificate with
+mkcert; this can prompt for operating-system certificate trust. Open
+`https://local.tryhydrogen.dev:5173` and register that origin's
+`/account/authorize` callback in the Shopify Customer Account API settings.
+Use the actual printed port if 5173 is occupied. This is local HTTPS, not the old
+CLI tunnel, and plain HTTP cannot complete customer OAuth. Use designated test
+customers and isolated services before testing account writes.
+
+Hydrogen 2026.10.2 has an upstream development-module mismatch when account and
+cart handlers share buyer-identity synchronization. The development server uses
+Shopify's documented fallback without that synchronization; production builds,
+including `npm run preview`, retain it. Validate login/refresh/logout and checkout
+identity against a built preview. Newsletter preferences also require the
+server-side Admin API credentials described in the newsletter setup guide.
+
+Session cookies use `Secure`, `HttpOnly` and `SameSite=Lax`. Only HTTP loopback
+requests (`localhost`, `127.0.0.1`, `[::1]`) in `vite dev` omit `Secure`; tunnel
+hosts and all production builds keep it even if the worker sees HTTP. The worker
+sets `Cache-Control: private, no-store` and `Oxygen-Cache-Control: no-store` on
+account documents, data, actions, redirects and errors. `npm run check:framework`
+also runs the mocked redirect, account-privacy and OAuth cookie regression checks.
 
 ## Shopify configuration
 
@@ -79,6 +97,33 @@ for mocked subscription checks.
 
 ## Deployment
 
-Connect this GitHub repository in the Hydrogen channel and map `main` to the Oxygen production environment. The `dev` branch deploys to Oxygen preview; pushes to either branch trigger a deployment. Add the storefront's Oxygen deployment token as the GitHub Actions secret `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`. Protect both branches so changes arrive through reviewed pull requests, and require the `PR checks` status check before merging. Before launch, connect the storefront domain to Oxygen, connect `checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN` in Oxygen.
+The single deployment owner is `.github/workflows/oxygen-deployment.yml`
+for storefront `1000179878` on `rudimenterre.myshopify.com`. The confirmed Oxygen
+mapping is `main` → Production, `dev` → the dedicated Dev environment, and pushes
+to other repository branches (including PR branches) → Preview. Production and
+Dev use explicit `--env-branch main` / `--env-branch dev`; other branches use
+`--preview`. Tags do not deploy. A PR event runs checks without a second deployment.
+
+All targets use the existing GitHub secret `OXYGEN_DEPLOYMENT_TOKEN_1000179878`,
+passed to the CLI as `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`. The separate production
+workflow is removed, and the legacy `oxygen-preview.yml` must stay removed when
+merging into `main`. The generic repository secret `SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN`
+is no longer used by these workflows; do not delete or rotate secrets without
+checking other consumers. Publication is serialized separately for Production,
+Dev and Preview, without canceling a deployment already in progress. CI uses
+Node 22 for both checks and deployments.
+
+Run `npm run check:deployment-workflow` to validate the workflow event/target
+matrix without contacting Shopify. Both PR checks and the deployment job run it.
+Protect `main` and `dev` so changes arrive through reviewed pull requests, and
+require the `PR checks` status before merging. The read-only inspection on
+2026-10-26 found both branches unprotected, with required status checks off;
+an administrator must enable these rules before launch and confirm token
+permissions. See
+[deployment ownership and verification](guides/audits/2026-10-26/repair-3.md).
+
+Before launch, connect the storefront domain to Oxygen, connect
+`checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN`
+in Oxygen.
 
 Production remains blocked until the bilingual content review, real-store checkout tests, domain/market setup and accessibility review are complete. See [`guides/launch-checklist.md`](guides/launch-checklist.md).

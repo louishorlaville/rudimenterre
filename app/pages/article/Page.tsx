@@ -1,6 +1,6 @@
 ﻿import {useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs.$blogHandle.$articleHandle';
-import {Image} from '@shopify/hydrogen';
+import {Image} from '~/components/CommerceMedia';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {

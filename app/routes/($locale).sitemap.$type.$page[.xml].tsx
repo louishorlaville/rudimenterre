@@ -1,5 +1,5 @@
 ﻿import type {Route} from './+types/($locale).sitemap.$type.$page[.xml]';
-import {getSitemap} from '@shopify/hydrogen';
+import {getSitemap} from '~/lib/sitemap.server';
 
 export async function loader({
   request,
@@ -10,11 +10,6 @@ export async function loader({
     storefront,
     request,
     params,
-    locales: ['EN-US', 'EN-CA', 'FR-CA'],
-    getLink: ({type, baseUrl, handle, locale}) => {
-      if (!locale) return `${baseUrl}/${type}/${handle}`;
-      return `${baseUrl}/${locale}/${type}/${handle}`;
-    },
   });
 
   response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`);

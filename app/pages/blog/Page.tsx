@@ -1,6 +1,7 @@
 ﻿import {Link, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs.$blogHandle._index';
-import {Image, getPaginationVariables} from '@shopify/hydrogen';
+import {Image} from '~/components/CommerceMedia';
+import {getPaginationVariables} from '~/components/Pagination';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';

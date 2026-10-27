@@ -1,59 +1,69 @@
 import * as serverBuild from 'virtual:react-router/server-build';
-import {createRequestHandler, storefrontRedirect} from '@shopify/hydrogen';
+import {createRequestHandler} from 'react-router';
+import {handleShopifyRoutes, handleShopifyRedirects} from '@shopify/hydrogen';
 import {createHydrogenRouterContext} from '~/lib/context';
 
-/**
- * Export a fetch handler in module format.
- */
 export default {
   async fetch(
     request: Request,
     env: Env,
     executionContext: ExecutionContext,
   ): Promise<Response> {
+    let response: Response;
     try {
-      const hydrogenContext = await createHydrogenRouterContext(
+      const context = await createHydrogenRouterContext(
         request,
         env,
         executionContext,
       );
-
-      /**
-       * Create a Hydrogen request handler that internally
-       * delegates to React Router for routing and rendering.
-       */
-      const handleRequest = createRequestHandler({
-        build: serverBuild,
-        mode: process.env.NODE_ENV,
-        getLoadContext: () => hydrogenContext,
+      const options = {
+        request,
+        requestContext: context.requestContext,
+        storefrontClient: context.storefrontClient,
+        sessionManager: context.sessionManager,
+        routeTemplates: context.routeTemplates,
+      };
+      const shopifyRoute = handleShopifyRoutes({
+        ...options,
+        handlers: [
+          context.customerAccount.cartHandlers,
+          ...(context.customerAccount.handlers
+            ? [context.customerAccount.handlers]
+            : []),
+        ],
       });
-
-      const response = await handleRequest(request);
-
-      if (hydrogenContext.session.isPending) {
-        response.headers.set(
-          'Set-Cookie',
-          await hydrogenContext.session.commit(),
-        );
-      }
-
-      if (response.status === 404) {
-        /**
-         * Check for redirects only when there's a 404 from the app.
-         * If the redirect doesn't exist, then `storefrontRedirect`
-         * will pass through the 404 response.
-         */
-        return storefrontRedirect({
-          request,
-          response,
-          storefront: hydrogenContext.storefront,
+      response = shopifyRoute
+        ? await shopifyRoute
+        : await createRequestHandler(serverBuild, process.env.NODE_ENV)(
+            request,
+            context,
+          );
+      if (response.status === 404)
+        response = (await handleShopifyRedirects(options)) ?? response;
+      if (context.session.isPending)
+        response.headers.append('Set-Cookie', await context.session.commit());
+      context.requestContext.applyResponseHeaders(response.headers);
+    } catch (error) {
+      if (error instanceof Response) response = error;
+      else {
+        console.error(error);
+        response = new Response('An unexpected error occurred', {
+          status: 500,
+          headers: {'Cache-Control': 'no-store'},
         });
       }
-
-      return response;
-    } catch (error) {
-      console.error(error);
-      return new Response('An unexpected error occurred', {status: 500});
     }
+    // Apply after routing and error handling, including early action rejections.
+    let pathname = new URL(request.url).pathname;
+    try {
+      pathname = decodeURIComponent(pathname);
+    } catch {
+      /* Keep the raw path. */
+    }
+    if (/^\/(?:fr\/|en\/)?account(?:\/|\.data$|$)/i.test(pathname)) {
+      response.headers.set('Cache-Control', 'private, no-store');
+      response.headers.set('Oxygen-Cache-Control', 'no-store');
+    }
+    return response;
   },
 };

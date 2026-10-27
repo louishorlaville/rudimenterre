@@ -19,6 +19,9 @@
 ## Production
 
 - GitHub `main` is connected to Oxygen production and preview branches remain private.
+- `dev` is connected to the dedicated Dev environment; PR branch pushes select Preview.
+- Only the storefront deployment workflow remains after merging; `npm run check:deployment-workflow` passes.
+- The storefront token's target/permissions and required `PR checks` rules on `main`/`dev` are verified in the hosting/GitHub settings.
 - Storefront and checkout domains are connected; `PUBLIC_CHECKOUT_DOMAIN` and CSP are correct.
 - Test orders pass on mobile and desktop in French and English.
 - Client acceptance, content freeze, launch approval and post-launch smoke-test owner are recorded.

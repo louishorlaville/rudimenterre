@@ -1,0 +1,27 @@
+Contact rate limiter failed { reason: 'Rate limiter unavailable' }
+Contact form failed { status: 503, detail: 'Limiteur : Rate limiter unavailable' }
+Contact rate limiter failed { reason: 'Rate limiter unavailable' }
+Contact form failed { status: 503, detail: 'Limiteur : Rate limiter unavailable' }
+Contact rate limiter failed { reason: 'Rate limiter unavailable' }
+Contact form failed { status: 503, detail: 'Limiteur : Rate limiter unavailable' }
+Contact rate limiter failed { reason: 'Error' }
+Contact form failed { status: 503, detail: 'Limiteur : Error' }
+Contact rate limiter failed { reason: 'Trusted IP missing' }
+Contact form failed { status: 503, detail: 'Limiteur : Trusted IP missing' }
+Contact rate limiter failed { reason: 'Rate limiter configuration missing' }
+Contact form failed {
+  status: 503,
+  detail: 'Limiteur : Rate limiter configuration missing'
+}
+Contact form configuration missing { variables: [ 'RESEND_API_KEY', 'RESEND_FROM_EMAIL' ] }
+Contact form failed {
+  status: 503,
+  detail: 'Configuration : RESEND_API_KEY, RESEND_FROM_EMAIL'
+}
+Contact email rejected by Resend { status: 401, code: undefined }
+Contact form failed { status: 502, detail: 'Resend 401 : invalid key' }
+Contact email rejected by Resend { status: 200, code: undefined }
+Contact form failed { status: 502, detail: 'Resend 200 : Invalid provider response' }
+Contact email request failed { reason: 'network-or-response' }
+Contact form failed { status: 502, detail: 'Resend network or response error' }
+Contact form checks passed (mocked Resend, no emails sent).

@@ -89,7 +89,7 @@ vm.runInNewContext(code, {
     if (name === 'react') return react;
     if (name === 'react/jsx-runtime')
       return {jsx, jsxs: jsx, Fragment: 'fragment'};
-    if (name === '@shopify/hydrogen') return {Image: 'image'};
+    if (name === '~/components/CommerceMedia') return {Image: 'image'};
     throw new Error(name);
   },
 });

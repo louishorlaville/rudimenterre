@@ -11,7 +11,9 @@ import {
 export async function action({request, context}: Route.ActionArgs) {
   const {customerAccount} = context;
   const fr = new URL(request.url).pathname.split('/')[1] !== 'en';
-  const unavailable = fr ? 'La modification de l’adresse n’a pas pu aboutir. Veuillez réessayer.' : 'The address change could not be completed. Please try again.';
+  const unavailable = fr
+    ? 'La modification de l’adresse n’a pas pu aboutir. Veuillez réessayer.'
+    : 'The address change could not be completed. Please try again.';
 
   try {
     const form = await request.formData();
@@ -53,7 +55,7 @@ export async function action({request, context}: Route.ActionArgs) {
       'address2',
       'city',
       'company',
-      'territoryCode',
+      'countryCode',
       'firstName',
       'lastName',
       'phoneNumber',
@@ -64,7 +66,14 @@ export async function action({request, context}: Route.ActionArgs) {
     for (const key of keys) {
       const value = form.get(key);
       if (typeof value === 'string') {
-        address[key] = value;
+        if (key === 'countryCode') {
+          const country = value.trim().toUpperCase();
+          if (!/^[A-Z]{2}$/.test(country))
+            return data({error: {[addressId]: unavailable}}, {status: 400});
+          address.countryCode = country as NonNullable<
+            CustomerAddressInput['countryCode']
+          >;
+        } else address[key] = value;
       }
     }
 
@@ -104,13 +113,13 @@ export async function action({request, context}: Route.ActionArgs) {
             addressId,
             createdAddress: data?.customerAddressCreate?.customerAddress,
             defaultAddress,
-            phoneSyncWarning: !await syncCustomerPhone({
+            phoneSyncWarning: !(await syncCustomerPhone({
               customerAccount,
               env: context.env,
               addressId: data.customerAddressCreate.customerAddress.id,
               phoneNumber: address.phoneNumber,
-              territoryCode: address.territoryCode,
-            }),
+              territoryCode: address.countryCode,
+            })),
           };
         } catch (error: unknown) {
           if (error instanceof Error) {
@@ -166,13 +175,13 @@ export async function action({request, context}: Route.ActionArgs) {
             addressId,
             updatedAddress: address,
             defaultAddress,
-            phoneSyncWarning: !await syncCustomerPhone({
+            phoneSyncWarning: !(await syncCustomerPhone({
               customerAccount,
               env: context.env,
               addressId: data.customerAddressUpdate.customerAddress.id,
               phoneNumber: address.phoneNumber,
-              territoryCode: address.territoryCode,
-            }),
+              territoryCode: address.countryCode,
+            })),
           };
         } catch (error: unknown) {
           if (error instanceof Error) {
@@ -272,4 +281,3 @@ export async function action({request, context}: Route.ActionArgs) {
     );
   }
 }
-

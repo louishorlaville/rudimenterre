@@ -1,18 +1,18 @@
-import type { ProductVariantFragment } from "storefrontapi.generated";
-import { Image } from "@shopify/hydrogen";
-import type { KeyboardEvent, PointerEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import type {ProductVariantFragment} from 'storefrontapi.generated';
+import {Image} from '~/components/CommerceMedia';
+import type {KeyboardEvent, PointerEvent} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 type ProductImageData = Omit<
-  NonNullable<ProductVariantFragment["image"]>,
-  "__typename"
+  NonNullable<ProductVariantFragment['image']>,
+  '__typename'
 >;
 
 export function ProductImage({
   images,
   activeIndex,
   onActiveIndexChange,
-  locale = "fr",
+  locale = 'fr',
   onFullscreen,
 }: {
   images: ProductImageData[];
@@ -23,8 +23,8 @@ export function ProductImage({
 }) {
   const imageFrame = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
-  const scrollTimeout = useRef<number>();
-  const zoomFrame = useRef<number>();
+  const scrollTimeout = useRef<number | undefined>(undefined);
+  const zoomFrame = useRef<number | undefined>(undefined);
   const zoomMedia = useRef<HTMLImageElement | null>(null);
   const scrolling = useRef(false);
   const pointer = useRef({
@@ -48,7 +48,7 @@ export function ProductImage({
   const zoomSourceWidth = activeImage?.width || 6400;
   const zoomSrcSetStep = Math.max(1, Math.floor(zoomSourceWidth / 16));
   const reducedMotion = () =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const resetZoom = (immediate = false) => {
     if (zoomFrame.current !== undefined) {
@@ -57,15 +57,15 @@ export function ProductImage({
     }
     const media = zoomMedia.current;
     if (!media) return;
-    if (immediate) media.style.transition = "none";
-    media.style.setProperty("--zoom-scale", "1");
-    media.classList.remove("is-zoomed");
+    if (immediate) media.style.transition = 'none';
+    media.style.setProperty('--zoom-scale', '1');
+    media.classList.remove('is-zoomed');
   };
 
   const followZoom = (event: PointerEvent<HTMLDivElement>) => {
     const carousel = track.current;
     if (
-      event.pointerType !== "mouse" ||
+      event.pointerType !== 'mouse' ||
       event.buttons !== 0 ||
       document.fullscreenElement !== imageFrame.current ||
       pointer.current.id !== 0 ||
@@ -73,13 +73,13 @@ export function ProductImage({
       !carousel
     )
       return;
-    const { clientX, clientY } = event;
+    const {clientX, clientY} = event;
     if (zoomFrame.current !== undefined)
       window.cancelAnimationFrame(zoomFrame.current);
     zoomFrame.current = window.requestAnimationFrame(() => {
       zoomFrame.current = undefined;
       const slide = carousel.children[activeIndex] as HTMLElement | undefined;
-      const media = slide?.querySelector("img");
+      const media = slide?.querySelector('img');
       if (!slide || !media || !media.naturalWidth || !media.naturalHeight)
         return;
       // Measure the untransformed slide: object-fit can leave large empty margins.
@@ -101,17 +101,17 @@ export function ProductImage({
         return;
       }
       zoomMedia.current = media;
-      media.style.removeProperty("transition");
+      media.style.removeProperty('transition');
       media.style.setProperty(
-        "--zoom-x",
+        '--zoom-x',
         `${((clientX - bounds.left) / bounds.width) * 100}%`,
       );
       media.style.setProperty(
-        "--zoom-y",
+        '--zoom-y',
         `${((clientY - bounds.top) / bounds.height) * 100}%`,
       );
-      media.style.setProperty("--zoom-scale", "2");
-      media.classList.add("is-zoomed");
+      media.style.setProperty('--zoom-scale', '2');
+      media.classList.add('is-zoomed');
     });
   };
 
@@ -120,7 +120,7 @@ export function ProductImage({
       resetZoom(true);
       setFullscreenSize(
         imageFrame.current && document.fullscreenElement === imageFrame.current
-          ? { width: window.innerWidth, height: window.innerHeight }
+          ? {width: window.innerWidth, height: window.innerHeight}
           : null,
       );
       // A fullscreen/viewport resize changes the snap offsets without changing the index.
@@ -128,14 +128,14 @@ export function ProductImage({
       if (carousel)
         carousel.scrollTo({
           left: activeIndex * carousel.clientWidth,
-          behavior: "instant",
+          behavior: 'instant',
         });
     };
-    document.addEventListener("fullscreenchange", updateFullscreen);
-    window.addEventListener("resize", updateFullscreen);
+    document.addEventListener('fullscreenchange', updateFullscreen);
+    window.addEventListener('resize', updateFullscreen);
     return () => {
-      document.removeEventListener("fullscreenchange", updateFullscreen);
-      window.removeEventListener("resize", updateFullscreen);
+      document.removeEventListener('fullscreenchange', updateFullscreen);
+      window.removeEventListener('resize', updateFullscreen);
       resetZoom(true);
     };
   }, [activeIndex]);
@@ -156,7 +156,7 @@ export function ProductImage({
     resetZoom(true);
     carousel.scrollTo({
       left: activeIndex * carousel.clientWidth,
-      behavior: reducedMotion() ? "auto" : "smooth",
+      behavior: reducedMotion() ? 'auto' : 'smooth',
     });
   }, [activeIndex]);
 
@@ -184,7 +184,7 @@ export function ProductImage({
     );
     carousel.scrollTo({
       left: nextIndex * carousel.clientWidth,
-      behavior: reducedMotion() ? "auto" : "smooth",
+      behavior: reducedMotion() ? 'auto' : 'smooth',
     });
     if (nextIndex !== activeIndex) onActiveIndexChange(nextIndex);
   };
@@ -196,16 +196,16 @@ export function ProductImage({
   };
 
   const handleNavigationKey = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === "ArrowLeft") {
+    if (event.key === 'ArrowLeft') {
       event.preventDefault();
       goTo(activeIndex - 1);
-    } else if (event.key === "ArrowRight") {
+    } else if (event.key === 'ArrowRight') {
       event.preventDefault();
       goTo(activeIndex + 1);
-    } else if (event.key === "Home") {
+    } else if (event.key === 'Home') {
       event.preventDefault();
       goTo(0);
-    } else if (event.key === "End") {
+    } else if (event.key === 'End') {
       event.preventDefault();
       goTo(images.length - 1);
     }
@@ -217,13 +217,13 @@ export function ProductImage({
       ref={imageFrame}
       role="region"
       aria-roledescription="carousel"
-      aria-label={locale === "fr" ? "Photos du produit" : "Product photos"}
+      aria-label={locale === 'fr' ? 'Photos du produit' : 'Product photos'}
       style={{
         aspectRatio: `${imageRatio}`,
         height: frameHeight ? `${frameHeight}px` : undefined,
       }}
       onPointerMove={(event) => {
-        if ((event.target as HTMLElement).closest("button")) resetZoom();
+        if ((event.target as HTMLElement).closest('button')) resetZoom();
       }}
     >
       <div
@@ -265,7 +265,7 @@ export function ProductImage({
             Math.abs(deltaX) > Math.abs(deltaY)
           ) {
             pointer.current.dragging = true;
-            carousel.classList.add("is-dragging");
+            carousel.classList.add('is-dragging');
           }
           if (!pointer.current.dragging) return;
           event.preventDefault();
@@ -276,14 +276,14 @@ export function ProductImage({
           const carousel = track.current;
           if (!carousel || pointer.current.id !== event.pointerId) return;
           carousel.releasePointerCapture(event.pointerId);
-          carousel.classList.remove("is-dragging");
+          carousel.classList.remove('is-dragging');
           pointer.current.id = 0;
           settle();
         }}
         onPointerCancel={(event) => {
           const carousel = track.current;
           if (!carousel || pointer.current.id !== event.pointerId) return;
-          carousel.classList.remove("is-dragging");
+          carousel.classList.remove('is-dragging');
           pointer.current.id = 0;
           settle();
         }}
@@ -300,11 +300,11 @@ export function ProductImage({
             <Image
               alt={
                 image.altText ||
-                (locale === "fr" ? "Photo du produit" : "Product photo")
+                (locale === 'fr' ? 'Photo du produit' : 'Product photo')
               }
               className="product-image__media"
               data={image}
-              loading={Math.abs(index - activeIndex) <= 1 ? "eager" : "lazy"}
+              loading={Math.abs(index - activeIndex) <= 1 ? 'eager' : 'lazy'}
               draggable={false}
               srcSetOptions={
                 fullscreenSize && index === activeIndex
@@ -322,7 +322,7 @@ export function ProductImage({
               sizes={
                 fullscreenSize && index === activeIndex
                   ? `${Math.min(image.width || Infinity, 2 * Math.min(fullscreenSize.width, fullscreenSize.height * imageRatio))}px`
-                  : "(min-width: 45em) 50vw, 100vw"
+                  : '(min-width: 45em) 50vw, 100vw'
               }
             />
           </div>
@@ -336,16 +336,12 @@ export function ProductImage({
             onClick={() => goTo(activeIndex - 1)}
             onKeyDown={handleNavigationKey}
             aria-label={
-              locale === "fr"
-                ? "Afficher la photo précédente"
-                : "Show previous photo"
+              locale === 'fr'
+                ? 'Afficher la photo précédente'
+                : 'Show previous photo'
             }
           >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              focusable="false"
-            >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="m15 5-7 7 7 7" />
             </svg>
           </button>
@@ -355,14 +351,10 @@ export function ProductImage({
             onClick={() => goTo(activeIndex + 1)}
             onKeyDown={handleNavigationKey}
             aria-label={
-              locale === "fr" ? "Afficher la photo suivante" : "Show next photo"
+              locale === 'fr' ? 'Afficher la photo suivante' : 'Show next photo'
             }
           >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              focusable="false"
-            >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="m9 5 7 7-7 7" />
             </svg>
           </button>
@@ -378,16 +370,12 @@ export function ProductImage({
           onFullscreen?.();
         }}
         aria-label={
-          locale === "fr"
-            ? "Afficher l’image en plein écran"
-            : "Show image fullscreen"
+          locale === 'fr'
+            ? 'Afficher l’image en plein écran'
+            : 'Show image fullscreen'
         }
       >
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-          focusable="false"
-        >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
         </svg>
       </button>

@@ -1,6 +1,7 @@
 ﻿import {useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).search';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
+import {getPaginationVariables} from '~/components/Pagination';
+import {Analytics} from '~/components/Analytics';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
 import {
@@ -27,7 +28,11 @@ export async function loader({request, context}: Route.LoaderArgs) {
 
   searchPromise.catch((error: Error) => {
     console.error(error);
-    return {term: '', result: null, error: 'La recherche est indisponible. Veuillez réessayer.'};
+    return {
+      term: '',
+      result: null,
+      error: 'La recherche est indisponible. Veuillez réessayer.',
+    };
   });
 
   return await searchPromise;
@@ -244,7 +249,9 @@ async function regularSearch({
   );
 
   const error = errors
-    ? (new URL(request.url).pathname.startsWith('/en') ? 'Search is unavailable. Please try again.' : 'La recherche est indisponible. Veuillez réessayer.')
+    ? new URL(request.url).pathname.startsWith('/en')
+      ? 'Search is unavailable. Please try again.'
+      : 'La recherche est indisponible. Veuillez réessayer.'
     : undefined;
 
   return {type: 'regular', term, error, result: {total, items}};

@@ -3,7 +3,9 @@ import type {
   MoneyFragment,
 } from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
-import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
+import {CartForm} from '~/components/CartForm';
+import {Money} from '~/components/CommerceMedia';
+import {type OptimisticCart} from '~/lib/cart-types';
 import {useEffect, useId, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
 import type {StorefrontLocale} from '~/lib/i18n';
@@ -40,9 +42,9 @@ export function CartSummary({
 
   return (
     <div aria-labelledby={summaryId} className={className}>
-      <h4 id={summaryId}>
+      <h2 id={summaryId}>
         {locale === 'fr' ? 'Récapitulatif' : 'Order summary'}
-      </h4>
+      </h2>
       <dl role="group" className="cart-subtotal">
         <dt>{locale === 'fr' ? 'Sous-total' : 'Subtotal'}</dt>
         <dd>{subtotal ? <Money data={subtotal} /> : '-'}</dd>
@@ -52,14 +54,14 @@ export function CartSummary({
         discountsHeadingId={discountsHeadingId}
         discountCodeInputId={discountCodeInputId}
         locale={locale}
-        collapsible={layout === 'aside'}
+        collapsible
       />
       <CartGiftCard
         giftCardCodes={cart?.appliedGiftCards}
         giftCardHeadingId={giftCardHeadingId}
         giftCardInputId={giftCardInputId}
         locale={locale}
-        collapsible={layout === 'aside'}
+        collapsible
       />
       <CartCheckoutActions
         checkoutUrl={cart?.checkoutUrl}
@@ -84,11 +86,7 @@ function CartCheckoutActions({
   return (
     <div className="cart-checkout-actions">
       <a
-        className={
-          layout === 'aside'
-            ? 'button button--orange cart-checkout-button'
-            : undefined
-        }
+        className="button button--orange cart-checkout-button"
         href={checkoutUrl}
         target="_self"
       >
@@ -106,7 +104,6 @@ function CartCheckoutActions({
           </p>
         )}
       </a>
-      {layout === 'page' && <br />}
     </div>
   );
 }
@@ -367,7 +364,7 @@ function GiftCardCodeForm({
 }: {
   inputId: string;
   locale: StorefrontLocale;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   disabled: boolean;
 }) {
   return (

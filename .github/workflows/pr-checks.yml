@@ -33,6 +33,9 @@ jobs:
       - name: Check text encoding
         run: npm run check:encoding
 
+      - name: Check deployment ownership
+        run: npm run check:deployment-workflow
+
       - name: Lint
         run: npm run lint
 
@@ -44,3 +47,6 @@ jobs:
 
       - name: Check route manifest
         run: npm run check:route-manifest
+
+      - name: Check patched framework and migrated integrations
+        run: npm run check:framework

@@ -11,3 +11,5 @@ node_modules
 *.tsbuildinfo
 tmp/
 pnpm-lock.yaml
+
+*-graphql-env.d.ts
