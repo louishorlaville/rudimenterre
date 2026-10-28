@@ -30,7 +30,7 @@ export function Header({isLoggedIn}: HeaderProps) {
         <a
           className="locale-switch"
           href={localizedPath(pathname, locale === 'fr' ? 'en' : 'fr')}
-          hrefLang={locale === 'fr' ? 'en-CA' : 'fr-CA'}
+          hrefLang={locale === 'fr' ? 'en' : 'fr'}
         >
           {locale === 'fr' ? 'EN' : 'FR'}
         </a>
@@ -93,7 +93,7 @@ export function HeaderMenu({
     >
       <NavLink
         onClick={close}
-        to={`/${locale}/collections/all`}
+        to={`/${locale}/adoptez`}
         prefetch="intent"
       >
         {locale === 'fr' ? 'Le Cuicui' : 'Cuicui'}

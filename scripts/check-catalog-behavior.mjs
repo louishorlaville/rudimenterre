@@ -42,6 +42,7 @@ function load(file, modules = {}) {
       console: {error() {}},
       require(name) {
         if (name in modules) return modules[name];
+        if (name === '~/lib/seo') return seo;
         if (name === 'react') return hooks;
         if (name === 'react/jsx-runtime') return runtime;
         if (name === 'react-router')
@@ -66,6 +67,9 @@ function nodes(tree, type) {
 }
 const i18n = load('app/lib/i18n.ts');
 const search = load('app/lib/search.ts');
+const editorial = load('app/lib/editorial-content.ts');
+const storefrontRedirects = load('app/lib/storefront-redirects.ts', {'./i18n': i18n, './editorial-content': editorial});
+const seo = load('app/lib/seo.ts', {'./i18n': i18n, './storefront-redirects': storefrontRedirects});
 const variants = load('app/lib/variants.ts', {'./i18n': i18n});
 const pagination = {
   getPaginationVariables: () => ({first: 8}),

@@ -1,4 +1,5 @@
-﻿import {redirect, useLoaderData} from 'react-router';
+import {createPageSeo} from '~/lib/seo';
+import {redirect, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).collections.$handle';
 import collectionStyles from '~/pages/collections/Page.css?url';
 
@@ -12,9 +13,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -59,6 +58,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   return {
     collection,
+    seo: createPageSeo(request, {title: collection.seo?.title || collection.title + ' — Rudimenterre', description: collection.seo?.description || collection.description, pagination: true}),
   };
 }
 
@@ -146,6 +146,7 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      seo { title description }
       products(
         first: $first,
         last: $last,

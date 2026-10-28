@@ -67,7 +67,7 @@ const product = {
   vendor: 'Fixture',
   description: 'Fixture description',
   descriptionHtml: '<p>Fixture description</p>',
-  seo: {},
+  seo: {title: 'Shopify fixture SEO', description: 'Shopify fixture summary'},
   images: {nodes: []},
   metafield: null,
   dimensionsImage: null,
@@ -239,6 +239,10 @@ globalThis.fetch = async (url, init) => {
     data = {products: {nodes: [product]}};
   else if (/query Product\b/.test(body.query)) data = {product};
   else if (/query EditorialPage\b/.test(body.query)) data = {metaobject: null};
+  else if (/query AdoptionProducts\b/.test(body.query)) {
+    const price = {amount: body.variables.country === 'FR' ? '568.00' : '698.00', currencyCode: body.variables.country === 'FR' ? 'EUR' : 'CAD'};
+    data = {collection: {products: {nodes: [{...product, availableForSale: true, priceRange: {minVariantPrice: price, maxVariantPrice: price}}]}}};
+  }
   else if (/query SitemapCount\b/.test(body.query))
     data = {sitemap: {pagesCount: {count: 1}}};
   else if (/query SitemapResources\b/.test(body.query))
@@ -327,7 +331,21 @@ try {
     );
     const item = await request(`/${locale}/products/fixture`);
     assert.equal(item.status, 200, `Product ${locale}`);
-    assert.ok((await item.text()).includes('Audit fixture'));
+    const itemHtml = await item.text();
+    assert.ok(itemHtml.includes('Audit fixture'));
+    assert.ok(itemHtml.includes('<title>Shopify fixture SEO</title>'));
+    assert.ok(itemHtml.includes('content="Shopify fixture summary"'));
+    assert.ok(itemHtml.includes(`rel="canonical" href="https://rudimenterre.com/${locale}/products/fixture"`));
+    assert.equal((itemHtml.match(/rel="canonical"/g) ?? []).length, 1);
+    assert.equal(item.headers.get('X-Robots-Tag'), 'noindex, follow', 'Preview responses cannot be indexed');
+    const adoption = await request(`/${locale}/adoptez`);
+    assert.equal(adoption.status, 200);
+    const adoptionHtml = await adoption.text();
+    assert.match(adoptionHtml, /href="[^"]*#adopt-kits"/);
+    assert.ok(adoptionHtml.includes(`href="/${locale}/products/fixture"`));
+    assert.ok(adoptionHtml.includes('698'));
+    for (const code of ['fr-CA', 'en-CA', 'fr-FR', 'en-FR'])
+      assert.ok(adoptionHtml.includes(`hrefLang="${code}"`) || adoptionHtml.includes(`hrefLang="${code.toLowerCase()}"`) || adoptionHtml.includes(`hreflang="${code}"`));
     const page = await request(`/${locale}/cart`);
     assert.equal(page.status, 200);
     const missing = await request(`/${locale}/unknown-fixture-path`);
@@ -355,7 +373,20 @@ try {
     const childSitemap = await request(`/${locale}/sitemap/products/1.xml`);
     assert.equal(childSitemap.status, 200);
     assert.ok((await childSitemap.text()).includes('/fr/products/fixture'));
+    const staticSitemap = await request(`/${locale}/sitemap/static/1.xml`);
+    assert.equal(staticSitemap.status, 200);
+    assert.ok((await staticSitemap.text()).includes('https://rudimenterre.com/en/adoptez'));
   }
+  const publishedProduct = await worker.fetch(new Request('https://rudimenterre.com/fr/products/fixture'), env, execution);
+  assert.equal(publishedProduct.headers.get('X-Robots-Tag'), null);
+  await publishedProduct.text();
+  const searchResponse = await worker.fetch(new Request('https://rudimenterre.com/fr/search?predictive=true'), env, execution);
+  assert.equal(searchResponse.headers.get('X-Robots-Tag'), 'noindex, follow');
+  await searchResponse.text();
+  const franceAdoption = await worker.fetch(new Request('https://rudimenterre.fr/en/adoptez'), env, execution);
+  assert.equal(franceAdoption.status, 200);
+  const franceAdoptionHtml = await franceAdoption.text();
+  assert.ok(franceAdoptionHtml.includes('568') && franceAdoptionHtml.includes('€'));
   const empty = await request('/api/cart');
   assert.equal(empty.status, 200);
   assert.deepEqual(await empty.json(), {cart: null});

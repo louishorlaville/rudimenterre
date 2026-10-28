@@ -1,3 +1,4 @@
+import {createPageSeo} from '~/lib/seo';
 import {useLoaderData} from 'react-router';
 import {useEffect, useRef, useState} from 'react';
 import type {Route} from '../../routes/+types/($locale).products.$handle';
@@ -64,23 +65,7 @@ function readDimensions(description: string) {
     .replace(/\s*\n\s*/g, '\n');
 }
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const locale = data?.locale ?? 'fr';
-  return [
-    {
-      title: `${data?.product.seo?.title || data?.product.title || 'Rudimenterre'} — Rudimenterre`,
-    },
-    {
-      name: 'description',
-      content:
-        data?.product.seo?.description || data?.product.description || '',
-    },
-    {
-      rel: 'canonical',
-      href: `/${locale}/products/${data?.product.handle}`,
-    },
-  ];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -123,7 +108,10 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  return {product, locale: params.locale === 'en' ? 'en' : 'fr'};
+  return {product, locale: params.locale === 'en' ? 'en' : 'fr', seo: createPageSeo(request, {
+    title: product.seo?.title || product.title + ' — Rudimenterre',
+    description: product.seo?.description || product.description,
+  })};
 }
 
 /**

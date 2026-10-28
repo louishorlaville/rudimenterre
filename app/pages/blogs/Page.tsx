@@ -1,3 +1,4 @@
+import {createPageSeo} from '~/lib/seo';
 import {localeFromPathname} from '~/lib/i18n';
 import {Link, useLocation, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs._index';
@@ -7,9 +8,7 @@ import type {BlogsQuery} from 'storefrontapi.generated';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -39,7 +38,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {blogs};
+  return {blogs, seo: createPageSeo(request, {title: 'Articles — Rudimenterre', pagination: true, staticAlternates: true})};
 }
 
 /**

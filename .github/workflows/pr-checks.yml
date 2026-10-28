@@ -53,6 +53,9 @@ jobs:
       - name: Check editorial content contracts
         run: npm run check:editorial
 
+      - name: Check storefront SEO and migration behavior
+        run: npm run check:seo
+
       - name: Build storefront
         run: npm run build
 

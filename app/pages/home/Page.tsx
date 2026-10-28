@@ -1,3 +1,4 @@
+import {createPageSeo} from '~/lib/seo';
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex -- Scrollable regions must remain keyboard focusable. */
 import {Link, redirect, useLoaderData} from 'react-router';
 import {useEffect, useRef, useState} from 'react';
@@ -12,23 +13,18 @@ import {HomeReviews} from '~/components/HomeReviews';
 import {pagePath} from '~/lib/editorial-content';
 import {isStorefrontLocale} from '~/lib/i18n';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const fr = data?.locale !== 'en';
-  return [
-    {title: fr ? 'Le Cuicui — Rudimenterre' : 'Cuicui — Rudimenterre'},
-    {name:'description',content:fr ? 'Le Cuicui, relais mobile de cuissons saines et durables.' : 'Cuicui, a mobile relay for healthy, sustainable cooking.'},
-    {tagName:'link',rel:'canonical',href:fr ? '/fr' : '/en'},
-    {tagName:'link',rel:'alternate',hrefLang:'fr-CA',href:'/fr'},
-    {tagName:'link',rel:'alternate',hrefLang:'en-CA',href:'/en'},
-  ];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader({params, context, request}: Route.LoaderArgs) {
-  if (!params.locale) throw redirect(`/fr${new URL(request.url).search}`);
+  if (!params.locale) throw redirect(`/fr${new URL(request.url).search}`, 301);
   const locale = params.locale.toLowerCase();
   if (!isStorefrontLocale(locale)) throw new Response(null,{status:404});
-  const response = await context.storefront.query(HOME_PRODUCT_QUERY,{cache:context.storefront.CacheShort()}).catch(() => ({products:{nodes:[]}}));
-  return {locale,product:response.products.nodes[0] ?? null};
+  const response = await context.storefront.query(HOME_PRODUCT_QUERY,{cache:context.storefront.CacheShort()}).catch(() => ({products:{nodes:[]}, shop: null}));
+  return {locale, product: response.products.nodes[0] ?? null, seo: createPageSeo(request, {
+    title: response.shop?.name || (locale === 'fr' ? 'Le Cuicui — Rudimenterre' : 'Cuicui — Rudimenterre'),
+    description: response.shop?.description || (locale === 'fr' ? 'Le Cuicui, relais mobile de cuissons saines et durables.' : 'Cuicui, a mobile relay for healthy, sustainable cooking.'),
+    staticAlternates: true,
+  })};
 }
 
 export default function Homepage() {
@@ -1103,6 +1099,7 @@ export default function Homepage() {
 
 const HOME_PRODUCT_QUERY = `#graphql
  query HomeProduct($country: CountryCode, $language: LanguageCode) @inContext(country:$country,language:$language) {
+  shop { name description }
   products(first:1,sortKey:UPDATED_AT,reverse:true) { nodes { id title handle } }
  }
 ` as const;

@@ -21,7 +21,7 @@ export function Footer(_props: {
       <nav className="site-footer__nav" aria-label={fr ? 'Plan du site' : 'Sitemap'}>
         <div className="footer-column">
           <p>{fr ? 'Découvrir' : 'Discover'}</p>
-          <Link to={`/${locale}/collections/all`}>{fr ? 'Le Cuicui' : 'Cuicui'}</Link>
+          <Link to={`/${locale}/adoptez`}>{fr ? 'Le Cuicui' : 'Cuicui'}</Link>
           <Link to={pagePath(locale, 'steam')}>{fr ? 'Comment ça marche' : 'How it works'}</Link>
           <Link to={pagePath(locale, 'project')}>{fr ? 'Le projet' : 'The project'}</Link>
           <Link to={pagePath(locale, 'making')}>{fr ? 'Fabrication et entretien' : 'Making and care'}</Link>

@@ -4,6 +4,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import ts from 'typescript';
 import * as React from 'react';
+import {formatMoney} from '@shopify/hydrogen';
 import * as jsxRuntime from 'react/jsx-runtime';
 import {renderToStaticMarkup} from 'react-dom/server';
 
@@ -28,10 +29,12 @@ function load(file) {
       module,
       exports: module.exports,
       URL,
+      Request,
       Response,
       console,
       require(name) {
         if (name === 'react') return React;
+        if (name === '@shopify/hydrogen') return {formatMoney};
         if (name === 'react/jsx-runtime') return jsxRuntime;
         if (name === 'react-router')
           return {
@@ -95,6 +98,7 @@ try {
           storefront: {
             CacheLong: () => ({}),
             query: async (_query, {variables}) => {
+              if (_query.includes('query AdoptionProducts')) return {collection: {products: {nodes: []}}};
               assert.equal(variables.handle, id);
               if (failure) throw new Error('Synthetic CMS outage');
               return response;

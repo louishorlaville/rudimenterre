@@ -26,6 +26,7 @@ relying on automatic TypeScript stripping in older Node 22 minors.
 | `npm run typecheck` | None; includes codegen, `tsc --noEmit`, GraphQL check | Same generation effects; temporary GraphQL config is removed | PR |
 | `node scripts/check-graphql.mjs` | Existing generated types; bundled schemas | Creates/removes `.hydrogen-gql-local-<uuid>.json`; invokes installed gql.tada | Via typecheck |
 | `npm run check:catalog` | None; locale links, search recovery, pending cart button, JSON product details, policies | In-memory mocked modules / React SSR | PR |
+| `npm run check:seo` | None; canonical/hreflang, Shopify SEO binding, market-priced adoption cards, sitemaps and migration redirects | In-memory mocked loaders / React SSR; no provider calls | PR |
 | `npm run check:editorial` | None; 11 page IDs × FR/EN, metadata and fallback contracts | In-memory mocked CMS / React SSR | PR |
 | `npm run check:customer-phone` | None; static/OAuth phone sync and address partial save | Mocked Admin and Customer Account APIs | PR |
 | `npm run check:admin-token` | None; renewal, rotation, scope and newsletter integration | Mocked token, Shopify and Redis calls | PR |

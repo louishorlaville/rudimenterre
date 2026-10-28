@@ -2,6 +2,8 @@ import * as serverBuild from 'virtual:react-router/server-build';
 import {createRequestHandler} from 'react-router';
 import {handleShopifyRoutes, handleShopifyRedirects} from '@shopify/hydrogen';
 import {createHydrogenRouterContext} from '~/lib/context';
+import {getStorefrontRedirect} from '~/lib/storefront-redirects';
+import {isProductionHost} from '~/lib/seo';
 
 export default {
   async fetch(
@@ -11,6 +13,8 @@ export default {
   ): Promise<Response> {
     let response: Response;
     try {
+      const redirect = getStorefrontRedirect(request);
+      if (redirect) throw redirect;
       const context = await createHydrogenRouterContext(
         request,
         env,
@@ -64,6 +68,10 @@ export default {
       response.headers.set('Cache-Control', 'private, no-store');
       response.headers.set('Oxygen-Cache-Control', 'no-store');
     }
+    if (!isProductionHost(new URL(request.url).hostname))
+      response.headers.set('X-Robots-Tag', 'noindex, follow');
+    else if (/^\/(?:fr\/|en\/)?search(?:\/|\.data$|$)/i.test(pathname))
+      response.headers.set('X-Robots-Tag', 'noindex, follow');
     return response;
   },
 };

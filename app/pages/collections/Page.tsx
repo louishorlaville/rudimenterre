@@ -1,3 +1,4 @@
+import {createPageSeo} from '~/lib/seo';
 import {localeFromPathname} from '~/lib/i18n';
 import {useLoaderData, useLocation, Link} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).collections._index';
@@ -10,6 +11,8 @@ import {getPaginationVariables} from '~/components/Pagination';
 import {Image} from '~/components/CommerceMedia';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -37,7 +40,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {collections};
+  return {collections, seo: createPageSeo(request, {title: 'Collections — Rudimenterre', pagination: true, staticAlternates: true})};
 }
 
 /**
