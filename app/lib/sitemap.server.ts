@@ -2,7 +2,7 @@ import type {createStorefrontService} from './storefront.server';
 import {PAGE_SLUGS} from './editorial-content';
 import {getLocaleFromRequest} from './i18n';
 import {getSeoOrigin} from './seo';
-import {getStorefrontRedirect} from './storefront-redirects';
+import {getCanonicalStorefrontPathname} from './storefront-redirects';
 type Storefront = ReturnType<typeof createStorefrontService>;
 const types = [
   'products',
@@ -98,12 +98,7 @@ export async function getSitemap({
       return (result.sitemap?.resources?.items ?? []).flatMap((resource) => {
         const type = params.type === 'articles' ? 'blogs' : params.type;
         const url = new URL(`${origin}/${locale}/${type}/${resource.handle}`);
-        const redirect = getStorefrontRedirect(new Request(url));
-        if (redirect)
-          url.pathname = new URL(
-            redirect.headers.get('Location')!,
-            origin,
-          ).pathname;
+        url.pathname = getCanonicalStorefrontPathname(url);
         // Application-owned equivalents are already present in the static sitemap.
         if (staticPaths.includes(url.pathname.replace(/^\/(fr|en)\/?/, '')))
           return [];

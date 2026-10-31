@@ -34,3 +34,10 @@ export function getStorefrontRedirect(request: Request): Response | null {
     headers: {Location: `${destination}${url.search}`},
   });
 }
+
+export function getCanonicalStorefrontPathname(url: URL): string {
+  const redirect = getStorefrontRedirect(new Request(url));
+  return redirect
+    ? new URL(redirect.headers.get('Location')!, url).pathname
+    : url.pathname;
+}

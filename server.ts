@@ -14,7 +14,10 @@ export default {
     let response: Response;
     try {
       const redirect = getStorefrontRedirect(request);
-      if (redirect) throw redirect;
+      const resourcePath = /^\/(?:fr\/|en\/)?(?:products|collections|pages|blogs|policies)(?:\/|$)/i.test(
+        new URL(request.url).pathname,
+      );
+      if (redirect && !resourcePath) throw redirect;
       const context = await createHydrogenRouterContext(
         request,
         env,
@@ -27,23 +30,28 @@ export default {
         sessionManager: context.sessionManager,
         routeTemplates: context.routeTemplates,
       };
-      const shopifyRoute = handleShopifyRoutes({
-        ...options,
-        handlers: [
-          context.customerAccount.cartHandlers,
-          ...(context.customerAccount.handlers
-            ? [context.customerAccount.handlers]
-            : []),
-        ],
-      });
-      response = shopifyRoute
-        ? await shopifyRoute
-        : await createRequestHandler(serverBuild, process.env.NODE_ENV)(
-            request,
-            context,
-          );
-      if (response.status === 404)
-        response = (await handleShopifyRedirects(options)) ?? response;
+      if (redirect) {
+        // Resolve merchant redirects before a locale prefix hides the original path.
+        response = (await handleShopifyRedirects(options)) ?? redirect;
+      } else {
+        const shopifyRoute = handleShopifyRoutes({
+          ...options,
+          handlers: [
+            context.customerAccount.cartHandlers,
+            ...(context.customerAccount.handlers
+              ? [context.customerAccount.handlers]
+              : []),
+          ],
+        });
+        response = shopifyRoute
+          ? await shopifyRoute
+          : await createRequestHandler(serverBuild, process.env.NODE_ENV)(
+              request,
+              context,
+            );
+        if (response.status === 404)
+          response = (await handleShopifyRedirects(options)) ?? response;
+      }
       if (context.session.isPending)
         response.headers.append('Set-Cookie', await context.session.commit());
       context.requestContext.applyResponseHeaders(response.headers);

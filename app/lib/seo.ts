@@ -1,6 +1,6 @@
 import type {MetaDescriptor} from 'react-router';
 import {getLocaleFromRequest} from './i18n';
-import {getStorefrontRedirect} from './storefront-redirects';
+import {getCanonicalStorefrontPathname} from './storefront-redirects';
 
 export function getSeoOrigin(request: Request) {
   return getLocaleFromRequest(request).country === 'FR'
@@ -31,12 +31,7 @@ export function createPageSeo(
   const canonical = new URL(getSeoOrigin(request));
   canonical.pathname =
     options.pathname ?? source.pathname.replace(/\.data$/, '');
-  const redirect = getStorefrontRedirect(new Request(canonical));
-  if (redirect)
-    canonical.pathname = new URL(
-      redirect.headers.get('Location')!,
-      canonical,
-    ).pathname;
+  canonical.pathname = getCanonicalStorefrontPathname(canonical);
   if (options.pagination && source.searchParams.has('cursor')) {
     canonical.searchParams.set('cursor', source.searchParams.get('cursor')!);
     if (source.searchParams.get('direction') === 'previous')
