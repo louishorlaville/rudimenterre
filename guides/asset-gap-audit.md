@@ -7,7 +7,7 @@ The supplied PDF mockups and their companion image folders were audited and inco
 | Source mockups | Supplied and audited for all pages | Approve responsive interpretation |
 | Pour Apprendre | Removed from routes and navigation | None |
 | Brand logo | Implemented as the text wordmark `RUDIMENTERRE` | Approve spacing and weight |
-| Fonts | Helvetica Neue stack with Caveat as the provisional cursive | Approve or supply final licensed cursive webfont |
+| Fonts | Helvetica Neue/Helvetica/Arial stack; locally hosted Tangerine regular/bold for script accents | Approve Tangerine usage, font licensing and responsive readability |
 | Product/editorial media | Supplied imagery integrated and compressed | Approve crops and bilingual alt text |
 | French copy | Mockup copy represented in page fallbacks | Client copy/SEO proofread |
 | English copy | Interface and summaries supplied as preview copy | Client-approved full translation required |

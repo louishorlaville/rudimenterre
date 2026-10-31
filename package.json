@@ -17,7 +17,12 @@
     "dev:https": "vite dev",
     "deploy": "shopify hydrogen deploy --build-command \"npm run build\" --assets-dir dist/client --worker-dir dist/server",
     "check:framework": "node scripts/check-framework-migration.mjs",
-    "check:deployment-workflow": "node scripts/check-deployment-workflow.mjs"
+    "check:deployment-workflow": "node scripts/check-deployment-workflow.mjs",
+    "check:catalog": "node scripts/check-catalog-behavior.mjs",
+    "check:customer-phone": "node --experimental-strip-types scripts/check-customer-phone.mjs",
+    "check:admin-token": "node --experimental-strip-types scripts/check-shopify-admin-token.mjs",
+    "check:editorial": "node scripts/check-editorial-content.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {

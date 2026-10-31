@@ -1,8 +1,10 @@
+import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 
 const asset = (name: string) => `/images/rudimenterre/steam-${name}.webp`;
 
-export function SteamPage({locale, heroImage}: {
+export function SteamPage({content, locale, heroImage}: {
+  content: EditorialPageContent;
   locale: StorefrontLocale;
   heroImage?: {url: string; altText?: string | null} | null;
 }) {
@@ -10,8 +12,8 @@ export function SteamPage({locale, heroImage}: {
   return <article className="steam-page">
     <header className="steam-hero">
       <img src={heroImage?.url || asset('banner')} alt={heroImage?.altText || ''} width="3710" height="1248" fetchPriority="high" />
-      <div><h1>{fr ? 'LA VAPEUR-ÉTUVÉE' : 'STEAM-STEWING'}</h1>
-        <p>{fr ? 'À LA VAPEUR C’EST MEILLEUR, À L’ÉTUVÉE, C’EST FUTÉ !' : 'BETTER WITH STEAM, SMARTER WITH STEAM-STEWING!'}</p></div>
+      <div><h1>{content.heroOverrides?.title || (fr ? 'LA VAPEUR-ÉTUVÉE' : 'STEAM-STEWING')}</h1>
+        <p>{content.heroOverrides?.intro || (fr ? 'À LA VAPEUR C’EST MEILLEUR, À L’ÉTUVÉE, C’EST FUTÉ !' : 'BETTER WITH STEAM, SMARTER WITH STEAM-STEWING!')}</p></div>
     </header>
 
     <section className="steam-band steam-band--sage steam-question">

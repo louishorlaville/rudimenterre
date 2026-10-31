@@ -4,7 +4,7 @@
 
 - Hydrogen storefront is linked to the correct client store and uses Oxygen-managed credentials.
 - Flagship product, variants, inventory, CAD pricing and policies are published to the Hydrogen channel.
-- French and English metaobjects, menus, product copy, policy copy and alt text are complete.
+- French and English supported metaobject fields, code-owned navigation labels, product copy, policy copy and alt text are complete.
 - No fallback, draft, unverifiable award or placeholder content remains.
 
 ## Experience and quality
@@ -24,4 +24,6 @@
 - The storefront token's target/permissions and required `PR checks` rules on `main`/`dev` are verified in the hosting/GitHub settings.
 - Storefront and checkout domains are connected; `PUBLIC_CHECKOUT_DOMAIN` and CSP are correct.
 - Test orders pass on mobile and desktop in French and English.
+- [Verification](verification.md) commands and isolated preview journeys have recorded outcomes; offline passes are not live commerce acceptance.
+- [Operations](operations.md) has named operators/escalation contacts, a known-good deployment ID and reviewed recovery steps; the private release walkthrough and isolated Dev drill are complete.
 - Client acceptance, content freeze, launch approval and post-launch smoke-test owner are recorded.

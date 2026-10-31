@@ -1,4 +1,6 @@
-﻿import {Link, useLoaderData} from 'react-router';
+import {createPageSeo} from '~/lib/seo';
+import {localeFromPathname} from '~/lib/i18n';
+import {Link, useLocation, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs._index';
 import {getPaginationVariables} from '~/components/Pagination';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -6,9 +8,7 @@ import type {BlogsQuery} from 'storefrontapi.generated';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -38,7 +38,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {blogs};
+  return {blogs, seo: createPageSeo(request, {title: 'Articles — Rudimenterre', pagination: true, staticAlternates: true})};
 }
 
 /**
@@ -53,6 +53,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
+  const locale = localeFromPathname(useLocation().pathname);
   return (
     <div className="blogs">
       <h1>Blogs</h1>
@@ -63,7 +64,7 @@ export default function Blogs() {
               className="blog"
               key={blog.handle}
               prefetch="intent"
-              to={`/blogs/${blog.handle}`}
+              to={`/${locale}/blogs/${blog.handle}`}
             >
               <h2>{blog.title}</h2>
             </Link>

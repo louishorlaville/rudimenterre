@@ -67,7 +67,7 @@ const product = {
   vendor: 'Fixture',
   description: 'Fixture description',
   descriptionHtml: '<p>Fixture description</p>',
-  seo: {},
+  seo: {title: 'Shopify fixture SEO', description: 'Shopify fixture summary'},
   images: {nodes: []},
   metafield: null,
   dimensionsImage: null,
@@ -237,8 +237,19 @@ globalThis.fetch = async (url, init) => {
   else if (/query Footer\b/.test(body.query)) data = {menu: null};
   else if (/query HomeProduct\b/.test(body.query))
     data = {products: {nodes: [product]}};
-  else if (/query Product\b/.test(body.query)) data = {product};
+  else if (/query Product\b/.test(body.query))
+    data = {
+      product: body.variables.handle === 'old-kit'
+        ? null
+        : body.variables.handle === 'new-kit'
+          ? {...product, handle: 'new-kit', title: 'Replacement kit'}
+          : product,
+    };
   else if (/query EditorialPage\b/.test(body.query)) data = {metaobject: null};
+  else if (/query AdoptionProducts\b/.test(body.query)) {
+    const price = {amount: body.variables.country === 'FR' ? '568.00' : '698.00', currencyCode: body.variables.country === 'FR' ? 'EUR' : 'CAD'};
+    data = {collection: {products: {nodes: [{...product, availableForSale: true, priceRange: {minVariantPrice: price, maxVariantPrice: price}}]}}};
+  }
   else if (/query SitemapCount\b/.test(body.query))
     data = {sitemap: {pagesCount: {count: 1}}};
   else if (/query SitemapResources\b/.test(body.query))
@@ -255,7 +266,15 @@ globalThis.fetch = async (url, init) => {
         },
       },
     };
-  else if (/urlRedirects/.test(body.query)) data = {urlRedirects: {edges: []}};
+  else if (/urlRedirects/.test(body.query)) {
+    if (body.variables.query === 'path:/products/redirect-error')
+      return Response.json({errors: [{message: 'Synthetic redirect lookup failure'}]});
+    const target = {
+      'path:/products/old-kit': '/products/new-kit',
+      'path:/en/products/old-kit': '/en/products/new-kit',
+    }[body.variables.query];
+    data = {urlRedirects: {edges: target ? [{node: {target}}] : []}};
+  }
   else if (/cart\(/.test(body.query)) data = {cart};
   else
     throw new Error(
@@ -289,6 +308,51 @@ const request = (path, init) =>
   );
 
 try {
+  for (const method of ['GET', 'HEAD']) {
+    const legacy = await request('/products/old-kit?utm_source=migration', {method});
+    assert.equal(legacy.status, 301);
+    assert.equal(legacy.headers.get('Location'), '/products/new-kit?utm_source=migration');
+    assert.equal(legacy.headers.get('X-Robots-Tag'), 'noindex, follow');
+    assert.ok(requests.some((body) => body.variables?.query === 'path:/products/old-kit'));
+    const normalized = await request(legacy.headers.get('Location'), {method});
+    assert.equal(normalized.status, 301);
+    assert.equal(normalized.headers.get('Location'), '/fr/products/new-kit?utm_source=migration');
+    const replacement = await request(normalized.headers.get('Location'), {method});
+    assert.equal(replacement.status, 200, 'Old product redirect must reach the replacement');
+    if (method === 'GET') assert.ok((await replacement.text()).includes('Replacement kit'));
+    else await replacement.text();
+  }
+  for (const path of ['/products/missing-kit', '/products/redirect-error']) {
+    const fallback = await request(`${path}?variant=123`);
+    assert.equal(fallback.status, 301, 'Missing or failed lookup retains local normalization');
+    assert.equal(fallback.headers.get('Location'), `/fr${path}?variant=123`);
+    assert.ok(requests.some((body) => body.variables?.query === `path:${path}`));
+  }
+  const localizedRedirect = await request('/en/products/old-kit?utm_source=localized');
+  assert.equal(localizedRedirect.status, 301);
+  assert.equal(localizedRedirect.headers.get('Location'), '/en/products/new-kit?utm_source=localized');
+  const localizedReplacement = await request(localizedRedirect.headers.get('Location'));
+  assert.equal(localizedReplacement.status, 200);
+  await localizedReplacement.text();
+  const requestCount = requests.length;
+  const dataResponse = await request('/products/fixture.data');
+  assert.equal(dataResponse.status, 200, 'Data requests must not be normalized');
+  assert.equal(dataResponse.headers.get('Location'), null);
+  await dataResponse.text();
+  const postResponse = await request('/products/old-kit', {
+    method: 'POST',
+    headers: {Origin: 'https://shop.example'},
+  });
+  assert.equal(postResponse.status, 405, 'POST must still reach the route action handler');
+  assert.equal(postResponse.headers.get('Location'), null);
+  await postResponse.text();
+  assert.ok(!requests.slice(requestCount).some((body) => /urlRedirects/.test(body.query)));
+  for (const [path, target] of [['/', '/fr'], ['/en/', '/en'], ['/en/rudimenterre-project', '/en/projet-rudimenterre']]) {
+    const fastRedirect = await worker.fetch(new Request(`https://shop.example${path}`), {}, execution);
+    assert.equal(fastRedirect.status, 301, 'Static normalization must not require a Shopify context');
+    assert.equal(fastRedirect.headers.get('Location'), target);
+  }
+
   const assets = readdirSync('dist/client/assets').filter((name) =>
     /^manifest-.*\.js$/.test(name),
   );
@@ -327,7 +391,21 @@ try {
     );
     const item = await request(`/${locale}/products/fixture`);
     assert.equal(item.status, 200, `Product ${locale}`);
-    assert.ok((await item.text()).includes('Audit fixture'));
+    const itemHtml = await item.text();
+    assert.ok(itemHtml.includes('Audit fixture'));
+    assert.ok(itemHtml.includes('<title>Shopify fixture SEO</title>'));
+    assert.ok(itemHtml.includes('content="Shopify fixture summary"'));
+    assert.ok(itemHtml.includes(`rel="canonical" href="https://rudimenterre.com/${locale}/products/fixture"`));
+    assert.equal((itemHtml.match(/rel="canonical"/g) ?? []).length, 1);
+    assert.equal(item.headers.get('X-Robots-Tag'), 'noindex, follow', 'Preview responses cannot be indexed');
+    const adoption = await request(`/${locale}/adoptez`);
+    assert.equal(adoption.status, 200);
+    const adoptionHtml = await adoption.text();
+    assert.match(adoptionHtml, /href="[^"]*#adopt-kits"/);
+    assert.ok(adoptionHtml.includes(`href="/${locale}/products/fixture"`));
+    assert.ok(adoptionHtml.includes('698'));
+    for (const code of ['fr-CA', 'en-CA', 'fr-FR', 'en-FR'])
+      assert.ok(adoptionHtml.includes(`hrefLang="${code}"`) || adoptionHtml.includes(`hrefLang="${code.toLowerCase()}"`) || adoptionHtml.includes(`hreflang="${code}"`));
     const page = await request(`/${locale}/cart`);
     assert.equal(page.status, 200);
     const missing = await request(`/${locale}/unknown-fixture-path`);
@@ -355,7 +433,20 @@ try {
     const childSitemap = await request(`/${locale}/sitemap/products/1.xml`);
     assert.equal(childSitemap.status, 200);
     assert.ok((await childSitemap.text()).includes('/fr/products/fixture'));
+    const staticSitemap = await request(`/${locale}/sitemap/static/1.xml`);
+    assert.equal(staticSitemap.status, 200);
+    assert.ok((await staticSitemap.text()).includes('https://rudimenterre.com/en/adoptez'));
   }
+  const publishedProduct = await worker.fetch(new Request('https://rudimenterre.com/fr/products/fixture'), env, execution);
+  assert.equal(publishedProduct.headers.get('X-Robots-Tag'), null);
+  await publishedProduct.text();
+  const searchResponse = await worker.fetch(new Request('https://rudimenterre.com/fr/search?predictive=true'), env, execution);
+  assert.equal(searchResponse.headers.get('X-Robots-Tag'), 'noindex, follow');
+  await searchResponse.text();
+  const franceAdoption = await worker.fetch(new Request('https://rudimenterre.fr/en/adoptez'), env, execution);
+  assert.equal(franceAdoption.status, 200);
+  const franceAdoptionHtml = await franceAdoption.text();
+  assert.ok(franceAdoptionHtml.includes('568') && franceAdoptionHtml.includes('€'));
   const empty = await request('/api/cart');
   assert.equal(empty.status, 200);
   assert.deepEqual(await empty.json(), {cart: null});

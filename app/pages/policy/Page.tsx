@@ -1,14 +1,15 @@
-﻿import {Link, useLoaderData} from 'react-router';
+﻿import {Link, useLoaderData, useLocation} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).policies.$handle';
-import {type Shop} from '@shopify/hydrogen/storefront-api-types';
-import {useLocation} from 'react-router';
 import {localeFromPathname} from '~/lib/i18n';
 import {policyTitle} from '~/lib/policy-titles';
 
-type SelectedPolicies = keyof Pick<
-  Shop,
-  'privacyPolicy' | 'shippingPolicy' | 'termsOfService' | 'refundPolicy'
->;
+const POLICY_FIELDS = {
+  'privacy-policy': 'privacyPolicy',
+  'shipping-policy': 'shippingPolicy',
+  'terms-of-service': 'termsOfService',
+  'refund-policy': 'refundPolicy',
+  'subscription-policy': 'subscriptionPolicy',
+} as const;
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `${data?.policy.title ?? ''} | Rudimenterre`}];
@@ -19,10 +20,9 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     throw new Response('No handle was passed in', {status: 404});
   }
 
-  const policyName = params.handle.replace(
-    /-([a-z])/g,
-    (_: unknown, m1: string) => m1.toUpperCase(),
-  ) as SelectedPolicies;
+  if (!Object.hasOwn(POLICY_FIELDS, params.handle))
+    throw new Response('Unknown policy', {status: 404});
+  const policyName = POLICY_FIELDS[params.handle as keyof typeof POLICY_FIELDS];
 
   const data = await context.storefront.query(POLICY_CONTENT_QUERY, {
     variables: {
@@ -30,6 +30,7 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
       shippingPolicy: false,
       termsOfService: false,
       refundPolicy: false,
+      subscriptionPolicy: false,
       [policyName]: true,
       language: context.storefront.i18n?.language,
     },
@@ -42,7 +43,12 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
   }
 
   const locale = localeFromPathname(new URL(request.url).pathname);
-  return {policy: {...policy, title: policyTitle(policy.handle, locale, policy.title)}};
+  return {
+    policy: {
+      ...policy,
+      title: policyTitle(policy.handle, locale, policy.title),
+    },
+  };
 }
 
 export default function Policy() {
@@ -58,10 +64,15 @@ export default function Policy() {
           <span aria-hidden="true">←</span>
           {fr ? 'Toutes les politiques' : 'All policies'}
         </Link>
-        <p className="eyebrow">Rudimenterre · {fr ? 'Informations légales' : 'Legal information'}</p>
+        <p className="eyebrow">
+          Rudimenterre · {fr ? 'Informations légales' : 'Legal information'}
+        </p>
         <h1 id="policy-title">{policy.title}</h1>
       </header>
-      <div className="policy__body" dangerouslySetInnerHTML={{__html: policy.body}} />
+      <div
+        className="policy__body"
+        dangerouslySetInnerHTML={{__html: policy.body}}
+      />
     </article>
   );
 }
@@ -82,6 +93,7 @@ const POLICY_CONTENT_QUERY = `#graphql
     $refundPolicy: Boolean!
     $shippingPolicy: Boolean!
     $termsOfService: Boolean!
+    $subscriptionPolicy: Boolean!
   ) @inContext(language: $language, country: $country) {
     shop {
       privacyPolicy @include(if: $privacyPolicy) {
@@ -95,6 +107,13 @@ const POLICY_CONTENT_QUERY = `#graphql
       }
       refundPolicy @include(if: $refundPolicy) {
         ...Policy
+      }
+      subscriptionPolicy @include(if: $subscriptionPolicy) {
+        body
+        handle
+        id
+        title
+        url
       }
     }
   }

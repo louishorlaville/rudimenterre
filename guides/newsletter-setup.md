@@ -63,5 +63,7 @@ Official references:
 
 ## Verify code
 
-`node scripts/check-newsletter.mjs` checks validation, consent, tags, rate limits,
+`node --experimental-strip-types scripts/check-newsletter.mjs` checks validation, consent, tags, rate limits,
 and mocked API failures without creating customers or sending messages.
+
+For runtime/CI coverage see [verification](verification.md); for partial saves, token failures and recovery see [operations](operations.md).

@@ -2,6 +2,8 @@ import * as serverBuild from 'virtual:react-router/server-build';
 import {createRequestHandler} from 'react-router';
 import {handleShopifyRoutes, handleShopifyRedirects} from '@shopify/hydrogen';
 import {createHydrogenRouterContext} from '~/lib/context';
+import {getStorefrontRedirect} from '~/lib/storefront-redirects';
+import {isProductionHost} from '~/lib/seo';
 
 export default {
   async fetch(
@@ -11,6 +13,11 @@ export default {
   ): Promise<Response> {
     let response: Response;
     try {
+      const redirect = getStorefrontRedirect(request);
+      const resourcePath = /^\/(?:fr\/|en\/)?(?:products|collections|pages|blogs|policies)(?:\/|$)/i.test(
+        new URL(request.url).pathname,
+      );
+      if (redirect && !resourcePath) throw redirect;
       const context = await createHydrogenRouterContext(
         request,
         env,
@@ -23,23 +30,28 @@ export default {
         sessionManager: context.sessionManager,
         routeTemplates: context.routeTemplates,
       };
-      const shopifyRoute = handleShopifyRoutes({
-        ...options,
-        handlers: [
-          context.customerAccount.cartHandlers,
-          ...(context.customerAccount.handlers
-            ? [context.customerAccount.handlers]
-            : []),
-        ],
-      });
-      response = shopifyRoute
-        ? await shopifyRoute
-        : await createRequestHandler(serverBuild, process.env.NODE_ENV)(
-            request,
-            context,
-          );
-      if (response.status === 404)
-        response = (await handleShopifyRedirects(options)) ?? response;
+      if (redirect) {
+        // Resolve merchant redirects before a locale prefix hides the original path.
+        response = (await handleShopifyRedirects(options)) ?? redirect;
+      } else {
+        const shopifyRoute = handleShopifyRoutes({
+          ...options,
+          handlers: [
+            context.customerAccount.cartHandlers,
+            ...(context.customerAccount.handlers
+              ? [context.customerAccount.handlers]
+              : []),
+          ],
+        });
+        response = shopifyRoute
+          ? await shopifyRoute
+          : await createRequestHandler(serverBuild, process.env.NODE_ENV)(
+              request,
+              context,
+            );
+        if (response.status === 404)
+          response = (await handleShopifyRedirects(options)) ?? response;
+      }
       if (context.session.isPending)
         response.headers.append('Set-Cookie', await context.session.commit());
       context.requestContext.applyResponseHeaders(response.headers);
@@ -64,6 +76,10 @@ export default {
       response.headers.set('Cache-Control', 'private, no-store');
       response.headers.set('Oxygen-Cache-Control', 'no-store');
     }
+    if (!isProductionHost(new URL(request.url).hostname))
+      response.headers.set('X-Robots-Tag', 'noindex, follow');
+    else if (/^\/(?:fr\/|en\/)?search(?:\/|\.data$|$)/i.test(pathname))
+      response.headers.set('X-Robots-Tag', 'noindex, follow');
     return response;
   },
 };

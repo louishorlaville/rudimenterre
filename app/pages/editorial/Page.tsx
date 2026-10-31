@@ -19,7 +19,8 @@ import {
   PAGE_SLUGS,
   pagePath,
 } from '~/lib/editorial-content';
-import {isStorefrontLocale} from '~/lib/i18n';
+import {isStorefrontLocale, getLocaleFromRequest} from '~/lib/i18n';
+import {createPageSeo} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({data}) => {
   if (!data) return [];
@@ -38,11 +39,7 @@ export const meta: Route.MetaFunction = ({data}) => {
   };
   return [
     {tagName: 'link', rel: 'stylesheet', href: specialStyles[data.content.id] || editorialStyles},
-    {title: `${data.content.title} — Rudimenterre`},
-    {name: 'description', content: data.content.seoDescription},
-    {tagName: 'link', rel: 'canonical', href: data.canonicalPath},
-    {tagName: 'link', rel: 'alternate', hrefLang: 'fr-CA', href: data.frPath},
-    {tagName: 'link', rel: 'alternate', hrefLang: 'en-CA', href: data.enPath},
+    ...data.seo,
   ];
 };
 
@@ -55,15 +52,19 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
   if (!fallback) throw new Response(null, {status: 404});
   if (params.page !== PAGE_SLUGS[fallback.id]) {
     const url = new URL(request.url);
-    throw redirect(`${pagePath(locale, fallback.id)}${url.search}`);
+    throw redirect(`${pagePath(locale, fallback.id)}${url.search}`, 301);
   }
 
-  const response = await context.storefront
+  const [response, catalog] = await Promise.all([context.storefront
     .query(EDITORIAL_PAGE_QUERY, {
       cache: context.storefront.CacheLong(),
       variables: {handle: fallback.id},
     })
-    .catch(() => null);
+    .catch(() => null),
+    fallback.id === 'adopt' ? context.storefront.query(ADOPTION_PRODUCTS_QUERY, {
+      variables: {handle: 'cuicuis'},
+    }) : Promise.resolve(null),
+  ]);
 
   const fields = (response?.metaobject?.fields ?? []) as Array<{
     key: string;
@@ -74,13 +75,19 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     } | null;
   }>;
   const field = (key: string) => fields.find((item) => item.key === key);
+  const text = (key: string) => {
+    const value = field(key)?.value;
+    return value?.trim() ? value : undefined;
+  };
+  const heroOverrides = {eyebrow: text('eyebrow'), title: text('title'), intro: text('intro')};
   const content = {
     ...fallback,
-    eyebrow: field('eyebrow')?.value || fallback.eyebrow,
-    title: field('title')?.value || fallback.title,
-    intro: field('intro')?.value || fallback.intro,
+    heroOverrides,
+    eyebrow: heroOverrides.eyebrow || fallback.eyebrow,
+    title: heroOverrides.title || fallback.title,
+    intro: heroOverrides.intro || fallback.intro,
     seoDescription:
-      field('seo_description')?.value || fallback.seoDescription,
+      text('seo_description') || fallback.seoDescription,
   };
   const media = field('hero_media')?.reference;
   const heroImage =
@@ -92,6 +99,14 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     locale,
     content,
     heroImage,
+    products: catalog?.collection?.products.nodes ?? [],
+    country: getLocaleFromRequest(request).country,
+    seo: createPageSeo(request, {
+      title: content.title + ' — Rudimenterre',
+      description: content.seoDescription,
+      pathname: pagePath(locale, fallback.id),
+      staticAlternates: true,
+    }),
     canonicalPath: pagePath(locale, fallback.id),
     frPath: locale === 'fr' ? pagePath('fr', fallback.id) : alternatePagePath(locale, fallback.id),
     enPath: locale === 'en' ? pagePath('en', fallback.id) : alternatePagePath(locale, fallback.id),
@@ -105,6 +120,8 @@ export default function EditorialRoute() {
       content={data.content}
       locale={data.locale}
       heroImage={data.heroImage}
+      products={data.products}
+      country={data.country}
     />
   );
 }
@@ -120,6 +137,23 @@ const EDITORIAL_PAGE_QUERY = `#graphql
           __typename
           ... on MediaImage {
             image { url altText width height }
+          }
+        }
+      }
+    }
+  }
+` as const;
+
+const ADOPTION_PRODUCTS_QUERY = `#graphql
+  query AdoptionProducts($handle: String!, $country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      products(first: 50) {
+        nodes {
+          id handle title availableForSale
+          priceRange {
+            minVariantPrice { amount currencyCode }
+            maxVariantPrice { amount currencyCode }
           }
         }
       }

@@ -4,17 +4,17 @@ import {EditorialTemplate} from '~/pages/editorial/Template';
 import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 
-export function DistillationPage() {
+export function DistillationPage({content, heroImage}: {content: EditorialPageContent; heroImage?: {url: string; altText?: string | null} | null}) {
   return (
     <article className="distillation-page">
       <header className="distillation-hero">
         <img
-          src="/images/rudimenterre/distillation/hero.jpg"
-          alt="Cuicui ouvert sur une table en bois"
+          src={heroImage?.url || '/images/rudimenterre/distillation/hero.jpg'}
+          alt={heroImage?.altText || 'Cuicui ouvert sur une table en bois'}
         />
         <div className="distillation-hero__copy">
-          <h1>EXPÉRIENCES DISTILLATION</h1>
-          <p>MOINS D’EAU POTABLE, PLUS D’AUTONOMIE</p>
+          <h1>{content.heroOverrides?.title || 'EXPÉRIENCES DISTILLATION'}</h1>
+          <p>{content.heroOverrides?.eyebrow || 'MOINS D’EAU POTABLE, PLUS D’AUTONOMIE'}</p>
           <img
             className="distillation-hero__drop"
             src="/images/rudimenterre/distillation/drop.png"
@@ -25,7 +25,7 @@ export function DistillationPage() {
       </header>
 
       <section className="distillation-lead">
-        <h2>ET SI DEMAIN L’EAU NE COULAIT PLUS PAR MAGIE DU ROBINET&nbsp;?</h2>
+        <h2>{content.heroOverrides?.intro || <>ET SI DEMAIN L’EAU NE COULAIT PLUS PAR MAGIE DU ROBINET&nbsp;?</>}</h2>
         <p>
           Pourrions-nous facilement cuire des pâtes&nbsp;? Faire une
           soupe&nbsp;? Cuire du riz&nbsp;? Non évidemment…

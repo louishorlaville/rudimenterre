@@ -42,6 +42,20 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Check catalog and search behavior
+        run: npm run check:catalog
+
+      - name: Check account phone and Admin token behavior
+        run: |
+          npm run check:customer-phone
+          npm run check:admin-token
+
+      - name: Check editorial content contracts
+        run: npm run check:editorial
+
+      - name: Check storefront SEO and migration behavior
+        run: npm run check:seo
+
       - name: Build storefront
         run: npm run build
 

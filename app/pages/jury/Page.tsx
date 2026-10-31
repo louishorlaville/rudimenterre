@@ -14,15 +14,15 @@ export function JuryPage({content, locale, heroImage}: {
 
   return <article className="jury-page">
     <header className="jury-hero">
-      <img src={heroImage?.url || content.heroImage} alt="" className="jury-hero__image" />
+      <img src={heroImage?.url || content.heroImage} alt={heroImage?.altText || ''} className="jury-hero__image" />
       <div className="jury-hero__copy">
         <h1>{content.title}</h1>
         <svg className="jury-hero__crown" viewBox="0 0 64 54" aria-hidden="true"><path d="M5 17 18 30 31 6 45 30 59 17 55 47H9Z" fill="#df8a35" stroke="#151515" strokeWidth="2.5" strokeLinejoin="round"/><circle cx="5" cy="15" r="3" fill="#df8a35" stroke="#151515" strokeWidth="2"/><circle cx="31" cy="5" r="3" fill="#df8a35" stroke="#151515" strokeWidth="2"/><circle cx="59" cy="15" r="3" fill="#df8a35" stroke="#151515" strokeWidth="2"/></svg>
-        <p>{fr ? <>17e Grand Prix International du Design - 2024<br />Lauréat Platine, Prix International<br />catégorie produit et conception durable</> : <>17th International Grand Prix du Design - 2024<br />Platinum winner, International Award<br />product and sustainable design category</>}</p>
+        <p>{content.heroOverrides?.intro || (fr ? <>17e Grand Prix International du Design - 2024<br />Lauréat Platine, Prix International<br />catégorie produit et conception durable</> : <>17th International Grand Prix du Design - 2024<br />Platinum winner, International Award<br />product and sustainable design category</>)}</p>
       </div>
     </header>
 
-    <h2 className="jury-banner">{fr ? 'MENTION DU JURY' : 'JURY MENTION'}</h2>
+    <h2 className="jury-banner">{content.heroOverrides?.eyebrow || (fr ? 'MENTION DU JURY' : 'JURY MENTION')}</h2>
 
     <div className="jury-main">
       <div className="jury-main__inner">

@@ -1,4 +1,6 @@
-﻿import {Link, useLoaderData} from 'react-router';
+import {createPageSeo} from '~/lib/seo';
+import {localeFromPathname} from '~/lib/i18n';
+import {Link, useLocation, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs.$blogHandle._index';
 import {Image} from '~/components/CommerceMedia';
 import {getPaginationVariables} from '~/components/Pagination';
@@ -6,9 +8,7 @@ import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.blog.title ?? ''} blog`}];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -49,7 +49,7 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
 
   redirectIfHandleIsLocalized(request, {handle: params.blogHandle, data: blog});
 
-  return {blog};
+  return {blog, seo: createPageSeo(request, {title: blog.seo?.title || blog.title + ' — Rudimenterre', description: blog.seo?.description, pagination: true})};
 }
 
 /**
@@ -90,6 +90,7 @@ function ArticleItem({
   article: ArticleItemFragment;
   loading?: HTMLImageElement['loading'];
 }) {
+  const locale = localeFromPathname(useLocation().pathname);
   const publishedAt = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -97,7 +98,7 @@ function ArticleItem({
   }).format(new Date(article.publishedAt!));
   return (
     <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
+      <Link to={`/${locale}/blogs/${article.blog.handle}/${article.handle}`}>
         {article.image && (
           <div className="blog-article-image">
             <Image

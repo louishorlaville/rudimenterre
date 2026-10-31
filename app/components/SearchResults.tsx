@@ -1,4 +1,5 @@
-import {Link} from 'react-router';
+import {localeFromPathname} from '~/lib/i18n';
+import {Link, useLocation} from 'react-router';
 import {Image, Money} from '~/components/CommerceMedia';
 import {Pagination} from '~/components/Pagination';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
@@ -35,6 +36,7 @@ function SearchResultsArticles({
   term,
   articles,
 }: PartialSearchResult<'articles'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!articles?.nodes.length) {
     return null;
   }
@@ -45,7 +47,7 @@ function SearchResultsArticles({
       <div>
         {articles?.nodes?.map((article) => {
           const articleUrl = urlWithTrackingParams({
-            baseUrl: `/blogs/${article.handle}`,
+            baseUrl: `/${locale}/blogs/${article.blog.handle}/${article.handle}`,
             trackingParams: article.trackingParameters,
             term,
           });
@@ -65,6 +67,7 @@ function SearchResultsArticles({
 }
 
 function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!pages?.nodes.length) {
     return null;
   }
@@ -75,7 +78,7 @@ function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
       <div>
         {pages?.nodes?.map((page) => {
           const pageUrl = urlWithTrackingParams({
-            baseUrl: `/pages/${page.handle}`,
+            baseUrl: `/${locale}/pages/${page.handle}`,
             trackingParams: page.trackingParameters,
             term,
           });
@@ -98,6 +101,7 @@ function SearchResultsProducts({
   term,
   products,
 }: PartialSearchResult<'products'>) {
+  const locale = localeFromPathname(useLocation().pathname);
   if (!products?.nodes.length) {
     return null;
   }
@@ -109,7 +113,7 @@ function SearchResultsProducts({
         {({nodes, isLoading, NextLink, PreviousLink}) => {
           const ItemsMarkup = nodes.map((product) => {
             const productUrl = urlWithTrackingParams({
-              baseUrl: `/products/${product.handle}`,
+              baseUrl: `/${locale}/products/${product.handle}`,
               trackingParams: product.trackingParameters,
               term,
             });

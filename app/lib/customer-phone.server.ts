@@ -1,3 +1,4 @@
+import {getShopifyAdminToken} from './shopify-admin-token.server.js';
 import type {CustomerAccount} from './customer-account.server';
 import {CUSTOMER_PHONE_QUERY} from '../graphql/customer-account/CustomerPhoneQuery.js';
 
@@ -12,7 +13,13 @@ export async function syncCustomerPhone({
   territoryCode,
 }: {
   customerAccount: Pick<CustomerAccount, 'query'>;
-  env: Pick<Env, 'PUBLIC_STORE_DOMAIN' | 'SHOPIFY_ADMIN_API_ACCESS_TOKEN'>;
+  env: Pick<
+    Env,
+    | 'PUBLIC_STORE_DOMAIN'
+    | 'SHOPIFY_ADMIN_API_ACCESS_TOKEN'
+    | 'SHOPIFY_ADMIN_CLIENT_ID'
+    | 'SHOPIFY_ADMIN_CLIENT_SECRET'
+  >;
   addressId: string;
   phoneNumber?: string | null;
   territoryCode?: string | null;
@@ -44,10 +51,8 @@ export async function syncCustomerPhone({
     if (phone === customer.phoneNumber?.phoneNumber) return true;
     if (!/^\+[1-9]\d{6,14}$/.test(phone)) return false;
 
-    const token = env.SHOPIFY_ADMIN_API_ACCESS_TOKEN;
+    const token = await getShopifyAdminToken(env);
     const domain = env.PUBLIC_STORE_DOMAIN;
-    if (!token || !/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(domain))
-      return false;
 
     const response = await fetch(
       `https://${domain}/admin/api/2026-07/graphql.json`,

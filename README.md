@@ -6,15 +6,27 @@ Bilingual, French-first storefront built with Shopify Hydrogen, React Router, Ty
 
 `app/routes` contains React Router entry points. Visible pages live in `app/pages/<page>/Page.tsx`, with `Page.css` beside the TSX when the page has unique styles. Shared UI remains in `app/components`, and `app/styles/app.css` holds site-wide styles. Editorial slugs use the common route in `app/pages/editorial` and choose a page component and stylesheet by content ID.
 
+## Maintenance guides
+
+- [Verification commands, side effects and CI coverage](guides/verification.md)
+- [Deployment recovery and troubleshooting](guides/operations.md)
+- [Editorial slots](guides/shopify-content-model.md), [product data/gallery](guides/product-content-model.md), [asset status](guides/asset-gap-audit.md)
+- [Regular search](guides/search/search.md) and [predictive building blocks](guides/predictiveSearch/predictiveSearch.md)
+
 ## Local development
 
 1. Use Node.js 22.12+ (22.x) or 24.x and install the locked dependencies with `npm ci`.
-2. Install the Hydrogen sales channel on the client store.
-3. Run `npx shopify hydrogen link` and choose the client storefront.
-4. Run `npx shopify hydrogen env pull` to replace the local Mock Shop settings.
-5. Start the site with `npm run dev`.
+2. Use `.env.example` for variable names and placeholders; obtain the correct development values through the approved store setup. Keep real `.env` files ignored and use separate non-production resources.
+3. Install the Hydrogen sales channel on the client store.
+4. Run `npx shopify hydrogen link` and choose the client storefront.
+5. Run `npx shopify hydrogen env pull` for the intended non-production environment. It writes local configuration and can overwrite `.env`; secret values may remain empty and need the approved setup.
+6. Start the site with `npm run dev`.
 
 Use `npm run typecheck`, `npm run lint`, and `npm run build` before opening a pull request. After building, run `npm run check:route-manifest` and `npm run check:framework`. The latter exercises the patched manifest handler, bilingual rendering, cart operations, OAuth URL/CSRF handling and sitemaps against the built worker with synthetic APIs; it does not contact Shopify or write live data.
+
+Run `npm run check:catalog` for offline FR/EN catalog/search links, regular/predictive search recovery, pending cart buttons, product JSON rendering and policy link regressions. It uses installed TypeScript and synthetic integrations, needs no build or credentials, and runs in PR checks. Browser and real-provider acceptance remain separate.
+
+Run `npm run check:editorial`, `npm run check:customer-phone` and `npm run check:admin-token` for editorial field/fallback rendering and mocked account phone, address partial-save and token-renewal regressions. All three run in PR checks without provider access. The account scripts explicitly enable Node TypeScript stripping (supported by the declared Node 22.12+/24 runtimes).
 
 Hydrogen 2026.10.2 uses React 19 and React Router 7.18.4. Core services live in `app/lib`, React bindings come from `@shopify/hydrogen/react`, and `server.ts` dispatches Shopify cart/account endpoints before the page router. `npm run codegen` generates the named GraphQL operation contracts and route types. `typecheck` also validates branded GraphQL documents against the bundled schemas without downloading schemas.
 
@@ -39,6 +51,8 @@ including `npm run preview`, retain it. Validate login/refresh/logout and checko
 identity against a built preview. Newsletter preferences also require the
 server-side Admin API credentials described in the newsletter setup guide.
 
+Address saves synchronize the account contact phone using the same server-side Admin credentials as newsletter preferences: `SHOPIFY_ADMIN_CLIENT_ID` plus `SHOPIFY_ADMIN_CLIENT_SECRET`, or legacy `SHOPIFY_ADMIN_API_ACCESS_TOKEN` when neither client credential is configured. See [Admin setup](guides/newsletter-setup.md). An incomplete client-credential pair fails rather than silently using a legacy token. Token/provider failure preserves the saved address and shows a phone-sync warning. Other recipients cannot replace an existing account phone unless the saved address is the default; blank phone fields never clear the account phone.
+
 Session cookies use `Secure`, `HttpOnly` and `SameSite=Lax`. Only HTTP loopback
 requests (`localhost`, `127.0.0.1`, `[::1]`) in `vite dev` omit `Secure`; tunnel
 hosts and all production builds keep it even if the worker sees HTTP. The worker
@@ -50,7 +64,7 @@ also runs the mocked redirect, account-privacy and OAuth cookie regression check
 
 - Publish the flagship product and its inventory to the Hydrogen sales channel.
 - Enable new customer accounts and grant the Customer Account API permissions needed by the generated account routes.
-- Create `main-menu` and `footer` menus. The storefront includes localized code fallbacks until the menus are ready.
+- Header and footer navigation are code-owned in `app/components/Header.tsx` and `Footer.tsx`, using `pagePath`/`UI_COPY` from `app/lib/editorial-content.ts`. Fetched Shopify menu data does not drive these links; publishing `main-menu` or `footer` menus will not activate them. Navigation edits require a code change.
 - Configure French and English in Shopify Markets. Map `rudimenterre.com` to Canada/CAD and `rudimenterre.fr` to France/EUR, then enable Shopify's market recommendation/domain redirection for geographic routing.
 - Create the `editorial_page` metaobject definition described in [`guides/shopify-content-model.md`](guides/shopify-content-model.md).
 - Configure Shopify Customer Privacy regions and localized banner copy.
@@ -62,7 +76,7 @@ Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in your local `.env` and in Oxygen'
 environment variables. The sender must belong to a domain verified in Resend.
 The visitor's email is used as Reply-To. The API key stays on the server.
 Without these settings, submissions return an error and keep the visitor's text.
-Run `node scripts/check-contact-form.mjs` to check validation and mocked sending.
+Run `node --experimental-strip-types scripts/check-contact-form.mjs` to check validation and mocked sending.
 
 ### Contact rate limits
 
@@ -81,9 +95,9 @@ The IP is HMAC-hashed with `SESSION_SECRET`; only the hash and timestamps are st
 with a one-hour expiry. Changing `SESSION_SECRET` resets identities. People sharing
 a public IP share limits; different IPs have independent limits. Localhost uses a
 loopback identity if Oxygen's header is absent. Client forwarding headers are ignored.
-Run `node --env-file=.env scripts/check-contact-redis.mjs` to verify the real Redis
+Run `node --env-file=tmp/.env.integration scripts/check-contact-redis.mjs` to verify the real Redis
 script using isolated temporary keys, including concurrent requests and rolling
-hour expiry, without sending emails. Test keys are removed after the check.
+hour expiry, without sending emails. The script attempts cleanup in `finally`; use the isolated-resource procedure in [verification](guides/verification.md).
 
 ## Newsletter
 
@@ -92,7 +106,7 @@ to Shopify Customers. Configure `SHOPIFY_ADMIN_CLIENT_ID` and
 `SHOPIFY_ADMIN_CLIENT_SECRET` for an installed app in the same Shopify organization
 with `write_customers` and customer email access, plus the shared Upstash
 configuration. See [newsletter setup](guides/newsletter-setup.md) for activation,
-segments and Shopify Messaging sender setup. Run `node scripts/check-newsletter.mjs`
+segments and Shopify Messaging sender setup. Run `node --experimental-strip-types scripts/check-newsletter.mjs`
 for mocked subscription checks.
 
 ## Deployment
@@ -121,6 +135,10 @@ require the `PR checks` status before merging. The read-only inspection on
 an administrator must enable these rules before launch and confirm token
 permissions. See
 [deployment ownership and verification](guides/audits/2026-10-26/repair-3.md).
+
+For release identification, known-good selection and rollback limits, follow the
+[operations runbook](guides/operations.md). Operator names, the known-good
+deployment and the private Oxygen walkthrough still need owner confirmation.
 
 Before launch, connect the storefront domain to Oxygen, connect
 `checkout.<domain>` to the Online Store checkout, and set `PUBLIC_CHECKOUT_DOMAIN`

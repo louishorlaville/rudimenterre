@@ -1,8 +1,8 @@
 import type {Route} from './+types/[robots.txt]';
+import {getSeoOrigin} from '~/lib/seo';
 
 export function loader({request}: Route.LoaderArgs) {
-  const url = new URL(request.url);
-  const body = robotsTxtData({url: url.origin});
+  const body = robotsTxtData({url: getSeoOrigin(request)});
 
   return new Response(body, {
     status: 200,
@@ -25,9 +25,10 @@ ${generalDisallowRules({sitemapUrl})}
 User-agent: adsbot-google
 Disallow: /cart
 Disallow: /account
-Disallow: /search
-Allow: /search/
-Disallow: /search/?*
+Disallow: /fr/cart
+Disallow: /en/cart
+Disallow: /fr/account
+Disallow: /en/account
 
 User-agent: Nutch
 Disallow: /
@@ -55,6 +56,10 @@ Crawl-delay: 1
 function generalDisallowRules({sitemapUrl}: {sitemapUrl?: string}) {
   return `Disallow: /cart
 Disallow: /account
+Disallow: /fr/cart
+Disallow: /en/cart
+Disallow: /fr/account
+Disallow: /en/account
 Disallow: /collections/*sort_by*
 Disallow: /*/collections/*sort_by*
 Disallow: /collections/*+*
@@ -71,8 +76,6 @@ Disallow: /*/blogs/*+*
 Disallow: /*/blogs/*%2B*
 Disallow: /*/blogs/*%2b*
 Disallow: /policies/
-Disallow: /search
-Allow: /search/
-Disallow: /search/?*
+# Search remains crawlable so its noindex response can be read.
 ${sitemapUrl ? `Sitemap: ${sitemapUrl}` : ''}`;
 }

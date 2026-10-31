@@ -1,11 +1,10 @@
-﻿import {useLoaderData} from 'react-router';
+import {createPageSeo} from '~/lib/seo';
+import {useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).blogs.$blogHandle.$articleHandle';
 import {Image} from '~/components/CommerceMedia';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.article.title ?? ''} article`}];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -53,7 +52,7 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
 
   const article = blog.articleByHandle;
 
-  return {article};
+  return {article, seo: createPageSeo(request, {title: article.seo?.title || article.title + ' — Rudimenterre', description: article.seo?.description})};
 }
 
 /**
