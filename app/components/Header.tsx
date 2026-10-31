@@ -5,7 +5,7 @@ import type {HeaderQuery} from 'storefrontapi.generated';
 import {useAside} from './Aside';
 import {Brand} from './Brand';
 import {localizedPath, pagePath, UI_COPY} from '~/lib/editorial-content';
-import {localeFromPathname} from '~/lib/i18n';
+import {localeFromPathname, type StorefrontLocale} from '~/lib/i18n';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -34,13 +34,7 @@ export function Header({isLoggedIn}: HeaderProps) {
         >
           {locale === 'fr' ? 'EN' : 'FR'}
         </a>
-        <a href={`/${locale}/account`}>
-          <Suspense fallback={copy.signIn}>
-            <Await resolve={isLoggedIn} errorElement={copy.signIn}>
-              {(loggedIn) => (loggedIn ? copy.account : copy.signIn)}
-            </Await>
-          </Suspense>
-        </a>
+        <AccountLink locale={locale} isLoggedIn={isLoggedIn} />
         <CartToggle label={copy.cart} locale={locale} />
         <button
           className="menu-toggle"
@@ -131,6 +125,20 @@ export function HeaderMenu({
   );
 }
 
+export function MobileMenuUtilities({isLoggedIn}: {isLoggedIn: Promise<boolean>}) {
+  const locale = localeFromPathname(useLocation().pathname);
+  const {close} = useAside();
+  return (
+    <nav
+      className="mobile-menu-utilities"
+      aria-label={locale === 'fr' ? 'Outils' : 'Utilities'}
+    >
+      <AccountLink locale={locale} isLoggedIn={isLoggedIn} onClick={close} />
+      <CartToggle label={UI_COPY[locale].cart} locale={locale} showLabel />
+    </nav>
+  );
+}
+
 function HeaderSubmenu({
   label,
   links,
@@ -188,11 +196,36 @@ function HeaderSubmenu({
   );
 }
 
-function CartToggle({label, locale}: {label: string; locale: string}) {
-  return <CartCount label={label} locale={locale} />;
+function AccountLink({
+  locale,
+  isLoggedIn,
+  onClick,
+}: {
+  locale: StorefrontLocale;
+  isLoggedIn?: Promise<boolean>;
+  onClick?: () => void;
+}) {
+  const copy = UI_COPY[locale];
+  return (
+    <a href={`/${locale}/account`} onClick={onClick}>
+      <Suspense fallback={copy.signIn}>
+        <Await resolve={isLoggedIn} errorElement={copy.signIn}>
+          {(loggedIn) => (loggedIn ? copy.account : copy.signIn)}
+        </Await>
+      </Suspense>
+    </a>
+  );
 }
 
-function CartCount({label, locale}: {label: string; locale: string}) {
+function CartToggle({
+  label,
+  locale,
+  showLabel = false,
+}: {
+  label: string;
+  locale: string;
+  showLabel?: boolean;
+}) {
   const cart = useStorefrontCart();
   const {open} = useAside();
   const count = cart?.totalQuantity ?? 0;
@@ -206,8 +239,14 @@ function CartCount({label, locale}: {label: string; locale: string}) {
         open('cart');
       }}
     >
-      <CartIcon />
-      <span aria-hidden="true">{count}</span>
+      {showLabel ? (
+        `${label} (${count})`
+      ) : (
+        <>
+          <CartIcon />
+          <span aria-hidden="true">{count}</span>
+        </>
+      )}
     </a>
   );
 }
