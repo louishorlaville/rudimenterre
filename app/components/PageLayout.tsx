@@ -4,7 +4,7 @@ import {Aside} from './Aside';
 import {CartMain} from './CartMain';
 import {CartNotificationProvider} from './CartNotification';
 import {Footer} from './Footer';
-import {Header, HeaderMenu} from './Header';
+import {Header, HeaderMenu, MobileMenuUtilities} from './Header';
 import {localeFromPathname} from '~/lib/i18n';
 
 interface PageLayoutProps {
@@ -38,6 +38,7 @@ export function PageLayout({
         </Aside>
         <Aside type="mobile" heading="MENU">
           <HeaderMenu viewport="mobile" />
+          <MobileMenuUtilities isLoggedIn={isLoggedIn} />
         </Aside>
         <Header
           header={header}
