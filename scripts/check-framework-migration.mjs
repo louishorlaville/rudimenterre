@@ -248,7 +248,7 @@ globalThis.fetch = async (url, init) => {
   else if (/query EditorialPage\b/.test(body.query)) data = {metaobject: null};
   else if (/query AdoptionProducts\b/.test(body.query)) {
     const price = {amount: body.variables.country === 'FR' ? '568.00' : '698.00', currencyCode: body.variables.country === 'FR' ? 'EUR' : 'CAD'};
-    data = {collection: {products: {nodes: [{...product, availableForSale: true, priceRange: {minVariantPrice: price, maxVariantPrice: price}}]}}};
+    data = {collection: {products: {nodes: [{...product, handle: 'cuicui-gourmet', availableForSale: true, priceRange: {minVariantPrice: price, maxVariantPrice: price}}]}}};
   }
   else if (/query SitemapCount\b/.test(body.query))
     data = {sitemap: {pagesCount: {count: 1}}};
@@ -402,7 +402,7 @@ try {
     assert.equal(adoption.status, 200);
     const adoptionHtml = await adoption.text();
     assert.match(adoptionHtml, /href="[^"]*#adopt-kits"/);
-    assert.ok(adoptionHtml.includes(`href="/${locale}/products/fixture"`));
+    assert.ok(adoptionHtml.includes(`href="/${locale}/products/cuicui-gourmet"`));
     assert.ok(adoptionHtml.includes('698'));
     for (const code of ['fr-CA', 'en-CA', 'fr-FR', 'en-FR'])
       assert.ok(adoptionHtml.includes(`hrefLang="${code}"`) || adoptionHtml.includes(`hrefLang="${code.toLowerCase()}"`) || adoptionHtml.includes(`hreflang="${code}"`));

@@ -47,9 +47,7 @@ export default function Homepage() {
     {icon: '/images/rudimenterre/home-food-icon-5.png', title: fr?'poissons':'Fish', detail: fr?'et crustacés':'and shellfish'},
     {icon: '/images/rudimenterre/home-food-icon-6.png', title: fr?'viandes':'Meat', detail: fr?'et volailles':'and poultry'},
   ];
-  const openingRef = useRef<HTMLDivElement>(null);
-  const heroTrackRef = useRef<HTMLDivElement>(null);
-  const bannerRef = useRef<HTMLDivElement>(null);
+  const openingContentRef = useRef<HTMLDivElement>(null);
   const benefitScrollRef = useRef<HTMLElement>(null);
   const benefitTrackRef = useRef<HTMLDivElement>(null);
   const kitchenCompareRef = useRef<HTMLElement>(null);
@@ -127,97 +125,27 @@ export default function Homepage() {
   }, []);
 
   useEffect(() => {
-    const opening = openingRef.current;
-    const track = heroTrackRef.current;
-    const banner = bannerRef.current;
-    if (!opening || !track || !banner) return;
+    const openingContent = openingContentRef.current;
+    if (!openingContent) return;
 
+    const motion = window.matchMedia('(prefers-reduced-motion: no-preference)');
     let frame = 0;
-    let layout = {
-      headerHeight: 0,
-      bannerHeight: 0,
-      travel: 0,
-      trackTop: 0,
-    };
-
-    const measureBanner = () => {
-      const header = document.querySelector<HTMLElement>('.site-header');
-      const headerHeight = header?.getBoundingClientRect().height ?? 0;
-      const viewportHeight = window.innerHeight;
-      const sectionPreviewHeight = window.innerWidth <= 760
-        ? 72
-        : Math.min(180, viewportHeight * .2);
-      const heroHeight = Math.max(
-        512,
-        viewportHeight - headerHeight - sectionPreviewHeight,
-      );
-      const introLift = window.innerWidth <= 760
-        ? Math.max(80, Math.min(112, viewportHeight * .12))
-        : Math.max(112, Math.min(168, viewportHeight * .16));
-      opening.style.setProperty('--hero-height', `${heroHeight}px`);
-      const bannerHeight = banner.getBoundingClientRect().height;
-      const trackTop = track.getBoundingClientRect().top + window.scrollY;
-      const travel = Math.max(
-        0,
-        viewportHeight - headerHeight - bannerHeight,
-        heroHeight - introLift,
-      );
-      layout = {
-        headerHeight,
-        bannerHeight,
-        travel,
-        trackTop: track.getBoundingClientRect().top + window.scrollY,
-      };
-
-      track.style.setProperty('--banner-travel', `${travel}px`);
-      opening.style.setProperty('--banner-travel', `${travel}px`);
-      opening.style.setProperty('--banner-height', `${bannerHeight}px`);
-      opening.style.setProperty('--intro-lift', `${introLift}px`);
-      opening.style.setProperty('--banner-visible-height', `${bannerHeight * .6}px`);
-      banner.style.setProperty('--banner-top', `${headerHeight}px`);
-    };
-
-    const updateBanner = () => {
+    const update = () => {
       frame = 0;
-      if (window.innerWidth <= 760) {
-        // A short image drift keeps the mobile opening in normal document flow.
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        banner.style.setProperty('--mobile-banner-shift', `${reduced ? 0 : Math.min(24, Math.max(0, window.scrollY) * .08)}px`);
-        return;
-      }
-      if (CSS.supports('animation-timeline: scroll(root block)') && CSS.supports('animation-range: 0px 100vh')) return;
-      // Keep scroll updates transform-only. Changing the opening block's
-      // layout during scrolling lets scroll anchoring move the next section.
-      const scrollProgress = Math.max(
-        0,
-        window.scrollY - (layout.trackTop - layout.headerHeight),
-      );
-      const contentHold = Math.min(layout.travel, scrollProgress);
-      banner.style.setProperty('--banner-shift', `${scrollProgress}px`);
-      opening.style.setProperty('--content-hold', `${contentHold}px`);
+      if (!motion.matches) return;
+      openingContent.style.setProperty('--opening-scroll', `${Math.max(0, window.scrollY)}px`);
     };
-    const scheduleBannerUpdate = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(updateBanner);
-    };
-    const measureAndUpdate = () => {
-      measureBanner();
-      scheduleBannerUpdate();
+    const scheduleUpdate = () => {
+      if (!frame && motion.matches) frame = requestAnimationFrame(update);
     };
 
-    measureAndUpdate();
-    // Styles can settle after hydration; refresh the initial geometry then too.
-    const resizeObserver = new ResizeObserver(measureAndUpdate);
-    const header = document.querySelector<HTMLElement>('.site-header');
-    if (header) resizeObserver.observe(header);
-    resizeObserver.observe(banner);
-    window.addEventListener('scroll', scheduleBannerUpdate, {passive: true});
-    window.addEventListener('resize', measureAndUpdate);
+    scheduleUpdate();
+    motion.addEventListener('change', scheduleUpdate);
+    window.addEventListener('scroll', scheduleUpdate, {passive: true});
     return () => {
       cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-      window.removeEventListener('scroll', scheduleBannerUpdate);
-      window.removeEventListener('resize', measureAndUpdate);
+      motion.removeEventListener('change', scheduleUpdate);
+      window.removeEventListener('scroll', scheduleUpdate);
     };
   }, []);
 
@@ -380,40 +308,46 @@ export default function Homepage() {
   }, []);
 
   return <div className="home">
-    <div className="home-opening" ref={openingRef}>
-      <div className="home-hero-track" ref={heroTrackRef}>
-        <section className="home-hero">
-          <div className="home-hero__copy">
-            <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
-            <p className="home-hero__lead">{fr ? <>un relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
-            <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+    <div className="home-opening">
+      <div className="home-opening__track">
+        <div className="home-opening__content" ref={openingContentRef}>
+          <div className="home-opening__panorama" aria-hidden="true">
+            <div className="home-banner">
+              <img src="/images/rudimenterre/home-banner.jpg" alt="" />
+            </div>
           </div>
-          <div className="home-banner" ref={bannerRef} aria-hidden="true">
-            <img src="/images/rudimenterre/home-banner.jpg" alt="" />
-          </div>
-        </section>
-      </div>
 
-      <div className="home-opening__content">
-        <div className="home-intro__product">
-          <img src="/images/rudimenterre/home-hero-uncapped.webp" width="1209" height="1300" alt={fr ? 'Le Cuicui Rudimenterre sans bouchon' : 'The Rudimenterre Cuicui with its chimney uncapped'} />
-          <div className="home-intro__smoke" aria-hidden="true">
-            <span /><span /><span /><span /><span /><span /><span /><span />
-          </div>
+          <section className="home-hero">
+            <div className="home-hero__copy">
+              <div className="home-hero__text">
+                <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
+                <p className="home-hero__lead">{fr ? <>un relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
+                <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+              </div>
+              <Link className="button button--light home-hero__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
+            </div>
+            <div className="home-intro__product">
+              <img src="/images/rudimenterre/home-hero-uncapped.webp" width="1209" height="1300" alt={fr ? 'Le Cuicui Rudimenterre sans bouchon' : 'The Rudimenterre Cuicui with its chimney uncapped'} />
+              <div className="home-intro__smoke" aria-hidden="true">
+                <span /><span /><span /><span /><span /><span /><span /><span />
+              </div>
+            </div>
+          </section>
+
+          <section className="home-intro">
+            <div className="home-intro__media">
+              <img src="/images/rudimenterre/home-life.webp" alt={fr ? 'Le Cuicui utilisé dans une cuisine' : 'The Cuicui being used in a kitchen'} loading="lazy" />
+            </div>
+            <div className="home-intro__copy">
+              <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
+              <h2>{fr?'Une autre approche de l’organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
+              {fr ? <p><strong>La cuisine du quotidien</strong> n’est pas une performance du dimanche : c’est <strong>s’organiser avec bon sens.</strong> C’est l’art de <strong>relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br/><strong>On n’exécute pas, on réfléchit pour nous libérer</strong> des contraintes du quotidien qui nous rendent créatifs.</p>
+                : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
+            </div>
+          </section>
         </div>
-        <section className="home-intro">
-          <div className="home-intro__media">
-            <Link className="button button--light home-intro__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
-            <img src="/images/rudimenterre/home-life.webp" alt={fr ? 'Le Cuicui utilisé dans une cuisine' : 'The Cuicui being used in a kitchen'} loading="lazy" />
-          </div>
-          <div className="home-intro__copy">
-            <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
-            <h2>{fr?'Une autre approche de l’organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
-            {fr ? <p><strong>La cuisine du quotidien</strong> n’est pas une performance du dimanche : c’est <strong>s’organiser avec bon sens.</strong> C’est l’art de <strong>relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br/><strong>On n’exécute pas, on réfléchit pour nous libérer</strong> des contraintes du quotidien qui nous rendent créatifs.</p>
-              : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
-          </div>
-        </section>
-
+      </div>
+      <div>
         <section className="home-banner-feature" aria-label={fr?'Atouts du Cuicui':'Cuicui benefits'}>
           <div className="home-icon-strip home-icon-strip--benefits">
             {iconBenefits.map((benefit) => <article key={benefit.title}>
