@@ -8,6 +8,7 @@ export type AdoptionProduct = {
   handle: string;
   title: string;
   availableForSale: boolean;
+  featuredImage?: {url: string; altText?: string | null; width?: number | null; height?: number | null} | null;
   priceRange: {
     minVariantPrice: {amount: string; currencyCode: string};
     maxVariantPrice: {amount: string; currencyCode: string};
@@ -37,13 +38,12 @@ export function AdoptPage({content, locale, heroImage, products = [], country = 
               ? (fr ? `${products.length} kits au choix` : `Choose from ${products.length} kits`)
               : (fr ? 'Aucun kit disponible pour le moment.' : 'No kits available at the moment.')}
           </p>
-          {/* The supplied V2 artwork is used as a sprite for its product photography only. */}
-          <div className="adopt-products-art" role="img" aria-label={fr ? 'Les kits Cuicui en terre cuite' : 'Terracotta Cuicui kits'}>
-            <img src="/images/rudimenterre/adopt-options.webp" alt="" loading="lazy" />
-          </div>
           <div className="adopt-kits" id="adopt-kits">
             {products.map((product) => (
               <div key={product.id}>
+                {product.featuredImage && (
+                  <img className="adopt-kit__image" src={product.featuredImage.url} alt={product.featuredImage.altText || product.title} width={product.featuredImage.width || undefined} height={product.featuredImage.height || undefined} loading="lazy" />
+                )}
                 <h3>{product.title}</h3>
                 <p>
                   {product.priceRange.minVariantPrice.amount !== product.priceRange.maxVariantPrice.amount && (fr ? 'À partir de ' : 'From ')}

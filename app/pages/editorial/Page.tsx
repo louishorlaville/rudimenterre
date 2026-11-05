@@ -99,7 +99,9 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     locale,
     content,
     heroImage,
-    products: catalog?.collection?.products.nodes ?? [],
+    products: (catalog?.collection?.products.nodes ?? []).filter(
+      (product) => ['explorateur-cuicui', 'cuicui-gourmet'].includes(product.handle),
+    ),
     country: getLocaleFromRequest(request).country,
     seo: createPageSeo(request, {
       title: content.title + ' — Rudimenterre',
@@ -151,6 +153,7 @@ const ADOPTION_PRODUCTS_QUERY = `#graphql
       products(first: 50) {
         nodes {
           id handle title availableForSale
+          featuredImage { url altText width height }
           priceRange {
             minVariantPrice { amount currencyCode }
             maxVariantPrice { amount currencyCode }

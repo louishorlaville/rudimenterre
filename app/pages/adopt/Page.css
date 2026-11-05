@@ -19,10 +19,9 @@
 .adopt-registration-status { margin: 24px auto 0; font-size: 14px; }
 .adopt-option h2 { margin: 36px 0 10px; font-size: clamp(23px, 2.2vw, 34px); line-height: 1.2; text-transform: uppercase; }
 .adopt-option__description { max-width: 510px; margin: 0 auto; font-style: italic; font-size: clamp(16px, 1.5vw, 23px); line-height: 1.55; }
-.adopt-products-art, .adopt-vital-art { position: relative; overflow: hidden; }
-.adopt-products-art { aspect-ratio: 635 / 240; margin: 34px auto 35px; width: 100%; }
-.adopt-products-art img { position: absolute; max-width: none; width: 216.693%; left: -3.15%; top: -462.5%; }
-.adopt-kits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.adopt-vital-art { position: relative; overflow: hidden; }
+.adopt-kits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 34px; }
+.adopt-kit__image { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; margin-bottom: 20px; }
 .adopt-kits h3, .adopt-kits p { margin: 0; font-size: clamp(16px, 1.65vw, 25px); line-height: 1.45; }
 .adopt-kits p { font-size: clamp(16px, 1.5vw, 23px); }
 .adopt-kit__link { display: inline-flex; min-height: 44px; align-items: center; margin-top: 14px; padding: 8px 14px; border: 1px solid var(--ink); border-radius: 999px; font-size: .75rem; font-weight: 600; line-height: 1.2; text-transform: uppercase; letter-spacing: .06em; }
@@ -36,6 +35,6 @@
   .adopt-option { padding: 44px 20px 48px; }
   .adopt-page .adopt-option__button { min-height: 52px; padding: 12px 18px; }
   .adopt-option h2 { margin-top: 28px; }
-  .adopt-products-art { margin: 28px auto 20px; }
+  .adopt-kits { margin-top: 28px; }
   .adopt-vital-art { width: 48%; margin-top: 36px; }
 }
