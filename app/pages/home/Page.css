@@ -262,13 +262,24 @@ body:has(#main-content > .home) .site-header {
   --opening-product-height: max(11rem, calc(var(--opening-stage-height) * .37));
   position: relative;
   height: var(--opening-product-height);
-  background: #000;
+  background: var(--cream);
+}
+
+.home-intro__product::before {
+  content: '';
+  position: absolute;
+  inset-block: clamp(.75rem, 1.4vw, 1.25rem) -2.5rem;
+  inset-inline: 0;
+  width: min(calc(100% - 2 * clamp(1rem, 4vw, 3rem)), calc(var(--opening-reference-height, 100svh) * .5));
+  margin-inline: auto;
+  border-radius: 999px 999px 0 0;
+  background: var(--ink);
 }
 
 .home-intro__pot {
   position: absolute;
   inset-inline: 0;
-  bottom: -16%;
+  bottom: -8%;
   width: min(84%, calc(var(--opening-product-height) * 1.05 * 1209 / 1300));
   margin-inline: auto;
 }
@@ -283,8 +294,10 @@ body:has(#main-content > .home) .site-header {
   position: absolute;
   left: 61%;
   top: 11.1%;
-  width: 22%;
-  height: 28%;
+  width: 32%;
+  height: 9%;
+  overflow: clip;
+  mask-image: radial-gradient(ellipse 50% 72% at 50% 72%, #000 28%, transparent 100%);
   transform: translate(-50%, -100%);
   pointer-events: none;
 }
@@ -312,19 +325,19 @@ body:has(#main-content > .home) .site-header {
     radial-gradient(ellipse at 48% 48%, rgba(148, 160, 150, .28), transparent 74%);
   transform-origin: 50% 100%;
   opacity: 0;
-  animation: cuicui-smoke-rise 1.4s linear infinite;
+  animation: cuicui-smoke-rise 2.8s linear infinite;
 }
-.home-intro__smoke > span:nth-child(2) { --steam-drift: -18%; animation-delay: -.175s; }
-.home-intro__smoke > span:nth-child(3) { --steam-drift: 22%; animation-delay: -.35s; }
-.home-intro__smoke > span:nth-child(4) { --steam-drift: -12%; animation-delay: -.525s; }
-.home-intro__smoke > span:nth-child(5) { --steam-drift: 8%; animation-delay: -.7s; }
-.home-intro__smoke > span:nth-child(6) { --steam-drift: -16%; animation-delay: -.875s; }
-.home-intro__smoke > span:nth-child(7) { --steam-drift: 18%; animation-delay: -1.05s; }
-.home-intro__smoke > span:nth-child(8) { --steam-drift: -8%; animation-delay: -1.225s; }
+.home-intro__smoke > span:nth-child(2) { --steam-drift: -18%; animation-delay: -.35s; }
+.home-intro__smoke > span:nth-child(3) { --steam-drift: 22%; animation-delay: -.7s; }
+.home-intro__smoke > span:nth-child(4) { --steam-drift: -12%; animation-delay: -1.05s; }
+.home-intro__smoke > span:nth-child(5) { --steam-drift: 8%; animation-delay: -1.4s; }
+.home-intro__smoke > span:nth-child(6) { --steam-drift: -16%; animation-delay: -1.75s; }
+.home-intro__smoke > span:nth-child(7) { --steam-drift: 18%; animation-delay: -2.1s; }
+.home-intro__smoke > span:nth-child(8) { --steam-drift: -8%; animation-delay: -2.45s; }
 @keyframes cuicui-smoke-rise {
   0% { opacity: 0; filter: blur(1px); transform: translate(0, 0) scale(.16, .45); }
   12% { opacity: .4; filter: blur(1.8px); transform: translate(0, -20%) scale(.5, .85); }
-  38% { opacity: .35; filter: blur(3px); transform: translate(var(--steam-drift), -85%) scale(1.2, 1.3) rotate(-4deg); }
+  38% { opacity: .35; filter: blur(3px); transform: translate(var(--steam-drift), -85%) scale(1.5, 1.3) rotate(-4deg); }
   68% { opacity: .225; filter: blur(5px); transform: translate(calc(var(--steam-drift) * -.4), -170%) scale(2.1, 1.8) rotate(7deg); }
   100% { opacity: 0; filter: blur(8px); transform: translate(var(--steam-drift), -255%) scale(3, 2.2) rotate(-3deg); }
 }
@@ -339,7 +352,8 @@ body:has(#main-content > .home) .site-header {
 }
 
 .home-intro__heading {
-  padding-block: clamp(2rem, 5svh, 3.5rem) .75rem;
+  /* Tangerine capitals extend above their line box. */
+  padding-block: calc(2.5rem + clamp(1.5rem, 2vw, 2rem) + .5rem) .75rem;
 }
 
 .home-intro .script {
@@ -350,7 +364,7 @@ body:has(#main-content > .home) .site-header {
 
 .home-intro h2 {
   max-width: 27ch;
-  margin: clamp(.85rem, 2.5svh, 1.8rem) 0 0;
+  margin: clamp(1rem, 2vw, 2rem) 0 0;
   font-size: clamp(1.25rem, min(2.15vw, 4svh), 2.3rem);
   line-height: 1.14;
   text-transform: uppercase;
@@ -465,14 +479,12 @@ body:has(#main-content > .home) .site-header {
   }
 
   .home-intro__pot {
-    bottom: -14%;
+    bottom: -8%;
     width: min(84%, calc(var(--opening-reference-height) * .375));
     transform: translateX(-12%);
   }
 
-  .home-intro__heading {
-    padding-block-start: clamp(2rem, calc(var(--opening-reference-height) * .052), 4.25rem);
-  }
+  .home-intro__smoke { height: 20%; }
 
   .home-intro .script {
     font-size: clamp(2rem, calc(var(--opening-reference-height) * .05), 3.5rem);
@@ -480,7 +492,6 @@ body:has(#main-content > .home) .site-header {
 
   .home-intro h2 {
     max-width: 26ch;
-    margin-block-start: clamp(1rem, calc(var(--opening-reference-height) * .06), 3.75rem);
     font-size: clamp(1.25rem, calc(var(--opening-reference-height) * .026), 2.3rem);
   }
 
