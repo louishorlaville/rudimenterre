@@ -305,6 +305,13 @@
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
+.product--desktop .product-main__intro {
+  container-type: inline-size;
+}
+.product--desktop .product-main .product-title--single-line {
+  font-size: min(6rem, 8cqi);
+  white-space: nowrap;
+}
 .product--desktop .product-price {
   font-family: var(--font-display);
   margin-bottom: 1.5rem;

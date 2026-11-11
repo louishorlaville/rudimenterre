@@ -321,8 +321,9 @@ export default function Homepage() {
             <div className="home-hero__copy">
               <div className="home-hero__text">
                 <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
-                <p className="home-hero__lead">{fr ? <>un relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
-                <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+                <p className="home-hero__lead">{fr ? <>relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
+                <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons saines et durables.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+                {fr && <p className="script">Bienvenue dans la cuisine du futur</p>}
               </div>
               <Link className="button button--light home-hero__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
             </div>
@@ -339,9 +340,9 @@ export default function Homepage() {
               <img src="/images/rudimenterre/home-life.webp" alt={fr ? 'Le Cuicui utilisé dans une cuisine' : 'The Cuicui being used in a kitchen'} loading="lazy" />
             </div>
             <div className="home-intro__copy">
-              <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
-              <h2>{fr?'Une autre approche de l’organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
-              {fr ? <p><strong>La cuisine du quotidien</strong> n’est pas une performance du dimanche : c’est <strong>s’organiser avec bon sens.</strong> C’est l’art de <strong>relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br/><strong>On n’exécute pas, on réfléchit pour nous libérer</strong> des contraintes du quotidien qui nous rendent créatifs.</p>
+              <p className="script">{fr?'Solidaire, économe, créative':'Welcome to the kitchen of the future'}</p>
+              <h2>{fr?'Une autre organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
+              {fr ? <p><strong>Qui s’organise avec bon sens pour relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br />Parce que la cuisine du quotidien n’est pas une performance du dimanche.<br /><strong>On n’exécute pas, on réfléchit pour créer et nous libérer</strong> de nos contraintes.</p>
                 : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
             </div>
           </section>
@@ -783,8 +784,8 @@ export default function Homepage() {
         {[
           {tone: 'forest', image: 'home-discover-award.png', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
           {tone: 'blue', image: 'home-discover-kit.png', to: pagePath(locale, 'vadrouille'), title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
-          {tone: 'mint', image: 'project-flag.png', crop: {viewBox: '205 663 1090 1119', width: 1512, height: 2016}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui 100% français' : 'The Rudimenterre project\nA 100% French Cuicui'},
-          {tone: 'white', image: 'home-discover-making.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
+          {tone: 'mint', image: 'home-discover-eu-flag.png', crop: {viewBox: '0 0 1269 1500', width: 1269, height: 2044}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui européen' : 'The Rudimenterre project\nA European Cuicui'},
+          {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
           {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
           {tone: 'charcoal', image: 'home-discover-professional.png', crop: {viewBox: '1060 911 1939 1835', width: 4032, height: 3024}, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
         ].map((card) => (
@@ -928,7 +929,7 @@ export default function Homepage() {
           className="button button--light home-project-banner__cta"
           to={pagePath(locale, 'project')}
         >
-          {fr ? 'Un Cuicui 100% français' : 'A 100% French Cuicui'}
+          {fr ? 'Un Cuicui européen' : 'A European Cuicui'}
         </Link>
       </div>
     </section>

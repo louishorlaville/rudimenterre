@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import {Suspense, type SyntheticEvent} from 'react';
 import {Await, NavLink, useLocation} from 'react-router';
 import {useStorefrontCart} from '~/lib/cart';
 import type {HeaderQuery} from 'storefrontapi.generated';
@@ -11,6 +11,10 @@ interface HeaderProps {
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+}
+
+function markHeaderCtaInteracted(event: SyntheticEvent<HTMLAnchorElement>) {
+  event.currentTarget.classList.add('button--interacted');
 }
 
 export function Header({isLoggedIn}: HeaderProps) {
@@ -87,7 +91,7 @@ export function HeaderMenu({
     >
       <NavLink
         onClick={close}
-        to={`/${locale}/adoptez`}
+        to={`/${locale}/products/cuicui-pragmatique`}
         prefetch="intent"
       >
         {locale === 'fr' ? 'Le Cuicui' : 'Cuicui'}
@@ -116,6 +120,8 @@ export function HeaderMenu({
       <NavLink
         className="button button--orange header-cta"
         onClick={close}
+        onPointerEnter={markHeaderCtaInteracted}
+        onFocus={markHeaderCtaInteracted}
         to={pagePath(locale, 'adopt')}
         prefetch="intent"
       >

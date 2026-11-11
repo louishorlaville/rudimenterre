@@ -1,6 +1,14 @@
 import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 
+function ProjectFlag({className}: {className?: string}) {
+  return (
+    <svg className={className} viewBox="0 0 1269 1500" aria-hidden="true" focusable="false">
+      <image href="/images/rudimenterre/home-discover-eu-flag.png" width="1269" height="2044" />
+    </svg>
+  );
+}
+
 export function ProjectPage({content, locale, heroImage}: {
   content: EditorialPageContent;
   locale: StorefrontLocale;
@@ -21,22 +29,22 @@ export function ProjectPage({content, locale, heroImage}: {
 
       <section className="project-intro" aria-labelledby="project-intro-title">
         <div className="project-heading">
-          <img src="/images/rudimenterre/project-flag.png" alt="" aria-hidden="true" />
+          <ProjectFlag />
           <div>
             <h2 id="project-intro-title">{content.heroOverrides?.eyebrow || (fr ? 'LE PROJET' : 'THE PROJECT')}</h2>
-            <p>{content.heroOverrides?.intro || (fr ? 'UN CUICUI MADE IN FRANCE' : 'A CUICUI MADE IN FRANCE')}</p>
+            <p>{content.heroOverrides?.intro || (fr ? 'UN CUICUI EUROPÉEN' : 'A EUROPEAN CUICUI')}</p>
           </div>
-          <img className="project-heading__flag--right" src="/images/rudimenterre/project-flag.png" alt="" aria-hidden="true" />
+          <ProjectFlag className="project-heading__flag--right" />
         </div>
         {fr ? (
           <p className="project-copy project-copy--intro">
             <em>Imaginé au Canada, après 3 ans de R&amp;D et une fabrication à petite échelle pour tester le marché, l’intérêt que suscite le Cuicui ne fait que se renforcer.</em>{' '}
-            Aujourd’hui, nous souhaitons <strong>pouvoir offrir un Cuicui fabriqué en France</strong>, là où nous en avons le plus de demandes. Actuellement en processus de recherche de partenaire de fabrication, nous espérons <strong>proposer un Cuicui 100% français</strong> très bientôt.
+            Aujourd’hui, nous souhaitons <strong>pouvoir offrir un Cuicui fabriqué en Europe</strong>. Actuellement en processus de recherche de partenaire de fabrication, nous espérons <strong>proposer un Cuicui européen</strong> très bientôt.
           </p>
         ) : (
           <p className="project-copy project-copy--intro">
             <em>Imagined in Canada after three years of R&amp;D and small-scale production to test the market, the interest in Cuicui continues to grow.</em>{' '}
-            Today, we want to <strong>offer a Cuicui made in France</strong>, where demand is strongest. We are currently looking for a manufacturing partner and hope to <strong>offer a 100% French Cuicui</strong> very soon.
+            Today, we want to <strong>offer a Cuicui made in Europe</strong>. We are currently looking for a manufacturing partner and hope to <strong>offer a European Cuicui</strong> very soon.
           </p>
         )}
       </section>
