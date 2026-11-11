@@ -818,18 +818,22 @@ export default function Homepage() {
         {[
           {tone: 'forest', image: 'home-discover-award.png', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
           {tone: 'blue', image: 'home-discover-kit.png', to: pagePath(locale, 'vadrouille'), title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
-          {tone: 'mint', image: 'home-discover-eu-flag.png', crop: {viewBox: '0 0 1269 1500', width: 1269, height: 2044}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui européen' : 'The Rudimenterre project\nA European Cuicui'},
+          {tone: 'mint', image: 'home-discover-eu-flag-512.webp', mobileImage: 'home-discover-eu-flag-128.webp', imageHeight: 605, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui européen' : 'The Rudimenterre project\nA European Cuicui'},
           {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
           {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
-          {tone: 'charcoal', image: 'home-discover-professional.png', crop: {viewBox: '1060 911 1939 1835', width: 4032, height: 3024}, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
+          {tone: 'charcoal', image: 'home-discover-professional-512.webp', mobileImage: 'home-discover-professional-128.webp', imageHeight: 485, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
         ].map((card) => (
           <Link key={card.tone} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
             <div className="home-discover__illustration" aria-hidden="true">
-              {card.crop ? (
-                <svg viewBox={card.crop.viewBox} focusable="false">
-                  <image href={`/images/rudimenterre/${card.image}`} width={card.crop.width} height={card.crop.height} />
-                </svg>
-              ) : <img src={`/images/rudimenterre/${card.image}`} alt="" loading="lazy" />}
+              <img
+                src={`/images/rudimenterre/${card.image}`}
+                srcSet={card.mobileImage ? `/images/rudimenterre/${card.mobileImage} 128w, /images/rudimenterre/${card.image} 512w` : undefined}
+                sizes={card.mobileImage ? '(max-width: 760px) 64px, 260px' : undefined}
+                width={card.mobileImage ? 512 : undefined}
+                height={card.imageHeight}
+                alt=""
+                loading="lazy"
+              />
             </div>
             <h3>{card.title}</h3>
             <img className="home-discover__arrow" src="/images/rudimenterre/handdrawn-arrow.png" alt="" aria-hidden="true" loading="lazy" />
