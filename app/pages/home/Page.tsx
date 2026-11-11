@@ -455,7 +455,7 @@ export default function Homepage() {
         <p>{fr
           ? 'Inspirons-nous du passé pour réapprendre à nous organiser pour cuisiner comme hier avec moins. Je vous emmène au cœur de la cuisine du futur, entre saveurs retrouvées, sobriété et créativité, découvrir le potager médiéval revisité…'
           : 'Let the past teach us how to organise and cook with less once again. Come into the kitchen of the future—where rediscovered flavours, restraint and creativity meet a reimagined medieval kitchen garden.'}</p>
-        <Link className="button benefit-panel__cta" to={pagePath(locale,'project')}>{fr?'Visite guidée':'Guided tour'}</Link>
+        <Link className="button benefit-panel__cta" to={pagePath(locale,'garden')}>{fr?'Visite guidée':'Guided tour'}</Link>
       </article>
 
           </div>
