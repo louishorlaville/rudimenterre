@@ -1,37 +1,23 @@
-import {type FetcherWithComponents} from 'react-router';
-import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
+import type {ReactNode} from 'react';
+import type {OptimisticCartLineInput} from '~/lib/cart-types';
+import {CartForm, CartPendingButton} from './CartForm';
 
 export function AddToCartButton({
-  analytics,
   children,
   disabled,
   lines,
   onClick,
 }: {
-  analytics?: unknown;
-  children: React.ReactNode;
+  children: ReactNode;
   disabled?: boolean;
-  lines: Array<OptimisticCartLineInput>;
+  lines: OptimisticCartLineInput[];
   onClick?: () => void;
 }) {
   return (
-    <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
-      {(fetcher: FetcherWithComponents<any>) => (
-        <>
-          <input
-            name="analytics"
-            type="hidden"
-            value={JSON.stringify(analytics)}
-          />
-          <button
-            type="submit"
-            onClick={onClick}
-            disabled={disabled ?? fetcher.state !== 'idle'}
-          >
-            {children}
-          </button>
-        </>
-      )}
+    <CartForm action={CartForm.ACTIONS.LinesAdd} inputs={{lines}}>
+      <CartPendingButton disabled={disabled || !lines.length} onClick={onClick}>
+        {children}
+      </CartPendingButton>
     </CartForm>
   );
 }

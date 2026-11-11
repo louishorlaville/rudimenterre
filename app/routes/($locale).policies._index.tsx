@@ -1,1 +1,1 @@
-export {default, loader} from '~/pages/policies/Page';
+export {default, meta, loader} from '~/pages/policies/Page';

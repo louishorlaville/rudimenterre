@@ -66,6 +66,52 @@ export function HomeReviews({locale}: HomeReviewsProps) {
     setActivePage(getNearestPage(track, pageStarts));
   }, [pageStarts]);
 
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !isCarousel) return;
+
+    let drag: {pointerId: number; x: number; scrollLeft: number} | null = null;
+    const startDrag = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+      event.preventDefault();
+      drag = {
+        pointerId: event.pointerId,
+        x: event.clientX,
+        scrollLeft: track.scrollLeft,
+      };
+      track.classList.add('is-dragging');
+      track.setPointerCapture(event.pointerId);
+    };
+    const moveDrag = (event: PointerEvent) => {
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      event.preventDefault();
+      track.scrollLeft = drag.scrollLeft - (event.clientX - drag.x);
+    };
+    const endDrag = (event: PointerEvent) => {
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      drag = null;
+      track.classList.remove('is-dragging');
+      if (track.hasPointerCapture(event.pointerId))
+        track.releasePointerCapture(event.pointerId);
+    };
+
+    track.addEventListener('pointerdown', startDrag);
+    track.addEventListener('pointermove', moveDrag);
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('lostpointercapture', endDrag);
+    return () => {
+      track.removeEventListener('pointerdown', startDrag);
+      track.removeEventListener('pointermove', moveDrag);
+      track.removeEventListener('pointerup', endDrag);
+      track.removeEventListener('pointercancel', endDrag);
+      track.removeEventListener('lostpointercapture', endDrag);
+      track.classList.remove('is-dragging');
+      if (drag && track.hasPointerCapture(drag.pointerId))
+        track.releasePointerCapture(drag.pointerId);
+    };
+  }, [isCarousel]);
+
   useEffect(
     () => () => {
       if (scrollFrameRef.current)

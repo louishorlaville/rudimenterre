@@ -1,6 +1,6 @@
 import {Link, redirect, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).account.orders.$id';
-import {Money, Image} from '@shopify/hydrogen';
+import {Money, Image} from '~/components/CommerceMedia';
 import type {
   OrderLineItemFullFragment,
   OrderQuery,
@@ -28,7 +28,10 @@ export async function loader({params, context}: Route.LoaderArgs) {
   }
 
   const orderId = atob(params.id);
-  const {data, errors}: {data: OrderQuery; errors?: Array<{message: string}>} =
+  const {
+    data,
+    errors,
+  }: {data: OrderQuery | null; errors?: Array<{message: string}>} =
     await customerAccount.query(CUSTOMER_ORDER_QUERY, {
       variables: {
         orderId,

@@ -1,0 +1,47 @@
+.newsletter-page { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--paper); color: var(--ink); }
+.newsletter-photo { position: relative; min-height: 100%; overflow: hidden; background: var(--charcoal); }
+.newsletter-photo img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 52% 65%; }
+.newsletter-panel { display: flex; align-items: center; padding: clamp(3rem, 5vw, 5rem) clamp(1.5rem, 4vw, 5rem); }
+.newsletter-content { width: 100%; max-width: 32rem; margin-inline: auto; }
+.newsletter-eyebrow { margin: 0 0 1.5rem; font-size: .75rem; font-weight: 600; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase; }
+.newsletter-content h1 { max-width: 10ch; margin: 0; font-size: clamp(2.75rem, 4.3vw, 4.5rem); line-height: 1.02; text-wrap: balance; }
+.newsletter-intro { max-width: 34ch; margin: 1.5rem 0 2.5rem; font-size: 1.125rem; line-height: 1.6; }
+.newsletter-form { display: grid; gap: 1.5rem; font-size: 1rem; line-height: 1.5; }
+.newsletter-email { display: grid; gap: .625rem; }
+.newsletter-email > label, .newsletter-form legend { font-weight: 600; }
+.newsletter-email input { box-sizing: border-box; width: 100%; min-height: 3.5rem; padding: .875rem 1rem; border: 1px solid var(--ink); border-radius: 0; background: var(--white); color: var(--ink); font: inherit; caret-color: var(--clay); }
+.newsletter-email input::placeholder { color: #646055; opacity: 1; }
+.newsletter-form :is(input, button, a):focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.newsletter-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.newsletter-form legend { margin-bottom: .75rem; padding: 0; }
+.newsletter-interest { display: flex; align-items: center; gap: .875rem; min-height: 3.25rem; padding: .625rem 0; border-top: 1px solid rgba(23, 23, 23, .22); cursor: pointer; }
+.newsletter-interest:has(input:checked) { color: var(--ink); background: rgba(169, 211, 154, .2); }
+.newsletter-interest input { flex-shrink: 0; width: 1.125rem; height: 1.125rem; margin: 0; accent-color: var(--ink); }
+.newsletter-interest:last-of-type { border-bottom: 1px solid rgba(23, 23, 23, .22); }
+.newsletter-hint { margin: .75rem 0 0; font-size: .875rem; color: #59564e; }
+.newsletter-submit { --button-hover-bg: var(--ink); --button-hover-color: var(--white); min-height: 3.25rem; width: 100%; padding: .875rem 1.5rem; border: 2px solid var(--ink); background: #f47b00; color: var(--ink); font-size: 1rem; font-weight: 400; letter-spacing: 0; text-transform: none; cursor: pointer; }
+.newsletter-submit:hover, .newsletter-submit:focus-visible { color: var(--white); }
+.newsletter-submit:disabled { opacity: .6; cursor: default; }
+.newsletter-submit:disabled::before { display: none; }
+.newsletter-submit:disabled:hover { color: var(--ink); }
+.newsletter-availability { margin: -.75rem 0 0; font-size: .875rem; }
+.newsletter-consent { margin: 0; color: #59564e; font-size: .8125rem; line-height: 1.65; }
+.newsletter-consent a { text-decoration: underline; text-underline-offset: .2em; }
+.newsletter-error { margin: 0; color: #923022; font-size: .875rem; }
+.newsletter-email input[aria-invalid='true'] { border: 2px solid #923022; }
+.newsletter-success, .newsletter-preview { padding: 1rem; border: 1px solid var(--ink); background: var(--moss); line-height: 1.5; }
+.newsletter-success { margin: 0; }
+.newsletter-page ::selection { color: var(--paper); background: var(--clay); }
+@media (max-width: 48rem) {
+  .newsletter-page { grid-template-columns: minmax(0, 1fr); }
+  .newsletter-photo { min-height: 0; height: clamp(13rem, 42vw, 20rem); }
+  .newsletter-photo img { object-position: center 70%; }
+  .newsletter-panel { padding: 2.5rem var(--page-gutter) 3.5rem; }
+  .newsletter-content h1 { font-size: clamp(2.75rem, 8vw, 3.5rem); }
+  .newsletter-intro { margin-bottom: 2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .newsletter-submit { transition: none; }
+  .newsletter-submit::before { animation: none !important; }
+  .newsletter-submit:hover::before, .newsletter-submit:focus-visible::before { transform: none; }
+}

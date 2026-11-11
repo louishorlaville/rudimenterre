@@ -1,3 +1,4 @@
+import {createPageSeo} from '~/lib/seo';
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex -- Scrollable regions must remain keyboard focusable. */
 import {Link, redirect, useLoaderData} from 'react-router';
 import {useEffect, useRef, useState} from 'react';
@@ -12,23 +13,18 @@ import {HomeReviews} from '~/components/HomeReviews';
 import {pagePath} from '~/lib/editorial-content';
 import {isStorefrontLocale} from '~/lib/i18n';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const fr = data?.locale !== 'en';
-  return [
-    {title: fr ? 'Le Cuicui — Rudimenterre' : 'Cuicui — Rudimenterre'},
-    {name:'description',content:fr ? 'Le Cuicui, relais mobile de cuissons saines et durables.' : 'Cuicui, a mobile relay for healthy, sustainable cooking.'},
-    {tagName:'link',rel:'canonical',href:fr ? '/fr' : '/en'},
-    {tagName:'link',rel:'alternate',hrefLang:'fr-CA',href:'/fr'},
-    {tagName:'link',rel:'alternate',hrefLang:'en-CA',href:'/en'},
-  ];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader({params, context, request}: Route.LoaderArgs) {
-  if (!params.locale) throw redirect(`/fr${new URL(request.url).search}`);
+  if (!params.locale) throw redirect(`/fr${new URL(request.url).search}`, 301);
   const locale = params.locale.toLowerCase();
   if (!isStorefrontLocale(locale)) throw new Response(null,{status:404});
-  const response = await context.storefront.query(HOME_PRODUCT_QUERY,{cache:context.storefront.CacheShort()}).catch(() => ({products:{nodes:[]}}));
-  return {locale,product:response.products.nodes[0] ?? null};
+  const response = await context.storefront.query(HOME_PRODUCT_QUERY,{cache:context.storefront.CacheShort()}).catch(() => ({products:{nodes:[]}, shop: null}));
+  return {locale, product: response.products.nodes[0] ?? null, seo: createPageSeo(request, {
+    title: response.shop?.name || (locale === 'fr' ? 'Le Cuicui — Rudimenterre' : 'Cuicui — Rudimenterre'),
+    description: response.shop?.description || (locale === 'fr' ? 'Le Cuicui, relais mobile de cuissons saines et durables.' : 'Cuicui, a mobile relay for healthy, sustainable cooking.'),
+    staticAlternates: true,
+  })};
 }
 
 export default function Homepage() {
@@ -51,9 +47,7 @@ export default function Homepage() {
     {icon: '/images/rudimenterre/home-food-icon-5.png', title: fr?'poissons':'Fish', detail: fr?'et crustacés':'and shellfish'},
     {icon: '/images/rudimenterre/home-food-icon-6.png', title: fr?'viandes':'Meat', detail: fr?'et volailles':'and poultry'},
   ];
-  const openingRef = useRef<HTMLDivElement>(null);
-  const heroTrackRef = useRef<HTMLDivElement>(null);
-  const bannerRef = useRef<HTMLDivElement>(null);
+  const openingContentRef = useRef<HTMLDivElement>(null);
   const benefitScrollRef = useRef<HTMLElement>(null);
   const benefitTrackRef = useRef<HTMLDivElement>(null);
   const kitchenCompareRef = useRef<HTMLElement>(null);
@@ -131,89 +125,27 @@ export default function Homepage() {
   }, []);
 
   useEffect(() => {
-    const opening = openingRef.current;
-    const track = heroTrackRef.current;
-    const banner = bannerRef.current;
-    if (!opening || !track || !banner) return;
+    const openingContent = openingContentRef.current;
+    if (!openingContent) return;
 
+    const motion = window.matchMedia('(prefers-reduced-motion: no-preference)');
     let frame = 0;
-    let layout = {
-      headerHeight: 0,
-      bannerHeight: 0,
-      travel: 0,
-      trackTop: 0,
+    const update = () => {
+      frame = 0;
+      if (!motion.matches) return;
+      openingContent.style.setProperty('--opening-scroll', `${Math.max(0, window.scrollY)}px`);
+    };
+    const scheduleUpdate = () => {
+      if (!frame && motion.matches) frame = requestAnimationFrame(update);
     };
 
-    const measureBanner = () => {
-      const header = document.querySelector<HTMLElement>('.site-header');
-      const headerHeight = header?.getBoundingClientRect().height ?? 0;
-      const viewportHeight = window.innerHeight;
-      const sectionPreviewHeight = window.innerWidth <= 760
-        ? 72
-        : Math.min(180, viewportHeight * .2);
-      const heroHeight = Math.max(
-        512,
-        viewportHeight - headerHeight - sectionPreviewHeight,
-      );
-      const introLift = window.innerWidth <= 760
-        ? Math.max(80, Math.min(112, viewportHeight * .12))
-        : Math.max(112, Math.min(168, viewportHeight * .16));
-      const bannerHeight = banner.getBoundingClientRect().height;
-      const trackTop = track.getBoundingClientRect().top + window.scrollY;
-      const travel = Math.max(
-        0,
-        viewportHeight - headerHeight - bannerHeight,
-        heroHeight - introLift,
-      );
-      layout = {
-        headerHeight,
-        bannerHeight,
-        travel,
-        trackTop: track.getBoundingClientRect().top + window.scrollY,
-      };
-
-      track.style.setProperty('--hero-height', `${heroHeight}px`);
-      track.style.setProperty('--banner-travel', `${travel}px`);
-      opening.style.setProperty('--banner-travel', `${travel}px`);
-      opening.style.setProperty('--banner-height', `${bannerHeight}px`);
-      opening.style.setProperty('--intro-lift', `${introLift}px`);
-      opening.style.setProperty('--banner-visible-height', `${bannerHeight * .6}px`);
-      banner.style.setProperty('--banner-top', `${headerHeight}px`);
-    };
-
-    const updateBanner = () => {
-      if (window.innerWidth <= 760) {
-        // A short image drift keeps the mobile opening in normal document flow.
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        banner.style.setProperty('--mobile-banner-shift', `${reduced ? 0 : Math.min(24, Math.max(0, window.scrollY) * .08)}px`);
-        return;
-      }
-      // Keep scroll updates transform-only. Changing the opening block's
-      // layout during scrolling lets scroll anchoring move the next section.
-      const scrollProgress = Math.max(
-        0,
-        window.scrollY - (layout.trackTop - layout.headerHeight),
-      );
-      const contentHold = Math.min(layout.travel, scrollProgress);
-      banner.style.setProperty('--banner-shift', `${scrollProgress}px`);
-      opening.style.setProperty('--content-hold', `${contentHold}px`);
-    };
-    const scheduleBannerUpdate = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(updateBanner);
-    };
-    const measureAndUpdate = () => {
-      measureBanner();
-      scheduleBannerUpdate();
-    };
-
-    measureAndUpdate();
-    window.addEventListener('scroll', scheduleBannerUpdate, {passive: true});
-    window.addEventListener('resize', measureAndUpdate);
+    scheduleUpdate();
+    motion.addEventListener('change', scheduleUpdate);
+    window.addEventListener('scroll', scheduleUpdate, {passive: true});
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', scheduleBannerUpdate);
-      window.removeEventListener('resize', measureAndUpdate);
+      motion.removeEventListener('change', scheduleUpdate);
+      window.removeEventListener('scroll', scheduleUpdate);
     };
   }, []);
 
@@ -376,35 +308,47 @@ export default function Homepage() {
   }, []);
 
   return <div className="home">
-    <div className="home-opening" ref={openingRef}>
-      <div className="home-hero-track" ref={heroTrackRef}>
-        <section className="home-hero">
-          <div className="home-hero__copy">
-            <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
-            <p className="home-hero__lead">{fr ? <>un relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
-            <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons durables et nomades.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+    <div className="home-opening">
+      <div className="home-opening__track">
+        <div className="home-opening__content" ref={openingContentRef}>
+          <div className="home-opening__panorama" aria-hidden="true">
+            <div className="home-banner">
+              <img src="/images/rudimenterre/home-banner.jpg" alt="" />
+            </div>
           </div>
-          <div className="home-banner" ref={bannerRef} aria-hidden="true">
-            <img src="/images/rudimenterre/home-banner.jpg" alt="" />
-          </div>
-        </section>
+
+          <section className="home-hero">
+            <div className="home-hero__copy">
+              <div className="home-hero__text">
+                <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
+                <p className="home-hero__lead">{fr ? <>relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
+                <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons saines et durables.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+                {fr && <p className="script">Bienvenue dans la cuisine du futur</p>}
+              </div>
+              <Link className="button button--light home-hero__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
+            </div>
+            <div className="home-intro__product">
+              <img src="/images/rudimenterre/home-hero-uncapped.webp" width="1209" height="1300" alt={fr ? 'Le Cuicui Rudimenterre sans bouchon' : 'The Rudimenterre Cuicui with its chimney uncapped'} />
+              <div className="home-intro__smoke" aria-hidden="true">
+                <span /><span /><span /><span /><span /><span /><span /><span />
+              </div>
+            </div>
+          </section>
+
+          <section className="home-intro">
+            <div className="home-intro__media">
+              <img src="/images/rudimenterre/home-life.webp" alt={fr ? 'Le Cuicui utilisé dans une cuisine' : 'The Cuicui being used in a kitchen'} loading="lazy" />
+            </div>
+            <div className="home-intro__copy">
+              <p className="script">{fr?'Solidaire, économe, créative':'Welcome to the kitchen of the future'}</p>
+              <h2>{fr?'Une autre organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
+              {fr ? <p><strong>Qui s’organise avec bon sens pour relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br />Parce que la cuisine du quotidien n’est pas une performance du dimanche.<br /><strong>On n’exécute pas, on réfléchit pour créer et nous libérer</strong> de nos contraintes.</p>
+                : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
+            </div>
+          </section>
+        </div>
       </div>
-
-      <div className="home-opening__content">
-        <img className="home-intro__product" src="/images/rudimenterre/home-hero.webp" alt={fr ? 'Le Cuicui Rudimenterre entouré de légumes' : 'The Rudimenterre Cuicui surrounded by vegetables'} />
-        <section className="home-intro">
-          <div className="home-intro__media">
-            <Link className="button button--light home-intro__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
-            <img src="/images/rudimenterre/home-life.webp" alt={fr ? 'Le Cuicui utilisé dans une cuisine' : 'The Cuicui being used in a kitchen'} loading="lazy" />
-          </div>
-          <div className="home-intro__copy">
-            <p className="script">{fr?'Bienvenue dans la cuisine du futur':'Welcome to the kitchen of the future'}</p>
-            <h2>{fr?'Une autre approche de l’organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
-            {fr ? <p><strong>La cuisine du quotidien</strong> n’est pas une performance du dimanche : c’est <strong>s’organiser avec bon sens.</strong> C’est l’art de <strong>relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br/><strong>On n’exécute pas, on réfléchit pour nous libérer</strong> des contraintes du quotidien qui nous rendent créatifs.</p>
-              : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
-          </div>
-        </section>
-
+      <div>
         <section className="home-banner-feature" aria-label={fr?'Atouts du Cuicui':'Cuicui benefits'}>
           <div className="home-icon-strip home-icon-strip--benefits">
             {iconBenefits.map((benefit) => <article key={benefit.title}>
@@ -838,23 +782,23 @@ export default function Homepage() {
       </header>
       <div className="home-discover__grid">
         {[
-          {tone: 'forest', image: '', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
-          {tone: 'blue', image: 'home-kitchen-plate-cuicui.png', to: '#home-cuicui-news', title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
-          {tone: 'mint', image: '', to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui 100% français' : 'The Rudimenterre project\nA 100% French Cuicui'},
+          {tone: 'forest', image: 'home-discover-award.png', to: pagePath(locale, 'jury'), title: fr ? 'Le Cuicui récompensé\nGrand Prix du Design\n2024' : 'Award-winning Cuicui\nGrand Prix du Design\n2024'},
+          {tone: 'blue', image: 'home-discover-kit.png', to: pagePath(locale, 'vadrouille'), title: fr ? 'Le Cuicui en vadrouille\nVu dans la presse, TV…' : 'Cuicui on the road\nIn the press, on TV…'},
+          {tone: 'mint', image: 'home-discover-eu-flag.png', crop: {viewBox: '0 0 1269 1500', width: 1269, height: 2044}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui européen' : 'The Rudimenterre project\nA European Cuicui'},
           {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
-          {tone: 'sage', image: 'home-kitchen-plate-cuicui.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
-          {tone: 'charcoal', image: 'home-kitchen-plate-casserole.png', to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Pour les chefs du futur\nServices pro' : 'For the chefs of the future\nProfessional services'},
+          {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
+          {tone: 'charcoal', image: 'home-discover-professional.png', crop: {viewBox: '1060 911 1939 1835', width: 4032, height: 3024}, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
         ].map((card) => (
           <Link key={card.tone} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
             <div className="home-discover__illustration" aria-hidden="true">
-              {card.image ? <img src={`/images/rudimenterre/${card.image}`} alt="" loading="lazy" /> : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                  {card.tone === 'forest' ? <path d="M8 3h8v6a4 4 0 0 1-8 0V3ZM8 5H5v2a4 4 0 0 0 4 4m7-6h3v2a4 4 0 0 1-4 4m-3 2v5m-4 3h8m-7 0v-3h6v3" /> : <path d="M5 21V3m0 1c5-4 9 4 14 0v11c-5 4-9-4-14 0" />}
+              {card.crop ? (
+                <svg viewBox={card.crop.viewBox} focusable="false">
+                  <image href={`/images/rudimenterre/${card.image}`} width={card.crop.width} height={card.crop.height} />
                 </svg>
-              )}
+              ) : <img src={`/images/rudimenterre/${card.image}`} alt="" loading="lazy" />}
             </div>
             <h3>{card.title}</h3>
-            <svg className="home-discover__arrow" viewBox="0 0 32 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M3 12h25m-8-8 8 8-8 8" /></svg>
+            <img className="home-discover__arrow" src="/images/rudimenterre/handdrawn-arrow.png" alt="" aria-hidden="true" loading="lazy" />
           </Link>
         ))}
       </div>
@@ -966,6 +910,9 @@ export default function Homepage() {
           </p>
         </article>
       </div>
+      <Link className="button button--dark" to={pagePath(locale, 'vadrouille')}>
+        {fr ? 'Voir les sorties et la revue de presse' : 'See outings and press coverage'}
+      </Link>
     </section>
 
     <section className="home-project-banner" aria-labelledby="home-project-banner-title">
@@ -982,7 +929,7 @@ export default function Homepage() {
           className="button button--light home-project-banner__cta"
           to={pagePath(locale, 'project')}
         >
-          {fr ? 'Un Cuicui 100% français' : 'A 100% French Cuicui'}
+          {fr ? 'Un Cuicui européen' : 'A European Cuicui'}
         </Link>
       </div>
     </section>
@@ -1087,6 +1034,7 @@ export default function Homepage() {
 
 const HOME_PRODUCT_QUERY = `#graphql
  query HomeProduct($country: CountryCode, $language: LanguageCode) @inContext(country:$country,language:$language) {
+  shop { name description }
   products(first:1,sortKey:UPDATED_AT,reverse:true) { nodes { id title handle } }
  }
 ` as const;

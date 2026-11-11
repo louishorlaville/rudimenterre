@@ -19,6 +19,25 @@ export type PredictiveSearchReturn = ResultWithItems<
   NonNullable<PredictiveSearchQuery['predictiveSearch']>
 >;
 
+export function getEmptyRegularSearchResult(): RegularSearchReturn['result'] {
+  return {
+    total: 0,
+    items: {
+      articles: {nodes: []},
+      pages: {nodes: []},
+      products: {
+        nodes: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+      },
+    },
+  };
+}
+
 /**
  * Returns the empty state of a predictive search result to reset the search state.
  */
@@ -68,7 +87,7 @@ export function urlWithTrackingParams({
 }: UrlWithTrackingParams) {
   let search = new URLSearchParams({
     ...extraParams,
-    q: encodeURIComponent(term),
+    q: term,
   }).toString();
 
   if (trackingParams) {

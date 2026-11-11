@@ -1,10 +1,9 @@
-﻿import type {CustomerAddressInput} from '@shopify/hydrogen/customer-account-api-types';
+import type {CustomerAddressInput} from '@shopify/hydrogen/customer-account-api-types';
 import type {
   AddressFragment,
   CustomerFragment,
 } from 'customer-accountapi.generated';
 import {
-  data,
   Form,
   useActionData,
   useNavigation,
@@ -12,13 +11,21 @@ import {
   type Fetcher,
 } from 'react-router';
 import type {Route} from '../../routes/+types/($locale).account.addresses';
-import {useId} from 'react';
+import {useEffect, useId, useState} from 'react';
 import type {AccountContext, AccountLocale} from '~/pages/account/context';
-import {
-  UPDATE_ADDRESS_MUTATION,
-  DELETE_ADDRESS_MUTATION,
-  CREATE_ADDRESS_MUTATION,
-} from '~/graphql/customer-account/CustomerAddressMutations';
+
+const ADDRESS_FIELDS = [
+  'firstName',
+  'lastName',
+  'company',
+  'address1',
+  'address2',
+  'city',
+  'zoneCode',
+  'zip',
+  'countryCode',
+  'phoneNumber',
+] as const;
 
 export type ActionResponse = {
   addressId?: string | null;
@@ -27,6 +34,7 @@ export type ActionResponse = {
   deletedAddress?: string | null;
   error: Record<AddressFragment['id'], string> | null;
   updatedAddress?: AddressFragment;
+  phoneSyncWarning?: boolean;
 };
 
 export const meta: Route.MetaFunction = ({params}) => {
@@ -37,254 +45,6 @@ export async function loader({context}: Route.LoaderArgs) {
   await context.customerAccount.handleAuthStatus();
 
   return {};
-}
-
-export async function action({request, context}: Route.ActionArgs) {
-  const {customerAccount} = context;
-  const fr = new URL(request.url).pathname.split('/')[1] !== 'en';
-
-  try {
-    const form = await request.formData();
-
-    const addressId = form.has('addressId')
-      ? String(form.get('addressId'))
-      : null;
-    if (!addressId) {
-      throw new Error(
-        fr
-          ? 'Une adresse doit être sélectionnée.'
-          : 'You must provide an address id.',
-      );
-    }
-
-    // this will ensure redirecting to login never happen for mutatation
-    const isLoggedIn = await customerAccount.isLoggedIn();
-    if (!isLoggedIn) {
-      return data(
-        {
-          error: {
-            [addressId]: fr
-              ? 'Votre session a expiré. Reconnectez-vous.'
-              : 'Your session has expired. Sign in again.',
-          },
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-
-    const defaultAddress = form.has('defaultAddress')
-      ? String(form.get('defaultAddress')) === 'on'
-      : false;
-    const address: CustomerAddressInput = {};
-    const keys: (keyof CustomerAddressInput)[] = [
-      'address1',
-      'address2',
-      'city',
-      'company',
-      'territoryCode',
-      'firstName',
-      'lastName',
-      'phoneNumber',
-      'zoneCode',
-      'zip',
-    ];
-
-    for (const key of keys) {
-      const value = form.get(key);
-      if (typeof value === 'string') {
-        address[key] = value;
-      }
-    }
-
-    switch (request.method) {
-      case 'POST': {
-        // handle new address creation
-        try {
-          const {data, errors} = await customerAccount.mutate(
-            CREATE_ADDRESS_MUTATION,
-            {
-              variables: {
-                address,
-                defaultAddress,
-                language: customerAccount.i18n.language,
-              },
-            },
-          );
-
-          if (errors?.length) {
-            throw new Error(errors[0].message);
-          }
-
-          if (data?.customerAddressCreate?.userErrors?.length) {
-            throw new Error(data?.customerAddressCreate?.userErrors[0].message);
-          }
-
-          if (!data?.customerAddressCreate?.customerAddress) {
-            throw new Error(
-              fr
-                ? 'La création de l’adresse a échoué.'
-                : 'Address creation failed.',
-            );
-          }
-
-          return {
-            error: null,
-            createdAddress: data?.customerAddressCreate?.customerAddress,
-            defaultAddress,
-          };
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            return data(
-              {error: {[addressId]: error.message}},
-              {
-                status: 400,
-              },
-            );
-          }
-          return data(
-            {error: {[addressId]: error}},
-            {
-              status: 400,
-            },
-          );
-        }
-      }
-
-      case 'PUT': {
-        // handle address updates
-        try {
-          const {data, errors} = await customerAccount.mutate(
-            UPDATE_ADDRESS_MUTATION,
-            {
-              variables: {
-                address,
-                addressId: decodeURIComponent(addressId),
-                defaultAddress,
-                language: customerAccount.i18n.language,
-              },
-            },
-          );
-
-          if (errors?.length) {
-            throw new Error(errors[0].message);
-          }
-
-          if (data?.customerAddressUpdate?.userErrors?.length) {
-            throw new Error(data?.customerAddressUpdate?.userErrors[0].message);
-          }
-
-          if (!data?.customerAddressUpdate?.customerAddress) {
-            throw new Error(
-              fr
-                ? 'La mise à jour de l’adresse a échoué.'
-                : 'Address update failed.',
-            );
-          }
-
-          return {
-            error: null,
-            updatedAddress: address,
-            defaultAddress,
-          };
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            return data(
-              {error: {[addressId]: error.message}},
-              {
-                status: 400,
-              },
-            );
-          }
-          return data(
-            {error: {[addressId]: error}},
-            {
-              status: 400,
-            },
-          );
-        }
-      }
-
-      case 'DELETE': {
-        // handles address deletion
-        try {
-          const {data, errors} = await customerAccount.mutate(
-            DELETE_ADDRESS_MUTATION,
-            {
-              variables: {
-                addressId: decodeURIComponent(addressId),
-                language: customerAccount.i18n.language,
-              },
-            },
-          );
-
-          if (errors?.length) {
-            throw new Error(errors[0].message);
-          }
-
-          if (data?.customerAddressDelete?.userErrors?.length) {
-            throw new Error(data?.customerAddressDelete?.userErrors[0].message);
-          }
-
-          if (!data?.customerAddressDelete?.deletedAddressId) {
-            throw new Error(
-              fr
-                ? 'La suppression de l’adresse a échoué.'
-                : 'Address deletion failed.',
-            );
-          }
-
-          return {error: null, deletedAddress: addressId};
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            return data(
-              {error: {[addressId]: error.message}},
-              {
-                status: 400,
-              },
-            );
-          }
-          return data(
-            {error: {[addressId]: error}},
-            {
-              status: 400,
-            },
-          );
-        }
-      }
-
-      default: {
-        return data(
-          {
-            error: {
-              [addressId]: fr
-                ? 'Méthode non autorisée.'
-                : 'Method not allowed.',
-            },
-          },
-          {
-            status: 405,
-          },
-        );
-      }
-    }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return data(
-        {error: error.message},
-        {
-          status: 400,
-        },
-      );
-    }
-    return data(
-      {error},
-      {
-        status: 400,
-      },
-    );
-  }
 }
 
 export default function Addresses() {
@@ -340,7 +100,7 @@ function NewAddressForm({locale}: {locale: AccountLocale}) {
     address2: '',
     city: '',
     company: '',
-    territoryCode: '',
+    countryCode: undefined,
     firstName: '',
     id: 'new',
     lastName: '',
@@ -356,11 +116,11 @@ function NewAddressForm({locale}: {locale: AccountLocale}) {
       defaultAddress={null}
       locale={locale}
     >
-      {({stateForMethod}) => (
+      {({stateForMethod, hasChanges}) => (
         <div className="account-form-actions">
           <button
             className="account-button account-button--orange"
-            disabled={stateForMethod('POST') !== 'idle'}
+            disabled={stateForMethod('POST') !== 'idle' || !hasChanges}
             formMethod="POST"
             type="submit"
           >
@@ -396,11 +156,11 @@ function ExistingAddresses({
           defaultAddress={defaultAddress}
           locale={locale}
         >
-          {({stateForMethod}) => (
+          {({stateForMethod, hasChanges}) => (
             <div className="account-form-actions">
               <button
                 className="account-button account-button--orange"
-                disabled={stateForMethod('PUT') !== 'idle'}
+                disabled={stateForMethod('PUT') !== 'idle' || !hasChanges}
                 formMethod="PUT"
                 type="submit"
               >
@@ -447,12 +207,34 @@ export function AddressForm({
   locale: AccountLocale;
   children: (props: {
     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
+    hasChanges: boolean;
   }) => React.ReactNode;
 }) {
   const {state, formMethod} = useNavigation();
   const action = useActionData<ActionResponse>();
   const error = action?.error?.[addressId];
+  const saved =
+    action?.addressId === addressId &&
+    !action.error &&
+    (Boolean(action.createdAddress) || Boolean(action.updatedAddress));
   const isDefaultAddress = defaultAddress?.id === addressId;
+  const savedValues = JSON.stringify(
+    Object.fromEntries(
+      ADDRESS_FIELDS.map((name) => [name, address[name] ?? '']),
+    ),
+  );
+  const [values, setValues] = useState<Record<string, string>>(
+    () => JSON.parse(savedValues) as Record<string, string>,
+  );
+  const [makeDefault, setMakeDefault] = useState(isDefaultAddress);
+  useEffect(
+    () => setValues(JSON.parse(savedValues) as Record<string, string>),
+    [savedValues],
+  );
+  useEffect(() => setMakeDefault(isDefaultAddress), [isDefaultAddress]);
+  const hasChanges =
+    makeDefault !== isDefaultAddress ||
+    ADDRESS_FIELDS.some((name) => values[name] !== (address[name] ?? ''));
   const generatedId = useId();
   const fr = locale === 'fr';
   const field = (
@@ -479,12 +261,31 @@ export function AddressForm({
           type={type}
           autoComplete={autoComplete}
           placeholder={placeholder}
-          defaultValue={value ?? ''}
+          value={values[name] ?? value ?? ''}
+          onChange={(event) =>
+            setValues((previous) => ({...previous, [name]: event.target.value}))
+          }
+          disabled={state !== 'idle'}
           required={required}
           maxLength={maxLength}
           pattern={pattern}
+          title={
+            name === 'phoneNumber'
+              ? fr
+                ? 'Entrez un numéro avec son indicatif, par exemple +1 514 833-9722.'
+                : 'Enter a number with its country code, for example +1 514 833-9722.'
+              : undefined
+          }
+          aria-describedby={name === 'phoneNumber' ? `${id}-hint` : undefined}
           aria-label={label}
         />
+        {name === 'phoneNumber' ? (
+          <small id={`${id}-hint`}>
+            {fr
+              ? 'Indicatif du pays recommandé. Espaces et tirets acceptés, par ex. : +1 514 833-9722.'
+              : 'Country code recommended. Spaces and hyphens are accepted, e.g. +1 514 833-9722.'}
+          </small>
+        ) : null}
       </div>
     );
   };
@@ -566,24 +367,24 @@ export function AddressForm({
             true,
           )}
           {field(
-            'territoryCode',
+            'countryCode',
             fr ? 'Pays (code)' : 'Country code',
             fr ? 'Ex. CA ou FR' : 'e.g. CA or US',
             'country',
-            address?.territoryCode,
+            address?.countryCode,
             true,
             2,
           )}
           {field(
             'phoneNumber',
             fr ? 'Téléphone' : 'Phone',
-            '+1 613 555-0111',
+            fr ? 'Ex. : +1 514 833-9722' : 'e.g. +1 514 833-9722',
             'tel',
             address?.phoneNumber,
             false,
             undefined,
             'tel',
-            '^\\+?[1-9]\\d{3,14}$',
+            '^\\+?[0-9\\s().-]{7,20}$',
           )}
         </div>
         <label
@@ -591,7 +392,9 @@ export function AddressForm({
           htmlFor={`${generatedId}-defaultAddress`}
         >
           <input
-            defaultChecked={isDefaultAddress}
+            checked={makeDefault}
+            onChange={(event) => setMakeDefault(event.target.checked)}
+            disabled={state !== 'idle'}
             id={`${generatedId}-defaultAddress`}
             name="defaultAddress"
             type="checkbox"
@@ -605,8 +408,27 @@ export function AddressForm({
             <small>{error}</small>
           </p>
         ) : null}
+        {saved && state === 'idle' ? (
+          <p className="account-form-success" role="status">
+            <small>
+              {fr
+                ? 'Votre adresse a bien été enregistrée.'
+                : 'Your address has been saved.'}
+            </small>
+          </p>
+        ) : null}
+        {saved && action?.phoneSyncWarning && state === 'idle' ? (
+          <p className="account-form-error" role="alert">
+            <small>
+              {fr
+                ? 'Votre adresse est enregistrée, mais votre numéro de contact n’a pas pu être mis à jour.'
+                : 'Your address is saved, but your contact phone number could not be updated.'}
+            </small>
+          </p>
+        ) : null}
         {children({
           stateForMethod: (method) => (formMethod === method ? state : 'idle'),
+          hasChanges,
         })}
       </fieldset>
     </Form>

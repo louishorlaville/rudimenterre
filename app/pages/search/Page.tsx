@@ -1,36 +1,53 @@
 ﻿import {useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).search';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
+import {getPaginationVariables} from '~/components/Pagination';
+import {Analytics} from '~/components/Analytics';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
 import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
   getEmptyPredictiveSearchResult,
+  getEmptyRegularSearchResult,
 } from '~/lib/search';
+import {localeFromPathname} from '~/lib/i18n';
 import type {
   RegularSearchQuery,
   PredictiveSearchQuery,
 } from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: 'Search — Rudimenterre'}, {name: 'robots', content: 'noindex, follow'}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
   const url = new URL(request.url);
   const isPredictive = url.searchParams.has('predictive');
-  const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> =
-    isPredictive
+  try {
+    return await (isPredictive
       ? predictiveSearch({request, context})
-      : regularSearch({request, context});
-
-  searchPromise.catch((error: Error) => {
+      : regularSearch({request, context}));
+  } catch (error) {
     console.error(error);
-    return {term: '', result: null, error: error.message};
-  });
-
-  return await searchPromise;
+    const fallback = {
+      term: (url.searchParams.get('q') ?? '').trim(),
+      error:
+        localeFromPathname(url.pathname) === 'en'
+          ? 'Search is unavailable. Please try again.'
+          : 'La recherche est indisponible. Veuillez réessayer.',
+    };
+    return isPredictive
+      ? {
+          ...fallback,
+          type: 'predictive' as const,
+          result: getEmptyPredictiveSearchResult(),
+        }
+      : {
+          ...fallback,
+          type: 'regular' as const,
+          result: getEmptyRegularSearchResult(),
+        };
+  }
 }
 
 /**
@@ -59,7 +76,7 @@ export default function SearchPage() {
         )}
       </SearchForm>
       {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
+      {error ? null : !term || !result?.total ? (
         <SearchResults.Empty />
       ) : (
         <SearchResults result={result} term={term}>
@@ -136,6 +153,7 @@ const SEARCH_ARTICLE_FRAGMENT = `#graphql
   fragment SearchArticle on Article {
     __typename
     handle
+    blog { handle }
     id
     title
     trackingParameters
@@ -244,7 +262,9 @@ async function regularSearch({
   );
 
   const error = errors
-    ? errors.map(({message}: {message: string}) => message).join(', ')
+    ? new URL(request.url).pathname.startsWith('/en')
+      ? 'Search is unavailable. Please try again.'
+      : 'La recherche est indisponible. Veuillez réessayer.'
     : undefined;
 
   return {type: 'regular', term, error, result: {total, items}};

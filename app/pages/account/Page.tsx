@@ -1,6 +1,5 @@
 import {
   data as remixData,
-  Form,
   NavLink,
   Outlet,
   useLoaderData,
@@ -195,14 +194,14 @@ function AccountMenu({locale}: {locale: AccountContext['locale']}) {
 
 function Logout({locale}: {locale: AccountContext['locale']}) {
   return (
-    <Form
+    <form
       className="account-logout"
       method="POST"
-      action={accountPath(locale, '/account/logout')}
+      action={`/account/logout?return_to=/${locale}`}
     >
       <button type="submit">
         {locale === 'fr' ? 'Déconnexion' : 'Sign out'}
       </button>
-    </Form>
+    </form>
   );
 }

@@ -1,9 +1,5 @@
-import {useOptimisticCart, type OptimisticCart} from '@shopify/hydrogen';
+import {useStorefrontCart, useCart} from '~/lib/cart';
 import {Link, useLocation} from 'react-router';
-import type {
-  CartApiQueryFragment,
-  MoneyFragment,
-} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
@@ -14,7 +10,6 @@ import {useEffect, useRef} from 'react';
 export type CartLayout = 'page' | 'aside';
 
 export type CartMainProps = {
-  cart: CartApiQueryFragment | null;
   layout: CartLayout;
 };
 
@@ -42,10 +37,10 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
  * The main cart component that displays the cart items and summary.
  * It is used by both the /cart route and the cart aside dialog.
  */
-export function CartMain({layout, cart: originalCart}: CartMainProps) {
-  // The useOptimisticCart hook applies pending actions to the cart
+export function CartMain({layout}: CartMainProps) {
+  // The useStorefrontCart hook applies pending actions to the cart
   // so the user immediately sees feedback when they modify the cart.
-  const cart = useOptimisticCart(originalCart);
+  const cart = useStorefrontCart();
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const withDiscount =
@@ -54,18 +49,12 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const className = `cart-main cart-main--${layout} ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
-  const originalQuantities = new Map(
-    (originalCart?.lines?.nodes ?? []).map((line) => [line.id, line.quantity]),
-  );
-  const pendingLineIds = new Set(
-    (cart?.lines?.nodes ?? [])
-      .filter((line) => originalQuantities.get(line.id) !== line.quantity)
-      .map((line) => line.id),
-  );
+  const pendingLines = useCart((state) => state.pending.lines);
+  const pendingLineIds = new Set(pendingLines.keys());
   const locale = localeFromPathname(useLocation().pathname);
   const {type: activeAside} = useAside();
   const sectionRef = useRef<HTMLElement>(null);
-  const displayedSubtotal = getDisplayedSubtotal(cart, originalCart);
+  const displayedSubtotal = cart?.cost?.subtotalAmount;
 
   useEffect(() => {
     if (
@@ -136,70 +125,6 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   );
 }
 
-function getDisplayedSubtotal(
-  cart: OptimisticCart<CartApiQueryFragment | null>,
-  originalCart: CartApiQueryFragment | null,
-): MoneyFragment | undefined {
-  const currentLines = (cart?.lines?.nodes ?? []).filter(
-    (line) =>
-      !('parentRelationship' in line && line.parentRelationship?.parent),
-  );
-  const originalLines = (originalCart?.lines?.nodes ?? []).filter(
-    (line) =>
-      !('parentRelationship' in line && line.parentRelationship?.parent),
-  );
-  const originalById = new Map(originalLines.map((line) => [line.id, line]));
-  const currentById = new Map(currentLines.map((line) => [line.id, line]));
-  const hasPendingQuantityChange =
-    originalById.size !== currentById.size ||
-    originalLines.some(
-      (line) => currentById.get(line.id)?.quantity !== line.quantity,
-    );
-  const originalSubtotal = originalCart?.cost?.subtotalAmount;
-
-  if (!hasPendingQuantityChange || !originalSubtotal) {
-    const subtotal = cart?.cost?.subtotalAmount;
-    return subtotal?.amount && subtotal.currencyCode
-      ? {amount: subtotal.amount, currencyCode: subtotal.currencyCode}
-      : undefined;
-  }
-
-  let amount = Number(originalSubtotal.amount);
-
-  for (const originalLine of originalLines) {
-    const currentLine = currentById.get(originalLine.id);
-    const unitAmount =
-      Number(originalLine.cost.totalAmount.amount) / originalLine.quantity;
-    amount +=
-      ((currentLine?.quantity ?? 0) - originalLine.quantity) * unitAmount;
-  }
-
-  for (const currentLine of currentLines) {
-    if (!originalById.has(currentLine.id)) {
-      amount +=
-        Number(
-          currentLine.cost?.amountPerQuantity?.amount ??
-            currentLine.merchandise.price.amount,
-        ) * currentLine.quantity;
-    }
-  }
-
-  const precision = Math.min(
-    6,
-    Math.max(
-      originalSubtotal.amount.split('.')[1]?.length ?? 0,
-      ...originalLines.map(
-        (line) => line.cost.totalAmount.amount.split('.')[1]?.length ?? 0,
-      ),
-    ),
-  );
-
-  return {
-    currencyCode: originalSubtotal.currencyCode,
-    amount: amount.toFixed(precision),
-  };
-}
-
 function CartEmpty({
   hidden = false,
   layout,
@@ -217,15 +142,13 @@ function CartEmpty({
       }
       hidden={hidden}
     >
-      {layout === 'page' && <br />}
       <p>
         {locale === 'fr'
           ? 'Votre panier est encore vide.'
           : 'Your cart is still empty.'}
       </p>
-      {layout === 'page' && <br />}
       <Link
-        className={layout === 'aside' ? 'button button--orange' : undefined}
+        className="button button--orange"
         to={`/${locale}/adoptez`}
         onClick={close}
         prefetch="viewport"

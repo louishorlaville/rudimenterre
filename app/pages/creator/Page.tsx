@@ -1,3 +1,4 @@
+import type {EditorialPageContent} from '~/lib/editorial-content';
 import type {StorefrontLocale} from '~/lib/i18n';
 import {recipeStoryFr} from '~/lib/recipe-story';
 
@@ -21,7 +22,8 @@ const recipeStoryEn = [
   'Enjoy your meal, everyone!',
 ];
 
-export function RecipePage({locale, heroImage}: {
+export function RecipePage({content, locale, heroImage}: {
+  content: EditorialPageContent;
   locale: StorefrontLocale;
   heroImage?: {url: string; altText?: string | null} | null;
 }) {
@@ -32,12 +34,12 @@ export function RecipePage({locale, heroImage}: {
     <header className="recipe-hero">
       <img src={heroImage?.url || '/images/rudimenterre/recipe-banner.webp'} alt={heroImage?.altText || (fr ? 'Carole Briet entourée de sa famille' : 'Carole Briet with her family')} width="2000" height="898" fetchPriority="high" />
       <div className="recipe-hero__heading">
-        <h1>{fr ? 'La recette Rudimenterre' : 'The Rudimenterre recipe'}</h1>
-        <p>{fr ? 'L’attention, l’observation, le partage' : 'Attention, observation, sharing'}</p>
+        <h1>{content.heroOverrides?.title || (fr ? 'La recette Rudimenterre' : 'The Rudimenterre recipe')}</h1>
+        <p>{content.heroOverrides?.eyebrow || (fr ? 'L’attention, l’observation, le partage' : 'Attention, observation, sharing')}</p>
       </div>
     </header>
     <section className="recipe-story" aria-labelledby="recipe-story-title">
-      <h2 id="recipe-story-title">{fr ? <>La créatrice du Cuicui<br />Carole Briet vous parle…</> : <>The creator of Cuicui<br />Carole Briet tells her story…</>}</h2>
+      <h2 id="recipe-story-title">{content.heroOverrides?.intro || (fr ? <>La créatrice du Cuicui<br />Carole Briet vous parle…</> : <>The creator of Cuicui<br />Carole Briet tells her story…</>)}</h2>
       <div className="recipe-story__opening">
         <div className="recipe-story__copy">{paragraphs(0, 5)}</div>
         <img src="/images/rudimenterre/recipe-first.webp" alt={fr ? 'Carole dans sa cuisine avec son premier Cuicui' : 'Carole in her kitchen with her first Cuicui'} width="1093" height="1640" loading="lazy" />

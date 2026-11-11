@@ -2,7 +2,7 @@ import type {StorefrontLocale} from './i18n';
 
 export type EditorialPageId =
   | 'project' | 'steam' | 'garden' | 'making' | 'thermal'
-  | 'distillation' | 'creator' | 'jury' | 'adopt' | 'shipping';
+  | 'distillation' | 'creator' | 'jury' | 'adopt' | 'shipping' | 'vadrouille';
 
 export type EditorialSection = {
   title: string;
@@ -21,6 +21,8 @@ export type EditorialPageContent = {
   seoDescription: string;
   heroImage: string;
   heroPosition?: string;
+  // Preserve each layout's rich fallback copy when a CMS field is absent.
+  heroOverrides?: Partial<Pick<EditorialPageContent, 'eyebrow' | 'title' | 'intro'>>;
   sections: EditorialSection[];
 };
 
@@ -35,6 +37,7 @@ export const PAGE_SLUGS: Record<EditorialPageId, string> = {
   jury: 'jury',
   adopt: 'adoptez',
   shipping: 'tarifs-livraison-garanties',
+  vadrouille: 'cuicui-en-vadrouille',
 };
 
 const LEGACY_EN_SLUGS: Partial<Record<EditorialPageId, string>> = {
@@ -53,7 +56,8 @@ const LEGACY_EN_SLUGS: Partial<Record<EditorialPageId, string>> = {
 const img = (name: string) => `/images/rudimenterre/${name}`;
 
 const FR: Record<EditorialPageId, EditorialPageContent> = {
-  project: {id:'project', eyebrow:'Le projet', title:'Le projet Rudimenterre', intro:'Un Cuicui made in France', seoDescription:'Le projet Rudimenterre et son relais de cuissons saines et durables.', heroImage:img('project.webp'), sections:[
+  vadrouille: {id:'vadrouille', eyebrow:'', title:'Le Cuicui en vadrouille', intro:'Sorties, rencontres et revue de presse du Cuicui.', seoDescription:'Retrouvez le Cuicui en vadrouille : événements, passages à la télévision, prix et revue de presse Rudimenterre.', heroImage:img('vadrouille/hero.webp'), sections:[]},
+  project: {id:'project', eyebrow:'Le projet', title:'Le projet Rudimenterre', intro:'Un Cuicui européen', seoDescription:'Le projet Rudimenterre et son relais de cuissons saines et durables.', heroImage:img('project.webp'), sections:[
     {title:'Le projet', body:'Imaginé au Canada, après 3 ans de recherche et de fabrication pour tester le marché, l’intérêt que suscite le Cuicui montre que ce nouveau Potager-là nous sourit.', tone:'white'},
     {title:'Le concept', body:'Rudimenterre incarne dans une vision futuriste et visionnaire un objet et une solution simple pour redonner sens et goût à notre alimentation : le Cuicui.', tone:'cream'},
     {title:'La créatrice', body:'Carole Briet, créatrice du Cuicui Rudimenterre, est passionnée par la céramique et les pratiques culinaires autonomes, économes et durables.', tone:'cream'},
@@ -71,7 +75,7 @@ const FR: Record<EditorialPageId, EditorialPageContent> = {
   ]},
   making: {id:'making', eyebrow:'Matière', title:'Fabrication et entretien', intro:'Une fabrication attentive pour un objet appelé à durer.', seoDescription:'Matière, fabrication, garanties et entretien du Cuicui.', heroImage:img('making.webp'), sections:[
     {title:'Matière', body:'Argile naturelle, intérieur grès brut, extérieur émaillé garantissant une étanchéité totale de toutes les surfaces en contact alimentaire.', tone:'white'},
-    {title:'Fabrication', body:'Les premiers Cuicuis canadiens ont été fabriqués artisanalement dans l’atelier Rudimenterre à Montréal. La production française sera réalisée à la main dans une manufacture au savoir-faire historique.', tone:'cream'},
+    {title:'Fabrication', body:'Les premiers Cuicuis canadiens ont été fabriqués artisanalement dans l’atelier Rudimenterre à Montréal. La production européenne sera réalisée à la main dans une manufacture au savoir-faire historique.', tone:'cream'},
     {title:'Utilisation et entretien', body:'Lave-vaisselle, four traditionnel, cuisson indirecte sur casserole d’eau et frigidaire. Éviter les chocs thermiques et utiliser de préférence des ustensiles en bois.', tone:'blue'},
   ]},
   thermal: {id:'thermal', eyebrow:'Moins d’énergie, plus d’autonomie', title:'Expériences thermiques', intro:'Et si demain la cuisson des aliments demandait moins d’énergie ?', seoDescription:'Les expériences thermiques du Cuicui et la cuisson à feu éteint.', heroImage:img('thermal-hero.webp'), sections:[
@@ -96,10 +100,10 @@ const FR: Record<EditorialPageId, EditorialPageContent> = {
     {title:'Le jury a conclu', body:'On revient à l’essence-même de l’art de cuisiner avec cet outil culinaire dessiné avec ingéniosité et vision d’un avenir soutenable, solidaire et désirable.', tone:'cream'},
   ]},
   adopt: {id:'adopt', eyebrow:'Vous avez le choix', title:'Adoptez', intro:'Un Cuicui, un nouveau mode de cuisiner savoureux et bienfaisant.', seoDescription:'Adoptez le Cuicui et choisissez votre kit.', heroImage:img('adopt-hero.webp'), sections:[
-    {title:'Une édition limitée', body:'Un objet de céramique Cuicui fabriqué artisanalement en faïence au Canada en attendant la production française.', image:img('adopt-options.webp'), imageAlt:'Les options de Cuicui', tone:'cream'},
-    {title:'Du kit vital aux modules complémentaires', body:'Faites Cuicui français. Le kit vital réunit les éléments indispensables; les modules complémentaires enrichissent les usages.', image:img('adopt-kit.webp'), imageAlt:'Le kit vital du Cuicui', tone:'green'},
+    {title:'Une édition limitée', body:'Un objet de céramique Cuicui fabriqué artisanalement en faïence au Canada en attendant la production européenne.', image:img('adopt-options.webp'), imageAlt:'Les options de Cuicui', tone:'cream'},
+    {title:'Du kit vital aux modules complémentaires', body:'Pour le futur Cuicui européen, le kit vital réunit les éléments indispensables; les modules complémentaires enrichissent les usages.', image:img('adopt-kit.webp'), imageAlt:'Le kit vital du Cuicui', tone:'green'},
   ]},
-  shipping: {id:'shipping', eyebrow:'Des séries limitées', title:'Tarifs livraisons garanties', intro:'Expéditions prochaines séries fabriquées en France.', seoDescription:'Informations sur les emballages, livraisons, retours et garanties Rudimenterre.', heroImage:img('shipping.webp'), sections:[
+  shipping: {id:'shipping', eyebrow:'Des séries limitées', title:'Tarifs livraisons garanties', intro:'Expéditions prochaines séries fabriquées en Europe.', seoDescription:'Informations sur les emballages, livraisons, retours et garanties Rudimenterre.', heroImage:img('shipping.webp'), sections:[
     {title:'Emballage Rudimenterre', body:'Un emballage recyclable et protecteur est essentiel à la livraison de pièces en céramique. Chaque élément est soigneusement calé.', tone:'cream'},
     {title:'Expéditions', body:'Les frais, taxes et délais dépendent de la destination. Les montants définitifs sont confirmés avant la commande.', tone:'white'},
     {title:'Retours', body:'Contactez Rudimenterre avant tout retour afin de recevoir les informations nécessaires.', tone:'cream'},
@@ -108,7 +112,8 @@ const FR: Record<EditorialPageId, EditorialPageContent> = {
 };
 
 const EN_OVERRIDES: Record<EditorialPageId, Pick<EditorialPageContent,'eyebrow'|'title'|'intro'|'seoDescription'>> = {
-  project:{eyebrow:'The project',title:'The Rudimenterre project',intro:'A Cuicui made in France',seoDescription:'The Rudimenterre project and its healthy, sustainable cooking relay.'},
+  vadrouille:{eyebrow:'',title:'Cuicui on the road',intro:'Cuicui outings, gatherings and press coverage.',seoDescription:'Follow Cuicui on the road: events, television appearances, awards and Rudimenterre press coverage.'},
+  project:{eyebrow:'The project',title:'The Rudimenterre project',intro:'A European Cuicui',seoDescription:'The Rudimenterre project and its healthy, sustainable cooking relay.'},
   steam:{eyebrow:'Cooking method',title:'Steam cooking',intro:'Gentle steam, flavour and intelligent water use.',seoDescription:'Discover the Cuicui steam-cooking cycle.'},
   garden:{eyebrow:'Guided visit',title:'The medieval kitchen garden revisited',intro:'What did a kitchen garden once mean?',seoDescription:'From the medieval kitchen garden to Cuicui.'},
   making:{eyebrow:'Material',title:'Making and care',intro:'Thoughtful making for an object designed to last.',seoDescription:'Material, making, warranty and care for Cuicui.'},
@@ -117,12 +122,13 @@ const EN_OVERRIDES: Record<EditorialPageId, Pick<EditorialPageContent,'eyebrow'|
   creator:{eyebrow:'Attention, observation, sharing',title:'The Rudimenterre recipe',intro:'Cuicui creator Carole Briet tells the story.',seoDescription:'Carole Briet tells the story behind Cuicui.'},
   jury:{eyebrow:'Jury mention',title:'Award-winning Cuicui',intro:'17th International Grand Prix du Design — 2024',seoDescription:'Cuicui, Platinum winner at the Grands Prix du Design.'},
   adopt:{eyebrow:'The choice is yours',title:'Adopt',intro:'A Cuicui, a new, flavourful and beneficial way of cooking.',seoDescription:'Adopt Cuicui and choose your kit.'},
-  shipping:{eyebrow:'Limited series',title:'Pricing, shipping and warranty',intro:'Upcoming series made in France.',seoDescription:'Rudimenterre packaging, shipping, returns and warranty.'},
+  shipping:{eyebrow:'Limited series',title:'Pricing, shipping and warranty',intro:'Upcoming series made in Europe.',seoDescription:'Rudimenterre packaging, shipping, returns and warranty.'},
 };
 
 const EN_SECTIONS: Record<EditorialPageId, Array<{title:string;body:string;bullets?:string[]}>> = {
+  vadrouille:[],
   project:[
-    {title:'The project',body:'Imagined in Canada after three years of research and prototyping, Cuicui is now preparing for a new chapter made in France.'},
+    {title:'The project',body:'Imagined in Canada after three years of research and prototyping, Cuicui is now preparing for a new chapter with production in Europe.'},
     {title:'The concept',body:'Rudimenterre offers a simple, forward-looking way to bring meaning and pleasure back to everyday food.'},
     {title:'The creator',body:'Carole Briet explores ceramics and autonomous, economical and sustainable cooking practices.'},
   ],
@@ -139,7 +145,7 @@ const EN_SECTIONS: Record<EditorialPageId, Array<{title:string;body:string;bulle
   ],
   making:[
     {title:'Material',body:'Natural clay, raw stoneware interior and a glazed exterior make every food-contact surface watertight.'},
-    {title:'Making',body:'The first Canadian Cuicuis were handmade in Montréal. French production will continue by hand with a historic manufacturer.'},
+    {title:'Making',body:'The first Canadian Cuicuis were handmade in Montréal. European production will continue by hand with a historic manufacturer.'},
     {title:'Use and care',body:'Dishwasher, conventional oven, indirect cooking over water and refrigerator. Avoid thermal shock and favour wooden utensils.'},
   ],
   thermal:[
@@ -164,8 +170,8 @@ const EN_SECTIONS: Record<EditorialPageId, Array<{title:string;body:string;bulle
     {title:'The jury concluded',body:'This ingenious culinary tool returns to the essence of cooking while imagining a sustainable, cooperative and desirable future.'},
   ],
   adopt:[
-    {title:'A limited edition',body:'A ceramic Cuicui handmade in Canada while French production is being prepared.'},
-    {title:'From the vital kit to extra modules',body:'The vital kit contains the essentials; complementary modules extend the range of uses.'},
+    {title:'A limited edition',body:'A ceramic Cuicui handmade in Canada while European production is being prepared.'},
+    {title:'From the vital kit to extra modules',body:'For the future European Cuicui, the vital kit contains the essentials; complementary modules extend the range of uses.'},
   ],
   shipping:[
     {title:'Rudimenterre packaging',body:'Protective, recyclable packaging is essential for shipping ceramics. Every piece is carefully secured.'},
@@ -191,6 +197,7 @@ export const pagePath = (locale: StorefrontLocale, id: EditorialPageId) => `/${l
 export const alternatePagePath = (locale: StorefrontLocale, id: EditorialPageId) => pagePath(locale === 'fr' ? 'en' : 'fr', id);
 export function localizedPath(pathname: string, target: StorefrontLocale) {
   const parts = pathname.split('/').filter(Boolean);
+  if (parts[0] !== 'fr' && parts[0] !== 'en') parts.unshift('fr');
   const current: StorefrontLocale = parts[0] === 'en' ? 'en' : 'fr';
   const page = parts[1] ? getPageBySlug(current, parts[1]) : null;
   if (page) return pagePath(target, page.id);

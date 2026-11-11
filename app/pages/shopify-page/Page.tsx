@@ -1,10 +1,9 @@
-﻿import {useLoaderData} from 'react-router';
+import {createPageSeo} from '~/lib/seo';
+import {useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
-};
+export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -42,6 +41,7 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
 
   return {
     page,
+    seo: createPageSeo(request, {title: page.seo?.title || page.title + ' — Rudimenterre', description: page.seo?.description}),
   };
 }
 

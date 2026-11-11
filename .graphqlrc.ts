@@ -1,29 +1,17 @@
-import type {IGraphQLConfig} from 'graphql-config';
-import {getSchema} from '@shopify/hydrogen-codegen';
+import {getSchema, preset, pluckConfig} from '@shopify/hydrogen-codegen';
 
-/**
- * GraphQL Config
- * @see https://the-guild.dev/graphql/config/docs/user/usage
- * @type {IGraphQLConfig}
- */
-const graphqlConfig: IGraphQLConfig = {
-  projects: {
-    default: {
+export default {
+  pluckConfig,
+  generates: {
+    'storefrontapi.generated.d.ts': {
       schema: getSchema('storefront'),
-      documents: [
-        './*.{ts,tsx,js,jsx}',
-        './app/**/*.{ts,tsx,js,jsx}',
-        '!./app/graphql/**/*.{ts,tsx,js,jsx}',
-      ],
+      documents: ['app/**/*.{ts,tsx,js,jsx}', '!app/graphql/**'],
+      preset,
     },
-
-    customer: {
+    'customer-accountapi.generated.d.ts': {
       schema: getSchema('customer-account'),
-      documents: ['./app/graphql/customer-account/*.{ts,tsx,js,jsx}'],
+      documents: ['app/graphql/customer-account/*.{ts,js}'],
+      preset,
     },
-
-    // Add your own GraphQL projects here for CMS, Shopify Admin API, etc.
   },
 };
-
-export default graphqlConfig;

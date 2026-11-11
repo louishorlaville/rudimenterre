@@ -1,5 +1,6 @@
 import {redirect, useLoaderData} from 'react-router';
 import type {Route} from '../../routes/+types/($locale).$page';
+import vadrouilleStyles from '~/pages/vadrouille/Page.css?url';
 import editorialStyles from './Page.css?url';
 import projectStyles from '~/pages/project/Page.css?url';
 import distillationStyles from '~/pages/distillation/Page.css?url';
@@ -19,10 +20,12 @@ import {
   pagePath,
 } from '~/lib/editorial-content';
 import {isStorefrontLocale} from '~/lib/i18n';
+import {createPageSeo} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({data}) => {
   if (!data) return [];
   const specialStyles: Partial<Record<typeof data.content.id, string>> = {
+    vadrouille: vadrouilleStyles,
     project: projectStyles,
     distillation: data.locale === 'fr' ? distillationStyles : editorialStyles,
     adopt: adoptStyles,
@@ -36,11 +39,7 @@ export const meta: Route.MetaFunction = ({data}) => {
   };
   return [
     {tagName: 'link', rel: 'stylesheet', href: specialStyles[data.content.id] || editorialStyles},
-    {title: `${data.content.title} — Rudimenterre`},
-    {name: 'description', content: data.content.seoDescription},
-    {tagName: 'link', rel: 'canonical', href: data.canonicalPath},
-    {tagName: 'link', rel: 'alternate', hrefLang: 'fr-CA', href: data.frPath},
-    {tagName: 'link', rel: 'alternate', hrefLang: 'en-CA', href: data.enPath},
+    ...data.seo,
   ];
 };
 
@@ -53,7 +52,7 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
   if (!fallback) throw new Response(null, {status: 404});
   if (params.page !== PAGE_SLUGS[fallback.id]) {
     const url = new URL(request.url);
-    throw redirect(`${pagePath(locale, fallback.id)}${url.search}`);
+    throw redirect(`${pagePath(locale, fallback.id)}${url.search}`, 301);
   }
 
   const response = await context.storefront
@@ -72,13 +71,19 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     } | null;
   }>;
   const field = (key: string) => fields.find((item) => item.key === key);
+  const text = (key: string) => {
+    const value = field(key)?.value;
+    return value?.trim() ? value : undefined;
+  };
+  const heroOverrides = {eyebrow: text('eyebrow'), title: text('title'), intro: text('intro')};
   const content = {
     ...fallback,
-    eyebrow: field('eyebrow')?.value || fallback.eyebrow,
-    title: field('title')?.value || fallback.title,
-    intro: field('intro')?.value || fallback.intro,
+    heroOverrides,
+    eyebrow: heroOverrides.eyebrow || fallback.eyebrow,
+    title: heroOverrides.title || fallback.title,
+    intro: heroOverrides.intro || fallback.intro,
     seoDescription:
-      field('seo_description')?.value || fallback.seoDescription,
+      text('seo_description') || fallback.seoDescription,
   };
   const media = field('hero_media')?.reference;
   const heroImage =
@@ -90,6 +95,12 @@ export async function loader({params, context, request}: Route.LoaderArgs) {
     locale,
     content,
     heroImage,
+    seo: createPageSeo(request, {
+      title: content.title + ' — Rudimenterre',
+      description: content.seoDescription,
+      pathname: pagePath(locale, fallback.id),
+      staticAlternates: true,
+    }),
     canonicalPath: pagePath(locale, fallback.id),
     frPath: locale === 'fr' ? pagePath('fr', fallback.id) : alternatePagePath(locale, fallback.id),
     enPath: locale === 'en' ? pagePath('en', fallback.id) : alternatePagePath(locale, fallback.id),

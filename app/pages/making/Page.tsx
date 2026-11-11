@@ -4,7 +4,7 @@ import makingStyles from './Page.css?url';
 
 export {makingStyles};
 
-export function MakingPage({locale, heroImage}: {
+export function MakingPage({content, locale, heroImage}: {
   content: EditorialPageContent;
   locale: StorefrontLocale;
   heroImage?: {url: string; altText?: string | null} | null;
@@ -15,7 +15,7 @@ export function MakingPage({locale, heroImage}: {
     <header className="making-hero">
       <img src={heroImage?.url || '/images/rudimenterre/making.webp'} alt={heroImage?.altText || ''} />
       <div className="making-hero__shade" />
-      <h1>{fr ? 'Fabrication et entretien' : 'Making and care'}</h1>
+      <h1>{content.heroOverrides?.title || (fr ? 'Fabrication et entretien' : 'Making and care')}</h1>
     </header>
 
     <section className="making-band making-band--material" aria-labelledby="making-material-title">
@@ -25,7 +25,7 @@ export function MakingPage({locale, heroImage}: {
 
     <section className="making-band making-band--manufacturing" aria-labelledby="making-manufacturing-title">
       <h2 id="making-manufacturing-title">{fr ? 'Fabrication' : 'Making'}</h2>
-      {fr ? <p><em>Les premiers Cuicuis canadiens ont été fabriqués artisanalement en faïence par Carole Briet, la créatrice, dans son atelier Rudimenterre à Montréal. La production de Cuicuis français se fera à la main dans les ateliers d’une manufacture française au savoir-faire historique, pour satisfaire l’exigence qualitative du Cuicui.</em></p> : <p><em>The first Canadian Cuicuis were handmade in earthenware by creator Carole Briet in her Rudimenterre studio in Montréal. French Cuicuis will be made by hand in the workshops of a French manufacturer with a long-standing craft tradition, to meet Cuicui’s quality standards.</em></p>}
+      {fr ? <p><em>Les premiers Cuicuis canadiens ont été fabriqués artisanalement en faïence par Carole Briet, la créatrice, dans son atelier Rudimenterre à Montréal. La production de Cuicuis européens se fera à la main dans les ateliers d’une manufacture européenne au savoir-faire historique, pour satisfaire l’exigence qualitative du Cuicui.</em></p> : <p><em>The first Canadian Cuicuis were handmade in earthenware by creator Carole Briet in her Rudimenterre studio in Montréal. European Cuicuis will be made by hand in the workshops of a European manufacturer with a long-standing craft tradition, to meet Cuicui’s quality standards.</em></p>}
     </section>
 
     <section className="making-band making-band--warranty" aria-labelledby="making-warranty-title">

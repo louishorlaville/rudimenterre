@@ -1,1 +1,1 @@
-export {default, links, loader} from '~/pages/collections/Page';
+export {default, links, meta, loader} from '~/pages/collections/Page';

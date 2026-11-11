@@ -33,14 +33,34 @@ jobs:
       - name: Check text encoding
         run: npm run check:encoding
 
+      - name: Check deployment ownership
+        run: npm run check:deployment-workflow
+
       - name: Lint
         run: npm run lint
 
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Check catalog and search behavior
+        run: npm run check:catalog
+
+      - name: Check account phone and Admin token behavior
+        run: |
+          npm run check:customer-phone
+          npm run check:admin-token
+
+      - name: Check editorial content contracts
+        run: npm run check:editorial
+
+      - name: Check storefront SEO and migration behavior
+        run: npm run check:seo
+
       - name: Build storefront
         run: npm run build
 
       - name: Check route manifest
         run: npm run check:route-manifest
+
+      - name: Check patched framework and migrated integrations
+        run: npm run check:framework

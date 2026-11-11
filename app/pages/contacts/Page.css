@@ -1,0 +1,42 @@
+.contacts-page {
+  padding: clamp(3.5rem, 8vw, 7rem) var(--page-gutter);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.contacts-content { max-width: 48rem; margin-inline: auto; }
+.contacts-content .eyebrow { margin: 0 0 1.5rem; line-height: 1.5; }
+.contacts-content h1 { margin: 0; font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.05; }
+.contacts-intro { max-width: 44ch; margin: 1.5rem 0 2.5rem; font-size: 1.125rem; line-height: 1.65; }
+.contacts-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+.contacts-field { display: grid; gap: .625rem; }
+.contacts-field label { font-size: 1rem; font-weight: 600; line-height: 1.5; }
+.contacts-field input, .contacts-field textarea { width: 100%; min-width: 0; padding: .875rem 1rem; border: 1px solid var(--ink); border-radius: 0; background: var(--white); color: var(--ink); font: inherit; font-size: 1rem; line-height: 1.5; }
+.contacts-field input { min-height: 3.25rem; }
+.contacts-field textarea { resize: vertical; }
+.contacts-field--message, .contacts-form-hint, .contacts-feedback { grid-column: 1 / -1; }
+.contacts-form-hint { font-size: .875rem; line-height: 1.5; }
+.contacts-form .contacts-write { margin-top: 0; cursor: pointer; }
+.contacts-write:disabled { opacity: .6; cursor: wait; }
+.contacts-feedback:empty { display: none; }
+.contacts-feedback p { padding: 1rem; line-height: 1.5; border: 1px solid currentColor; }
+.contacts-success { background: var(--moss); }
+.contacts-error { color: #923022; }
+.contacts-form :is(input, textarea):focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.contacts-details { display: flex; flex-direction: column; align-items: flex-start; padding-top: 2rem; border-top: 1px solid var(--ink); }
+.contacts-details h2 { margin: 0 0 .75rem; font-size: 1rem; line-height: 1.5; letter-spacing: 0; }
+.contacts-email { display: inline-flex; align-items: center; min-height: 2.75rem; max-width: 100%; font-size: clamp(1.125rem, 3vw, 1.5rem); line-height: 1.5; overflow-wrap: anywhere; text-decoration: underline; text-underline-offset: .2em; }
+.contacts-write { margin-top: 1.5rem; min-height: 3.25rem; padding: .875rem 1.75rem; border: 2px solid var(--ink); font-size: 1rem; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.contacts-write:hover, .contacts-write:focus-visible { color: var(--button-hover-color); }
+.contacts-page a:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+@media (max-width: 48rem) {
+  .contacts-intro { font-size: 1rem; }
+  .contacts-form { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contacts-write { transition: none; }
+  .contacts-write::before { animation: none !important; }
+  .contacts-write:hover::before, .contacts-write:focus-visible::before { transform: none; }
+}

@@ -1,4 +1,8 @@
-import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
+import {ShopifyScripts} from '@shopify/hydrogen/react';
+import {CartProvider} from '~/lib/cart';
+import {AnalyticsTracker} from '~/components/Analytics';
+import {routeTemplates} from '~/lib/shopify-routes';
+import {useNonce} from '~/lib/nonce';
 import {
   Outlet,
   useRouteError,
@@ -9,9 +13,10 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
+  useLocation,
+  useNavigate,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -33,6 +38,12 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
   // revalidate when manually revalidating via useRevalidator
   if (currentUrl.toString() === nextUrl.toString()) return true;
+
+  if (
+    localeFromPathname(currentUrl.pathname) !==
+    localeFromPathname(nextUrl.pathname)
+  )
+    return true;
 
   // Defaulting to no revalidation for root loader data to improve performance.
   // When using this feature, you risk your UI getting out of sync with your server.
@@ -62,7 +73,6 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
     {
       rel: 'preload',
       href: '/fonts/tangerine-regular.ttf',
@@ -85,27 +95,25 @@ export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const [criticalData, initialCart] = await Promise.all([
+    loadCriticalData(args),
+    deferredData.cart,
+  ]);
 
   const {storefront, env} = args.context;
 
   return {
     ...deferredData,
     ...criticalData,
+    cart: initialCart,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     locale: localeFromPathname(new URL(args.request.url).pathname),
-    shop: getShopAnalytics({
-      storefront,
-      publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
-    }),
-    consent: {
-      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
-      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: true,
-      // localize the privacy banner
-      country: args.context.storefront.i18n.country,
-      language: args.context.storefront.i18n.language,
+    shop: {
+      shopId: criticalData.header.shop.id,
+      storefrontId: env.PUBLIC_STOREFRONT_ID ?? '',
+      myshopifyDomain: env.PUBLIC_STORE_DOMAIN,
     },
+    i18n: storefront.i18n,
   };
 }
 
@@ -159,17 +167,40 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  const navigate = useNavigate();
+  const {pathname} = useLocation();
   const rootData = useRouteLoaderData<RootLoader>('root');
+  const faviconUrl =
+    rootData?.header?.shop.brand?.logo?.image?.url ??
+    'https://rudimenterre.com/cdn/shop/files/favicon_32x32.png?v=1744030862';
 
   return (
-    <html lang={rootData?.locale ?? 'fr'}>
+    <html lang={rootData?.locale ?? localeFromPathname(pathname)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+        {rootData && (
+          <ShopifyScripts
+            shop={rootData.shop}
+            i18n={{
+              ...rootData.i18n,
+              currency: rootData.i18n.country === 'FR' ? 'EUR' : 'CAD',
+            }}
+            routes={routeTemplates}
+            navigate={navigate}
+            consent={{mode: 'default-banner'}}
+            analytics={{
+              channel: rootData.shop.storefrontId ? 'hydrogen' : 'headless',
+            }}
+            shopifyAnalytics={Boolean(rootData.shop.storefrontId)}
+            nonce={nonce}
+          />
+        )}
         <Meta />
         <Links />
+        <link rel="icon" href={faviconUrl} />
       </head>
       <body>
         {children}
@@ -188,40 +219,85 @@ export default function App() {
   }
 
   return (
-    <Analytics.Provider
-      cart={data.cart}
-      shop={data.shop}
-      consent={data.consent}
-    >
+    <CartProvider initialData={{cart: data.cart}}>
+      <AnalyticsTracker />
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>
-    </Analytics.Provider>
+    </CartProvider>
   );
 }
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  let errorMessage = 'Une erreur inattendue est survenue.';
-  let errorStatus = 500;
-
-  if (isRouteErrorResponse(error)) {
-    errorMessage = error?.data?.message ?? error.data;
-    errorStatus = error.status;
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
-  }
+  const fr = localeFromPathname(useLocation().pathname) === 'fr';
+  const notFound = isRouteErrorResponse(error) && error.status === 404;
+  const home = fr ? '/fr' : '/en';
 
   return (
-    <div className="route-error" role="alert">
-      <p className="eyebrow">Rudimenterre</p>
-      <h1>{errorStatus === 404 ? 'Page introuvable' : 'Quelque chose a changé.'}</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
-      )}
+    <div className="route-error">
+      <header className="route-error__header">
+        <a
+          className="route-error__brand"
+          href={home}
+          aria-label={fr ? 'Rudimenterre — accueil' : 'Rudimenterre — home'}
+        >
+          Rudimenterre<sup aria-hidden="true">®</sup>
+        </a>
+        <span className="route-error__status">
+          {notFound ? '404' : fr ? 'Erreur' : 'Error'}
+        </span>
+      </header>
+      <main className="route-error__main" aria-labelledby="route-error-title">
+        <div className="route-error__copy">
+          <h1 id="route-error-title">
+            {notFound
+              ? fr
+                ? 'Page introuvable'
+                : 'Page not found'
+              : fr
+                ? 'Une erreur est survenue'
+                : 'Something went wrong'}
+          </h1>
+          <p className="route-error__description">
+            {notFound
+              ? fr
+                ? 'Cette page n’est pas disponible. Revenez à l’accueil ou poursuivez la découverte du Cuicui.'
+                : 'This page is no longer available. Return home or keep exploring the Cuicui.'
+              : fr
+                ? 'Veuillez réessayer dans quelques instants.'
+                : 'Please try again in a few moments.'}
+          </p>
+          <div className="route-error__actions">
+            <a className="button button--dark" href={home}>
+              {fr ? 'Revenir à l’accueil' : 'Back to home'}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
+                <path d="M4 12h15m-6-6 6 6-6 6" />
+              </svg>
+            </a>
+            {notFound && (
+              <a className="route-error__discover" href={`${home}/adoptez`}>
+                {fr ? 'Découvrir le Cuicui' : 'Discover the Cuicui'}
+              </a>
+            )}
+          </div>
+        </div>
+        <img
+          className="route-error__image"
+          src="/images/rudimenterre/home-adopt-still-life.jpeg"
+          alt=""
+          width={724}
+          height={1086}
+        />
+      </main>
     </div>
   );
 }

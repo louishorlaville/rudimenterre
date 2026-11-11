@@ -5,42 +5,53 @@
   "version": "2026.4.5",
   "type": "module",
   "scripts": {
-    "build": "shopify hydrogen build --codegen",
-    "dev": "shopify hydrogen dev --codegen",
-    "preview": "shopify hydrogen preview --build",
+    "build": "npm run codegen && react-router build",
+    "dev": "vite dev",
+    "dev:accounts": "npm run dev:https",
+    "preview": "vite preview",
     "lint": "eslint --no-error-on-unmatched-pattern .",
-    "typecheck": "react-router typegen && tsc --noEmit",
-    "codegen": "shopify hydrogen codegen && react-router typegen",
+    "typecheck": "npm run codegen && tsc --noEmit && node scripts/check-graphql.mjs",
+    "codegen": "graphql-codegen --config .graphqlrc.ts && react-router typegen",
     "check:encoding": "node scripts/check-encoding.mjs",
-    "check:route-manifest": "node scripts/check-route-manifest.mjs"
+    "check:route-manifest": "node scripts/check-route-manifest.mjs",
+    "dev:https": "vite dev",
+    "deploy": "shopify hydrogen deploy --build-command \"npm run build\" --assets-dir dist/client --worker-dir dist/server",
+    "check:framework": "node scripts/check-framework-migration.mjs",
+    "check:deployment-workflow": "node scripts/check-deployment-workflow.mjs",
+    "check:catalog": "node scripts/check-catalog-behavior.mjs",
+    "check:customer-phone": "node --experimental-strip-types scripts/check-customer-phone.mjs",
+    "check:admin-token": "node --experimental-strip-types scripts/check-shopify-admin-token.mjs",
+    "check:editorial": "node scripts/check-editorial-content.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
-    "@shopify/hydrogen": "2026.4.4",
+    "@shopify/hydrogen": "2026.10.2",
+    "gql.tada": "1.9.2",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
     "isbot": "^5.1.22",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router": "7.16.0",
-    "react-router-dom": "7.16.0"
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-router": "7.18.4"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@graphql-codegen/cli": "5.0.2",
-    "@react-router/dev": "7.16.0",
-    "@react-router/fs-routes": "7.16.0",
-    "@shopify/cli": "3.93.2",
+    "@react-router/dev": "7.18.4",
+    "@react-router/fs-routes": "7.18.4",
+    "@shopify/cli": "4.8.1",
     "@shopify/hydrogen-codegen": "0.3.3",
-    "@shopify/mini-oxygen": "4.2.0",
+    "@shopify/mini-oxygen": "4.2.3",
     "@shopify/oxygen-workers-types": "^4.1.6",
     "@shopify/prettier-config": "^1.1.2",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/eslint": "^9.6.1",
-    "@types/react": "^18.3.28",
-    "@types/react-dom": "^18.3.7",
+    "@types/node": "22.19.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "eslint": "^9.18.0",
@@ -59,6 +70,6 @@
     "vite": "^8.0.1"
   },
   "engines": {
-    "node": "^22 || ^24"
+    "node": "^22.12 || ^24"
   }
 }

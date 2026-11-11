@@ -1,12 +1,14 @@
 import {
   useFetcher,
   useNavigate,
+  useLocation,
   type FormProps,
   type Fetcher,
 } from 'react-router';
 import React, {useRef, useEffect} from 'react';
 import type {PredictiveSearchReturn} from '~/lib/search';
 import {useAside} from './Aside';
+import {localeFromPathname} from '~/lib/i18n';
 
 type SearchFormPredictiveChildren = (args: {
   fetchResults: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -33,6 +35,7 @@ export function SearchFormPredictive({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const aside = useAside();
+  const endpoint = `/${localeFromPathname(useLocation().pathname)}${SEARCH_ENDPOINT}`;
 
   /** Reset the input value and blur the input */
   function resetInput(event: React.FormEvent<HTMLFormElement>) {
@@ -46,7 +49,9 @@ export function SearchFormPredictive({
   /** Navigate to the search page with the current input value */
   function goToSearch() {
     const term = inputRef?.current?.value;
-    void navigate(SEARCH_ENDPOINT + (term ? `?q=${term}` : ''));
+    void navigate(
+      endpoint + (term ? `?${new URLSearchParams({q: term})}` : ''),
+    );
     aside.close();
   }
 
@@ -54,7 +59,7 @@ export function SearchFormPredictive({
   function fetchResults(event: React.ChangeEvent<HTMLInputElement>) {
     void fetcher.submit(
       {q: event.target.value || '', limit: 5, predictive: true},
-      {method: 'GET', action: SEARCH_ENDPOINT},
+      {method: 'GET', action: endpoint},
     );
   }
 
