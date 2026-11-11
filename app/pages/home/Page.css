@@ -330,6 +330,9 @@ body:has(#main-content > .home) .site-header {
   line-height: 1.55;
 }
 .home-hero__details br { display: none; }
+.home-hero__details + .script {
+  margin-block-start: clamp(1rem, 2vw, 1.75rem);
+}
 .home-hero__cta {
   align-self: center;
   margin-top: clamp(1.5rem, 2.2vw, 2rem);

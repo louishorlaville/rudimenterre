@@ -75,7 +75,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
 .brand { font-family: var(--font-display); font-size: clamp(1.05rem, 1.7vw, 1.35rem); font-weight: 400; letter-spacing: .01em; }
 .brand-word { display: inline-flex; white-space: nowrap; }
 .brand-letter { display: inline-block; transform-origin: 50% 90%; will-change: transform; }
-.brand--tracking .brand-letter { animation: none !important; transform: translate3d(var(--brand-shift-x, 0px), var(--brand-shift-y, 0px), 0) rotate(var(--brand-rotation, 0deg)); transition: transform 80ms ease-out; }
+.brand--tracking .brand-letter { animation: none !important; transform: translate3d(var(--brand-shift-x, 0px), var(--brand-shift-y, 0px), 0) rotate(var(--brand-rotation, 0deg)); transition: transform 50ms ease-out; }
 .brand--tracking .brand-mark { transition: transform 180ms ease-out; transform: translateY(.12em) translateX(.08em) rotate(4deg); }
 .brand:is(:hover, :focus-visible) .brand-letter:nth-child(odd) { animation: brand-letter-jostle-a .58s cubic-bezier(.22, 1, .36, 1) both; }
 .brand:is(:hover, :focus-visible) .brand-letter:nth-child(even) { animation: brand-letter-jostle-b .58s cubic-bezier(.22, 1, .36, 1) both; }
