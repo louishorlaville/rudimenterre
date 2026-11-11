@@ -359,37 +359,15 @@ try {
   );
 
   const {AdoptPage} = load('app/pages/adopt/Page.tsx');
-  const money = {amount: '568.00', currencyCode: 'EUR'};
-  const product = {
-    ...fixture,
-    availableForSale: false,
-    priceRange: {minVariantPrice: money, maxVariantPrice: money},
-  };
-  const html = renderToStaticMarkup(
-    React.createElement(AdoptPage, {
-      locale: 'fr',
-      country: 'FR',
-      content: {},
-      products: [product],
-    }),
-  );
-  assert.ok(html.includes('href="#adopt-kits"'));
-  assert.ok(html.includes('id="adopt-kits"'));
-  assert.ok(html.includes('href="/fr/products/fixture"'));
-  assert.ok(html.includes('568') && html.includes('€'));
-  assert.ok(html.includes('Épuisé'));
-  assert.ok(
-    !html.includes('550') &&
-      !html.includes('698') &&
-      !html.includes('cuicui-aventurier'),
-  );
-  const emptyHtml = renderToStaticMarkup(
-    React.createElement(AdoptPage, {locale: 'en', content: {}, products: []}),
-  );
-  assert.ok(emptyHtml.includes('No kits available'));
-  assert.ok(!emptyHtml.includes('/products/'));
+  for (const locale of ['fr', 'en']) {
+    const html = renderToStaticMarkup(
+      React.createElement(AdoptPage, {locale, content: {}}),
+    );
+    assert.ok(html.includes('href="/' + locale + '/products/cuicui-pragmatique"'));
+    assert.ok(!html.includes('id="adopt-kits"'));
+  }
   process.stdout.write(
-    'SEO metadata, production origins, reciprocal static alternates, Shopify fields, migration redirects, localized sitemaps and market-priced adoption cards passed (offline).\n',
+    'SEO metadata, production origins, reciprocal static alternates, Shopify fields, migration redirects, localized sitemaps and localized adoption links passed (offline).\n',
   );
 } finally {
   globalThis.fetch = originalFetch;

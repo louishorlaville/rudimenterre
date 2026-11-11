@@ -246,10 +246,6 @@ globalThis.fetch = async (url, init) => {
           : product,
     };
   else if (/query EditorialPage\b/.test(body.query)) data = {metaobject: null};
-  else if (/query AdoptionProducts\b/.test(body.query)) {
-    const price = {amount: body.variables.country === 'FR' ? '568.00' : '698.00', currencyCode: body.variables.country === 'FR' ? 'EUR' : 'CAD'};
-    data = {collection: {products: {nodes: [{...product, handle: 'cuicui-gourmet', availableForSale: true, priceRange: {minVariantPrice: price, maxVariantPrice: price}}]}}};
-  }
   else if (/query SitemapCount\b/.test(body.query))
     data = {sitemap: {pagesCount: {count: 1}}};
   else if (/query SitemapResources\b/.test(body.query))
@@ -401,9 +397,9 @@ try {
     const adoption = await request(`/${locale}/adoptez`);
     assert.equal(adoption.status, 200);
     const adoptionHtml = await adoption.text();
-    assert.match(adoptionHtml, /href="[^"]*#adopt-kits"/);
-    assert.ok(adoptionHtml.includes(`href="/${locale}/products/cuicui-gourmet"`));
-    assert.ok(adoptionHtml.includes('698'));
+    assert.ok(!adoptionHtml.includes('id="adopt-kits"'));
+    assert.ok(adoptionHtml.includes(`href="/${locale}/products/cuicui-pragmatique"`));
+    assert.ok(adoptionHtml.includes('href="#adopt-vital"'));
     for (const code of ['fr-CA', 'en-CA', 'fr-FR', 'en-FR'])
       assert.ok(adoptionHtml.includes(`hrefLang="${code}"`) || adoptionHtml.includes(`hrefLang="${code.toLowerCase()}"`) || adoptionHtml.includes(`hreflang="${code}"`));
     const page = await request(`/${locale}/cart`);
@@ -446,7 +442,7 @@ try {
   const franceAdoption = await worker.fetch(new Request('https://rudimenterre.fr/en/adoptez'), env, execution);
   assert.equal(franceAdoption.status, 200);
   const franceAdoptionHtml = await franceAdoption.text();
-  assert.ok(franceAdoptionHtml.includes('568') && franceAdoptionHtml.includes('€'));
+  assert.ok(franceAdoptionHtml.includes('href="/en/products/cuicui-pragmatique"'));
   const empty = await request('/api/cart');
   assert.equal(empty.status, 200);
   assert.deepEqual(await empty.json(), {cart: null});

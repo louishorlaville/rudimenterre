@@ -98,7 +98,6 @@ try {
           storefront: {
             CacheLong: () => ({}),
             query: async (_query, {variables}) => {
-              if (_query.includes('query AdoptionProducts')) return {collection: {products: {nodes: []}}};
               assert.equal(variables.handle, id);
               if (failure) throw new Error('Synthetic CMS outage');
               return response;
@@ -190,62 +189,34 @@ try {
       );
     }
   for (const locale of ['fr', 'en']) {
-    const gourmet = {
-      id: 'gourmet', handle: 'cuicui-gourmet', title: 'Cuicui Gourmet',
-      availableForSale: true,
-      featuredImage: {url: 'https://images.example/gourmet.webp', altText: 'Gourmet kit', width: 600, height: 600},
-      priceRange: {
-        minVariantPrice: {amount: '700.00', currencyCode: 'CAD'},
-        maxVariantPrice: {amount: '700.00', currencyCode: 'CAD'},
-      },
-    };
-    const pragmatique = {
-      ...gourmet, id: 'pragmatique', handle: 'explorateur-cuicui',
-      title: 'Cuicui Pragmatique', availableForSale: false,
-      featuredImage: {url: 'https://images.example/pragmatique.webp', altText: null, width: 600, height: 600},
-    };
-    const excluded = {
-      ...gourmet, id: 'other', handle: 'other-kit', title: 'Other kit',
-      featuredImage: {url: 'https://images.example/other.webp'},
-    };
-    for (const products of [
-      [gourmet, excluded, pragmatique],
-      [pragmatique, excluded, gourmet],
-      [excluded, gourmet],
-      [excluded],
-    ]) {
-      const data = await loader({
-        params: {locale, page: 'adoptez'},
-        request: new Request(`https://shop.example/${locale}/adoptez`),
-        context: {storefront: {
-          CacheLong: () => ({}),
-          query: async (query) => query.includes('query AdoptionProducts')
-            ? {collection: {products: {nodes: products}}}
-            : {metaobject: null},
-        }},
-      });
-      const expected = products.filter((product) => product !== excluded);
-      assert.deepEqual(Array.from(data.products), expected);
-      const html = render(data);
-      assert.ok(!html.includes('Other kit'));
-      assert.ok(!html.includes('/products/other-kit'));
-      assert.ok(!html.includes('https://images.example/other.webp'));
-      assert.ok(!html.includes('adopt-products-art'));
-      assert.equal((html.match(/class="adopt-kit__image"/g) || []).length, expected.length);
-      for (const product of expected) {
-        assert.ok(html.includes(product.title));
-        assert.ok(html.includes(product.featuredImage.url));
-        assert.ok(html.includes(`alt="${product.featuredImage.altText || product.title}"`));
-        assert.ok(html.includes(`/${locale}/products/${product.handle}`));
-      }
-      assert.ok(html.includes(expected.length
-        ? (locale === 'fr' ? `${expected.length} kits au choix` : `Choose from ${expected.length} kits`)
-        : (locale === 'fr' ? 'Aucun kit disponible pour le moment.' : 'No kits available at the moment.')));
-      assert.equal(html.includes(locale === 'fr' ? 'Épuisé' : 'Sold out'), expected.includes(pragmatique));
-      assert.ok(html.includes('adopt-vital-title'));
+    const html = render(await loader({
+      params: {locale, page: 'adoptez'},
+      request: new Request('https://shop.example/' + locale + '/adoptez'),
+      context: {storefront: {
+        CacheLong: () => ({}),
+        query: async (query) => {
+          assert.match(query, /query EditorialPage/);
+          return {metaobject: null};
+        },
+      }},
+    }));
+    assert.ok(html.includes('href="/' + locale + '/products/cuicui-pragmatique"'));
+    assert.ok(!html.includes('id="adopt-kits"'));
+    assert.ok(!html.includes('id="adopt-limited-title"'));
+    assert.ok(html.includes(locale === 'fr' ? 'Derniers exemplaires des premiers Cuicuis fabriqués artisanalement au Canada en attendant une production manufacturière européenne. Kit compatible avec une casserole de 18cm. Encore quelques kits disponibles' : 'The last of the original Cuicuis'));
+    assert.ok(html.includes('href="#adopt-vital"'));
+    assert.ok(html.includes('2027'));
+    for (const price of locale === 'fr'
+      ? ['450 à 550 €', '150 à 180 €', '40 à 50 €']
+      : ['€450 to €550', '€150 to €180', '€40 to €50']) {
+      assert.ok(html.includes(price));
     }
+    assert.match(html, /<button[^>]*disabled[^>]*aria-describedby="adopt-registration-status"/);
+    assert.ok(html.includes(locale === 'fr'
+      ? 'Les inscriptions ouvriront prochainement.'
+      : 'Registration will open soon.'));
   }
-  process.stdout.write('Adoption product selection, order, kit count and availability checks passed in FR/EN.\n');
+  process.stdout.write('Adoption product link and Essential Kit checks passed in FR/EN.\n');
   process.stdout.write(
     'Editorial CMS title/intro/eyebrow/media, SEO and fallback checks passed in FR/EN (11 pages; mocked CMS).\n',
   );

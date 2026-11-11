@@ -229,7 +229,15 @@ export default function Product() {
                 ? 'Vase de cuisson modulaire'
                 : 'Modular cooking vessel')}
           </p>
-          <h1>{title}</h1>
+          <h1
+            className={
+              product.handle === 'cuicui-pragmatique'
+                ? 'product-title--single-line'
+                : undefined
+            }
+          >
+            {title}
+          </h1>
           <ProductPrice
             price={selectedVariant?.price}
             compareAtPrice={selectedVariant?.compareAtPrice}
