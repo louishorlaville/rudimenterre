@@ -4,7 +4,7 @@ import {localHttps} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
 import {reactRouter} from '@react-router/dev/vite';
 
-export default defineConfig(({mode}) => ({
+export default defineConfig(({mode, isSsrBuild}) => ({
   plugins: [
     localHttps({enabled: process.env.npm_lifecycle_event === 'dev:https'}),
     ...oxygen({
@@ -21,6 +21,7 @@ export default defineConfig(({mode}) => ({
     tsconfigPaths: true,
   },
   build: {
+    sourcemap: isSsrBuild === true,
     // Allow a strict Content-Security-Policy
     // without inlining assets as base64:
     assetsInlineLimit: 0,
