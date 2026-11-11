@@ -1,22 +1,44 @@
-import {useRef, type PointerEvent as ReactPointerEvent} from 'react';
+import {useEffect, useRef, type PointerEvent as ReactPointerEvent} from 'react';
 import {Link} from 'react-router';
 
 const BRAND_NAME = 'RUDIMENTERRE';
 
 export function Brand({locale}: {locale: string}) {
   const brandRef = useRef<HTMLAnchorElement>(null);
+  const frameRef = useRef<number | null>(null);
+  const pointerRef = useRef({x: 0, y: 0});
+
+  useEffect(() => {
+    return () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+  }, []);
 
   function handleBrandPointerMove(event: ReactPointerEvent<HTMLAnchorElement>) {
     if (event.pointerType === 'touch' || !brandRef.current) return;
 
+    pointerRef.current = {x: event.clientX, y: event.clientY};
+    if (frameRef.current === null) {
+      frameRef.current = requestAnimationFrame(updateBrandTracking);
+    }
+  }
+
+  function updateBrandTracking() {
+    frameRef.current = null;
     const brand = brandRef.current;
-    const letters = brand.querySelectorAll<HTMLElement>('.brand-letter');
-    const pointerX = event.clientX;
-    const pointerY = event.clientY;
+    if (!brand) return;
+
+    const {x: pointerX, y: pointerY} = pointerRef.current;
+    const letters = Array.from(brand.querySelectorAll<HTMLElement>('.brand-letter'), (letter) => ({
+      letter,
+      rect: letter.getBoundingClientRect(),
+    }));
 
     brand.classList.add('brand--tracking');
-    letters.forEach((letter) => {
-      const rect = letter.getBoundingClientRect();
+    letters.forEach(({letter, rect}) => {
       const deltaX = pointerX - (rect.left + rect.width / 2);
       const deltaY = pointerY - (rect.top + rect.height / 2);
       const distance = Math.hypot(deltaX, deltaY);
@@ -34,6 +56,11 @@ export function Brand({locale}: {locale: string}) {
   }
 
   function resetBrandPointer() {
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+
     const brand = brandRef.current;
     if (!brand) return;
 
