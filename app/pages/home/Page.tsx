@@ -13,6 +13,9 @@ import {HomeReviews} from '~/components/HomeReviews';
 import {pagePath} from '~/lib/editorial-content';
 import {isStorefrontLocale} from '~/lib/i18n';
 
+const panoramaSrc = '/images/rudimenterre/home-banner-1086.webp';
+const panoramaSrcSet = `/images/rudimenterre/home-banner-768.webp 768w, ${panoramaSrc} 1086w`;
+
 export const meta: Route.MetaFunction = ({data}) => data?.seo ?? [];
 
 export async function loader({params, context, request}: Route.LoaderArgs) {
@@ -313,7 +316,15 @@ export default function Homepage() {
         <div className="home-opening__content" ref={openingContentRef}>
           <div className="home-opening__panorama" aria-hidden="true">
             <div className="home-banner">
-              <img src="/images/rudimenterre/home-banner.jpg" alt="" />
+              <img
+                src={panoramaSrc}
+                srcSet={panoramaSrcSet}
+                sizes="100vw"
+                width={1086}
+                height={724}
+                fetchPriority="high"
+                alt=""
+              />
             </div>
           </div>
 
@@ -328,7 +339,14 @@ export default function Homepage() {
               <Link className="button button--light home-hero__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
             </div>
             <div className="home-intro__product">
-              <img src="/images/rudimenterre/home-hero-uncapped.webp" width="1209" height="1300" alt={fr ? 'Le Cuicui Rudimenterre sans bouchon' : 'The Rudimenterre Cuicui with its chimney uncapped'} />
+              <img
+                src="/images/rudimenterre/home-hero-uncapped.webp"
+                srcSet="/images/rudimenterre/home-hero-uncapped-480.webp 480w, /images/rudimenterre/home-hero-uncapped-768.webp 768w, /images/rudimenterre/home-hero-uncapped.webp 1209w"
+                sizes="(max-width: 760px) min(calc(57vw - 1.14 * clamp(1.25rem, 4vw, 4.5rem)), 16rem), clamp(14rem, 27vw, 23rem)"
+                width={1209}
+                height={1300}
+                alt={fr ? 'Le Cuicui Rudimenterre sans bouchon' : 'The Rudimenterre Cuicui with its chimney uncapped'}
+              />
               <div className="home-intro__smoke" aria-hidden="true">
                 <span /><span /><span /><span /><span /><span /><span /><span />
               </div>
@@ -361,7 +379,15 @@ export default function Homepage() {
           </div>
         </section>
         <div className="home-banner-followup" aria-hidden="true">
-          <img src="/images/rudimenterre/home-banner.jpg" alt="" loading="lazy" />
+          <img
+            src={panoramaSrc}
+            srcSet={panoramaSrcSet}
+            sizes="100vw"
+            width={1086}
+            height={724}
+            alt=""
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
@@ -472,7 +498,15 @@ export default function Homepage() {
 
     <section className="home-photo-banner">
       <div className="home-photo-banner__frame">
-        <img src="/images/rudimenterre/home-soup-banner-wide.png" alt={fr?'Une préparation orangée cuisant dans le Cuicui':'An orange preparation cooking in the Cuicui'} loading="lazy" />
+        <img
+          src="/images/rudimenterre/home-soup-banner-wide-1537.webp"
+          srcSet="/images/rudimenterre/home-soup-banner-wide-768.webp 768w, /images/rudimenterre/home-soup-banner-wide-1200.webp 1200w, /images/rudimenterre/home-soup-banner-wide-1537.webp 1537w"
+          sizes="100vw"
+          width={1537}
+          height={1023}
+          alt={fr ? 'Une préparation orangée cuisant dans le Cuicui' : 'An orange preparation cooking in the Cuicui'}
+          loading="lazy"
+        />
       </div>
     </section>
 
