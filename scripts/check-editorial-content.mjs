@@ -207,8 +207,8 @@ try {
     assert.ok(html.includes('href="#adopt-vital"'));
     assert.ok(html.includes('2027'));
     for (const price of locale === 'fr'
-      ? ['450 à 550 €', '150 à 180 €', '40 à 50 €']
-      : ['€450 to €550', '€150 to €180', '€40 to €50']) {
+      ? ['450 à 550 €', '150 à 180 €', 'entre 40 et 50 €']
+      : ['€450 to €550', '€150 to €180', 'between €40 and €50']) {
       assert.ok(html.includes(price));
     }
     assert.match(html, /<button[^>]*disabled[^>]*aria-describedby="adopt-registration-status"/);
