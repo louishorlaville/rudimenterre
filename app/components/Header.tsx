@@ -71,7 +71,7 @@ export function HeaderMenu({
       to: pagePath(locale, 'steam'),
     },
     {
-      label: locale === 'fr' ? 'Thermique' : 'Thermal cooking',
+      label: locale === 'fr' ? 'Inertie thermique' : 'Thermal cooking',
       to: pagePath(locale, 'thermal'),
     },
     {
