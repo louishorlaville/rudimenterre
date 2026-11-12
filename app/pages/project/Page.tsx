@@ -29,7 +29,7 @@ export function ProjectPage({content, locale, heroImage}: {
 
       <section className="project-intro" aria-labelledby="project-intro-title">
         <div className="project-heading">
-          <ProjectFlag />
+          <ProjectFlag className="project-heading__flag--left" />
           <div>
             <h2 id="project-intro-title">{content.heroOverrides?.eyebrow || (fr ? 'LE PROJET' : 'THE PROJECT')}</h2>
             <p>{content.heroOverrides?.intro || (fr ? 'UN CUICUI EUROPÉEN' : 'A EUROPEAN CUICUI')}</p>

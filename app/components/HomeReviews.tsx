@@ -155,7 +155,7 @@ export function HomeReviews({locale}: HomeReviewsProps) {
     >
       <img
         className="home-reviews__background"
-        src="/images/rudimenterre/home-reviews-kitchen.jpg"
+        src="/images/rudimenterre/home-reviews-kitchen-dark.jpg"
         alt=""
         loading="lazy"
       />

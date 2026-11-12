@@ -59,7 +59,7 @@ export function RecipePage({content, locale, heroImage}: {
       <div className="recipe-book__inner">
         <div className="recipe-book__copy">
           <p>{fr ? <>Le carnet de recettes Rudimenterre de plus de 50 recettes (104 pages) est fourni au format PDF avec chaque Cuicui.<br />Vous pouvez vous procurer la version papier ici :</> : <>The Rudimenterre recipe book, with over 50 recipes (104 pages), is included as a PDF with every Cuicui.<br />You can get the printed edition here:</>}</p>
-          <a className="button button--orange" href="https://fr.blurb.ca/b/12260585-carnet-de-recettes-rudimenterre">{fr ? 'Je commande le carnet de recettes' : 'Order the recipe book'}</a>
+          <a className="button button--orange" href="https://www.blurb.ca/b/13059325-carnet-de-recettes-rudimenterre">{fr ? 'Je commande le carnet de recettes' : 'Order the recipe book'}</a>
           <img className="recipe-book__portrait" src="/images/rudimenterre/recipe-portrait.webp" alt={fr ? 'Carole présente son Cuicui' : 'Carole presents her Cuicui'} width="1200" height="1800" loading="lazy" />
         </div>
         <img className="recipe-book__cover" src="/images/rudimenterre/recipe-cover.webp" alt={fr ? 'Couverture du carnet de recettes Rudimenterre pour le Cuicui, par Carole Briet' : 'Rudimenterre recipes for Cuicui by Carole Briet, book cover'} width="777" height="1012" loading="lazy" />

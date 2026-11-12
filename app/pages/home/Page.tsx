@@ -360,7 +360,18 @@ export default function Homepage() {
             <div className="home-intro__copy">
               <p className="script">{fr?'Solidaire, économe, créative':'Welcome to the kitchen of the future'}</p>
               <h2>{fr?'Une autre organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
-              {fr ? <p><strong>Qui s’organise avec bon sens pour relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br />Parce que la cuisine du quotidien n’est pas une performance du dimanche.<br /><strong>On n’exécute pas, on réfléchit pour créer et nous libérer</strong> de nos contraintes.</p>
+              {fr ? <><p>
+                <strong>Qui s’organise avec bon sens<br className="home-intro__line-break" />{' '}
+                pour relier les repas entre eux</strong> plutôt<br className="home-intro__line-break" />{' '}
+                que de les isoler, en apprenant <strong>une méthode</strong><br className="home-intro__line-break" />{' '}
+                et non des recettes. Parce que la cuisine du<br className="home-intro__line-break" />{' '}
+                quotidien n’est pas une performance<br className="home-intro__line-break" />{' '}
+                du dimanche.
+              </p>
+              <p>
+                <strong>On n’exécute pas, on réfléchit pour créer et<br className="home-intro__line-break" />{' '}
+                nous libérer</strong> de nos contraintes.
+              </p></>
                 : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
             </div>
           </section>
@@ -455,7 +466,7 @@ export default function Homepage() {
         <p>{fr
           ? 'Inspirons-nous du passé pour réapprendre à nous organiser pour cuisiner comme hier avec moins. Je vous emmène au cœur de la cuisine du futur, entre saveurs retrouvées, sobriété et créativité, découvrir le potager médiéval revisité…'
           : 'Let the past teach us how to organise and cook with less once again. Come into the kitchen of the future—where rediscovered flavours, restraint and creativity meet a reimagined medieval kitchen garden.'}</p>
-        <Link className="button benefit-panel__cta" to={pagePath(locale,'project')}>{fr?'Visite guidée':'Guided tour'}</Link>
+        <Link className="button benefit-panel__cta" to={pagePath(locale,'garden')}>{fr?'Visite guidée':'Guided tour'}</Link>
       </article>
 
           </div>
@@ -662,13 +673,13 @@ export default function Homepage() {
       <h2 id="home-kitchen-follow-title">{fr?'Empilez - Distillez - Savourez !':'Stack - Distill - Savour!'}</h2>
       <div className="home-kitchen-follow__gallery">
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--left">
-          <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Riz et légumes préparés dans un récipient Rudimenterre':'Rice and vegetables prepared in a Rudimenterre vessel'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-center.jpg" alt={fr?'Riz et pommes de terre dans des récipients Cuicui, vus du dessus':'Overhead view of rice and potatoes in Cuicui vessels'} loading="lazy" />
         </figure>
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--center">
-          <img src="/images/rudimenterre/home-follow-kitchen-center.jpg" alt={fr?'Récipients Rudimenterre empilés pour plusieurs préparations':'Rudimenterre vessels stacked for several preparations'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Tour de cinq récipients Cuicui empilés':'Tower of five stacked Cuicui vessels'} loading="lazy" />
         </figure>
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--right">
-          <img src="/images/rudimenterre/home-follow-kitchen-right.jpg" alt={fr?'Préparations disposées dans plusieurs récipients Cuicui':'Food arranged in several Cuicui vessels'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-right.jpg" alt={fr?'Cuicui en terre cuite entouré de légumes':'Terracotta Cuicui surrounded by vegetables'} loading="lazy" />
         </figure>
       </div>
       <a
@@ -821,9 +832,9 @@ export default function Homepage() {
           {tone: 'mint', image: 'home-discover-eu-flag-512.webp', mobileImage: 'home-discover-eu-flag-128.webp', imageHeight: 605, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui européen' : 'The Rudimenterre project\nA European Cuicui'},
           {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
           {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
-          {tone: 'charcoal', image: 'home-discover-professional-512.webp', mobileImage: 'home-discover-professional-128.webp', imageHeight: 485, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
+          {id: 'home-professional-services', tone: 'charcoal', image: 'home-discover-professional-512.webp', mobileImage: 'home-discover-professional-128.webp', imageHeight: 485, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
         ].map((card) => (
-          <Link key={card.tone} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
+          <Link key={card.tone} id={card.id} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
             <div className="home-discover__illustration" aria-hidden="true">
               <img
                 src={`/images/rudimenterre/${card.image}`}
