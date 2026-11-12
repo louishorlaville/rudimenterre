@@ -662,13 +662,13 @@ export default function Homepage() {
       <h2 id="home-kitchen-follow-title">{fr?'Empilez - Distillez - Savourez !':'Stack - Distill - Savour!'}</h2>
       <div className="home-kitchen-follow__gallery">
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--left">
-          <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Riz et légumes préparés dans un récipient Rudimenterre':'Rice and vegetables prepared in a Rudimenterre vessel'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-center.jpg" alt={fr?'Riz et pommes de terre dans des récipients Cuicui, vus du dessus':'Overhead view of rice and potatoes in Cuicui vessels'} loading="lazy" />
         </figure>
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--center">
-          <img src="/images/rudimenterre/home-follow-kitchen-center.jpg" alt={fr?'Récipients Rudimenterre empilés pour plusieurs préparations':'Rudimenterre vessels stacked for several preparations'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-left.jpg" alt={fr?'Tour de cinq récipients Cuicui empilés':'Tower of five stacked Cuicui vessels'} loading="lazy" />
         </figure>
         <figure className="home-kitchen-follow__image home-kitchen-follow__image--right">
-          <img src="/images/rudimenterre/home-follow-kitchen-right.jpg" alt={fr?'Préparations disposées dans plusieurs récipients Cuicui':'Food arranged in several Cuicui vessels'} loading="lazy" />
+          <img src="/images/rudimenterre/home-follow-kitchen-right.jpg" alt={fr?'Cuicui en terre cuite entouré de légumes':'Terracotta Cuicui surrounded by vegetables'} loading="lazy" />
         </figure>
       </div>
       <a
@@ -821,9 +821,9 @@ export default function Homepage() {
           {tone: 'mint', image: 'home-discover-eu-flag.png', crop: {viewBox: '0 0 1269 1500', width: 1269, height: 2044}, to: pagePath(locale, 'project'), title: fr ? 'Le projet Rudimenterre\nUn Cuicui européen' : 'The Rudimenterre project\nA European Cuicui'},
           {tone: 'white', image: 'home-kitchen-compare-towel.png', to: pagePath(locale, 'making'), title: fr ? 'Matière\nFabrication,\nentretien' : 'Material\nMaking,\nand care'},
           {tone: 'sage', image: 'home-discover-workshops.png', to: `/${locale}/pages/ateliers-cuissons-rudimenterre`, title: fr ? 'Les ateliers cuissons\nRudimenterre' : 'Rudimenterre\ncooking workshops'},
-          {tone: 'charcoal', image: 'home-discover-professional.png', crop: {viewBox: '1060 911 1939 1835', width: 4032, height: 3024}, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
+          {id: 'home-professional-services', tone: 'charcoal', image: 'home-discover-professional.png', crop: {viewBox: '1060 911 1939 1835', width: 4032, height: 3024}, to: `/${locale}/pages/service-decouverte-pro`, title: fr ? 'Services pro\nPour les chefs du futur' : 'Professional services\nFor the chefs of the future'},
         ].map((card) => (
-          <Link key={card.tone} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
+          <Link key={card.tone} id={card.id} className={`home-discover__card home-discover__card--${card.tone}`} to={card.to}>
             <div className="home-discover__illustration" aria-hidden="true">
               {card.crop ? (
                 <svg viewBox={card.crop.viewBox} focusable="false">

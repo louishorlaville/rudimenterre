@@ -551,12 +551,10 @@ body:has(#main-content > .home) .site-header {
 .home-section-divider--video { padding-top: clamp(1.35rem, 2.2vw, 2rem); padding-bottom: clamp(1.35rem, 2.2vw, 2rem); }
 .home-kitchen-follow { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; padding: clamp(1.8rem, 3vw, 3rem) 0 clamp(4rem, 7vw, 7rem); background: var(--charcoal); color: var(--white); text-align: center; }
 .home-kitchen-follow h2 { margin: 0 0 clamp(1.8rem, 3vw, 3rem); font-size: clamp(1.1rem, 1.65vw, 1.55rem); letter-spacing: -.01em; text-transform: uppercase; }
-.home-kitchen-follow__gallery { display: grid; grid-template-columns: 26fr 48fr 23fr; gap: clamp(.7rem, 1.15vw, 1.15rem); width: 100%; height: clamp(18rem, 35vw, 34rem); }
-.home-kitchen-follow__image { min-width: 0; height: 100%; margin: 0; overflow: hidden; background: #18120e; }
-.home-kitchen-follow__image img { width: 100%; height: 100%; object-fit: cover; }
-.home-kitchen-follow__image--left img { object-position: 50% 52%; }
-.home-kitchen-follow__image--center img { object-position: 50% 51%; }
-.home-kitchen-follow__image--right img { object-position: 50% 50%; }
+.home-kitchen-follow__gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; aspect-ratio: 2; }
+.home-kitchen-follow__image { position: relative; min-width: 0; margin: 0; overflow: hidden; background: #18120e; }
+.home-kitchen-follow__image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.home-kitchen-follow__image--center img { object-fit: contain; }
 .home-kitchen-follow__cta { margin-top: clamp(3rem, 5.5vw, 5.5rem); background: var(--cream); color: var(--ink); }
 .home-library { position: relative; z-index: 4; padding: clamp(3.25rem, 6vw, 6rem) 0; background: var(--cream); }
 .home-library__header { min-height: clamp(7rem, 10vw, 10rem); display: grid; place-items: center; padding: 2rem var(--content-gutter); background: #292929; color: var(--cream); text-align: center; }
@@ -1397,6 +1395,9 @@ body:has(#main-content > .home) .site-header {
   letter-spacing: 0;
   text-transform: none;
 }
+#home-professional-services {
+  scroll-margin-top: calc(var(--header-height) + 24px);
+}
 .home-professional-banner {
   position: relative;
   min-height: clamp(28rem, 43vw, 41rem);
@@ -1570,11 +1571,9 @@ body:has(#main-content > .home) .site-header {
   .home-section-divider--video span { max-width: 18rem; line-height: 1.25; }
   .home-kitchen-follow { padding-block: 2.5rem 4rem; }
   .home-kitchen-follow h2 { margin-bottom: 2rem; font-size: 1.05rem; }
-  .home-kitchen-follow__gallery { grid-template-columns: 1fr 1fr; gap: .7rem; height: auto; padding-inline: .7rem; }
-  .home-kitchen-follow__image { height: 14rem; }
-  .home-kitchen-follow__image--center { grid-column: 1 / -1; grid-row: 1; height: min(78vw, 25rem); }
-  .home-kitchen-follow__image--left,
-  .home-kitchen-follow__image--right { grid-row: 2; }
+  .home-kitchen-follow__gallery { grid-template-columns: minmax(0, 1fr); aspect-ratio: auto; }
+  .home-kitchen-follow__image { aspect-ratio: 4 / 3; }
+  .home-kitchen-follow__image--center { aspect-ratio: 2 / 3; }
   .home-kitchen-follow__cta { margin-top: 3rem; }
   .home-library { padding-block: 3rem; }
   .home-library__header { min-height: 6.5rem; padding-inline: 1.5rem; }
@@ -2326,10 +2325,6 @@ body:has(#main-content > .home) .site-header {
   padding-block: clamp(1.5rem, 2.4vw, 2.4rem) clamp(3rem, 5vw, 5rem);
 }
 
-.home-kitchen-follow__gallery {
-  height: clamp(26rem, 42vw, 44rem);
-}
-
 .home-kitchen-follow__cta {
   margin-top: clamp(2.25rem, 4vw, 4rem);
 }
@@ -2548,14 +2543,6 @@ body:has(#main-content > .home) .site-header {
 
   .home-kitchen-follow {
     padding-block: 2rem 3rem;
-  }
-
-  .home-kitchen-follow__image {
-    height: 12rem;
-  }
-
-  .home-kitchen-follow__image--center {
-    height: min(68vw, 22rem);
   }
 
   .home-kitchen-follow__cta {
@@ -2984,19 +2971,6 @@ body:has(#main-content > .home) .site-header {
     min-width: 7.5rem;
   }
 
-  .home-kitchen-follow__gallery {
-    gap: .6rem;
-    padding-inline: .6rem;
-  }
-
-  .home-kitchen-follow__image {
-    height: 12rem;
-  }
-
-  .home-kitchen-follow__image--center {
-    height: min(72vw, 22rem);
-  }
-
   .home-library__scene {
     height: 80vw;
   }
@@ -3062,7 +3036,6 @@ body:has(#main-content > .home) .site-header {
   .practice-benefit-stack > div { min-height: 7rem; padding: 1rem .75rem; }
   .practice-benefit-stack span, .practice-benefit-stack strong { font-size: 1rem; line-height: 1.4; }
   .practice-media--cook-less > img { height: 15rem; width: 100%; }
-  .home-kitchen-follow__gallery { height: auto; }
   .home-kitchen-follow h2 { padding-inline: var(--page-gutter); line-height: 1.4; }
   .home-kitchen-follow__cta { max-width: calc(100% - 2 * var(--page-gutter)) !important; }
   .home-kitchen-compare__divider { min-height: 8rem; padding-block: 2.25rem; }
