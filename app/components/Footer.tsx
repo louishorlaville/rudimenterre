@@ -1,8 +1,13 @@
-import {Link, useLocation} from 'react-router';
+import type {SyntheticEvent} from 'react';
+import {Link, NavLink, useLocation} from 'react-router';
 import {Brand} from './Brand';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {pagePath} from '~/lib/editorial-content';
 import {localeFromPathname} from '~/lib/i18n';
+
+function markFooterCtaInteracted(event: SyntheticEvent<HTMLAnchorElement>) {
+  event.currentTarget.classList.add('button--interacted');
+}
 
 export function Footer(_props: {
   footer: Promise<FooterQuery | null>;
@@ -23,15 +28,17 @@ export function Footer(_props: {
           <p>{fr ? 'Découvrir' : 'Discover'}</p>
           <Link to={`/${locale}/adoptez`}>{fr ? 'Le Cuicui' : 'Cuicui'}</Link>
           <Link to={pagePath(locale, 'steam')}>{fr ? 'Comment ça marche' : 'How it works'}</Link>
+          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
           <Link to={pagePath(locale, 'project')}>{fr ? 'Le projet' : 'The project'}</Link>
           <Link to={pagePath(locale, 'making')}>{fr ? 'Fabrication et entretien' : 'Making and care'}</Link>
         </div>
 
         <div className="footer-column">
           <p>{fr ? 'En cuisine' : 'In the kitchen'}</p>
+          <a href="https://www.instagram.com/rudimenterre/reels/">{fr ? 'Suivez-nous en cuisine' : 'Follow us into the kitchen'}</a>
+          <a href="https://www.blurb.ca/b/13059325-carnet-de-recettes-rudimenterre">{fr ? 'Le carnet de recettes Rudimenterre' : 'The Rudimenterre recipe book'}</a>
           <Link to={pagePath(locale, 'creator')}>{fr ? 'La recette' : 'The recipe'}</Link>
-          <Link to={pagePath(locale, 'garden')}>{fr ? 'Potager' : 'Kitchen garden'}</Link>
-          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
+          <Link to={pagePath(locale, 'garden')}>{fr ? 'Le Potager' : 'Kitchen garden'}</Link>
         </div>
 
         <div className="footer-column footer-column--contact">
@@ -39,12 +46,19 @@ export function Footer(_props: {
           <Link to={`/${locale}/pages/contacts`}>{fr ? 'Contacts' : 'Contact'}</Link>
           <Link to={pagePath(locale, 'shipping')}>{fr ? 'Tarifs, livraison et garanties' : 'Pricing, shipping and warranty'}</Link>
           <Link to={`/${locale}/pages/presse-medias`}>{fr ? 'Presse médias' : 'Press and media'}</Link>
+          <Link to={`/${locale}#home-professional-services`}>{fr ? 'Pour les chefs du futur' : 'For the chefs of the future'}</Link>
         </div>
       </nav>
 
-      <Link className="button button--orange site-footer__cta" to={pagePath(locale, 'adopt')}>
-        {fr ? 'Adoptez' : 'Adopt'}
-      </Link>
+      <NavLink
+        className="button button--orange header-cta site-footer__cta"
+        onPointerEnter={markFooterCtaInteracted}
+        onFocus={markFooterCtaInteracted}
+        to={pagePath(locale, 'adopt')}
+        prefetch="intent"
+      >
+        <span>{fr ? 'Adoptez' : 'Adopt'}</span>
+      </NavLink>
 
       <nav className="footer-social" aria-label={fr ? 'Réseaux sociaux' : 'Social media'}>
         {[

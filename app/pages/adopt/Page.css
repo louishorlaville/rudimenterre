@@ -1,6 +1,6 @@
 .adopt-page {
   --adopt-accent: #f47b00;
-  --adopt-accent-ink: #a34700;
+  --adopt-accent-ink: #b54700;
   color: var(--charcoal);
   background: var(--paper);
   text-align: center;
@@ -159,12 +159,14 @@
 }
 
 .adopt-choices__image {
-  align-self: end;
+  align-self: start;
   justify-self: center;
-  width: 100%;
+  width: 125%;
   max-width: 38rem;
   height: auto;
   margin-bottom: .75rem;
+  /* Centre the Cuicui itself, excluding the shadow to its left. */
+  transform: translateX(-15%);
 }
 
 .adopt-vital {
@@ -210,6 +212,10 @@
   width: 100%;
   max-width: 21rem;
   height: auto;
+}
+
+.adopt-detail--kit {
+  grid-template-columns: minmax(0, 9fr) minmax(0, 11fr);
 }
 
 .adopt-detail--kit img {
@@ -273,6 +279,10 @@
   line-height: 1.45;
 }
 
+.adopt-comparison dd > * {
+  display: block;
+}
+
 .adopt-modules {
   padding: clamp(1rem, 3vw, 2.5rem) 0;
 }
@@ -283,6 +293,17 @@
 
 .adopt-registration p:last-child {
   font-style: italic;
+}
+
+@media (min-width: 701px) {
+  .adopt-option .adopt-button {
+    min-height: calc(2.3em + 1.3rem + 4px);
+  }
+
+  .adopt-detail--vessel > div {
+    align-self: end;
+    margin-block-end: clamp(1rem, 3vw, 2.5rem);
+  }
 }
 
 @media (max-width: 700px) {
