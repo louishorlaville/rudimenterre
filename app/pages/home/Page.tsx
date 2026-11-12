@@ -360,7 +360,18 @@ export default function Homepage() {
             <div className="home-intro__copy">
               <p className="script">{fr?'Solidaire, économe, créative':'Welcome to the kitchen of the future'}</p>
               <h2>{fr?'Une autre organisation des cuissons en cuisine':'Another approach to organising cooking in the kitchen'}</h2>
-              {fr ? <p><strong>Qui s’organise avec bon sens pour relier les repas entre eux</strong> plutôt que de les isoler, en apprenant <strong>une méthode</strong> et non des recettes.<br />Parce que la cuisine du quotidien n’est pas une performance du dimanche.<br /><strong>On n’exécute pas, on réfléchit pour créer et nous libérer</strong> de nos contraintes.</p>
+              {fr ? <><p>
+                <strong>Qui s’organise avec bon sens<br className="home-intro__line-break" />{' '}
+                pour relier les repas entre eux</strong> plutôt<br className="home-intro__line-break" />{' '}
+                que de les isoler, en apprenant <strong>une méthode</strong><br className="home-intro__line-break" />{' '}
+                et non des recettes. Parce que la cuisine du<br className="home-intro__line-break" />{' '}
+                quotidien n’est pas une performance<br className="home-intro__line-break" />{' '}
+                du dimanche.
+              </p>
+              <p>
+                <strong>On n’exécute pas, on réfléchit pour créer et<br className="home-intro__line-break" />{' '}
+                nous libérer</strong> de nos contraintes.
+              </p></>
                 : <p><strong>Everyday cooking</strong> is not a Sunday performance: it means <strong>organising with common sense.</strong> It is the art of <strong>connecting meals to one another</strong> rather than isolating them, by learning <strong>a method</strong>, not recipes.<br/><strong>We do not simply execute; we think in order to free ourselves</strong> from everyday constraints that make us creative.</p>}
             </div>
           </section>

@@ -197,13 +197,12 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
   --button-hover-border: var(--cream);
   justify-self: end;
   margin-top: clamp(2rem, 3vw, 3rem);
-  min-width: clamp(13rem, 19vw, 18rem);
-  min-height: clamp(3.3rem, 4.6vw, 4.4rem);
-  padding-inline: 2rem;
+  min-height: 3rem;
+  padding-inline: 1.4rem;
   border: 2px solid var(--ink);
   background: #f47b00;
   color: var(--cream);
-  font-size: clamp(1rem, 1.45vw, 1.45rem);
+  font-size: 1rem;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
@@ -413,8 +412,8 @@ html:has(.overlay.expanded) { overflow: hidden; }
     font-size: 1rem;
   }
   .site-footer__cta {
-    justify-self: stretch;
-    width: 100%;
+    justify-self: center;
+    min-height: 3.25rem;
     margin-top: 4rem;
   }
   .footer-meta {
