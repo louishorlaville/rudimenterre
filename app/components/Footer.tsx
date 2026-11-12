@@ -1,8 +1,13 @@
-import {Link, useLocation} from 'react-router';
+import type {SyntheticEvent} from 'react';
+import {Link, NavLink, useLocation} from 'react-router';
 import {Brand} from './Brand';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {pagePath} from '~/lib/editorial-content';
 import {localeFromPathname} from '~/lib/i18n';
+
+function markFooterCtaInteracted(event: SyntheticEvent<HTMLAnchorElement>) {
+  event.currentTarget.classList.add('button--interacted');
+}
 
 export function Footer(_props: {
   footer: Promise<FooterQuery | null>;
@@ -45,9 +50,15 @@ export function Footer(_props: {
         </div>
       </nav>
 
-      <Link className="button button--orange site-footer__cta" to={pagePath(locale, 'adopt')}>
-        {fr ? 'Adoptez' : 'Adopt'}
-      </Link>
+      <NavLink
+        className="button button--orange header-cta site-footer__cta"
+        onPointerEnter={markFooterCtaInteracted}
+        onFocus={markFooterCtaInteracted}
+        to={pagePath(locale, 'adopt')}
+        prefetch="intent"
+      >
+        <span>{fr ? 'Adoptez' : 'Adopt'}</span>
+      </NavLink>
 
       <nav className="footer-social" aria-label={fr ? 'Réseaux sociaux' : 'Social media'}>
         {[

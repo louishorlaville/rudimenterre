@@ -194,18 +194,8 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
   text-transform: uppercase;
 }
 .site-footer__cta {
-  --button-hover-border: var(--cream);
   justify-self: end;
   margin-top: clamp(2rem, 3vw, 3rem);
-  min-height: 3rem;
-  padding-inline: 1.4rem;
-  border: 2px solid var(--ink);
-  background: #f47b00;
-  color: var(--cream);
-  font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
 }
 .footer-social {
   display: flex;
@@ -413,7 +403,6 @@ html:has(.overlay.expanded) { overflow: hidden; }
   }
   .site-footer__cta {
     justify-self: center;
-    min-height: 3.25rem;
     margin-top: 4rem;
   }
   .footer-meta {
