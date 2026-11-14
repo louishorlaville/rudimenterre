@@ -8,21 +8,16 @@ const types = [
   'products',
   'collections',
   'pages',
-  'blogs',
-  'articles',
 ] as const;
 const enums = {
   products: 'PRODUCT',
   collections: 'COLLECTION',
   pages: 'PAGE',
-  blogs: 'BLOG',
-  articles: 'ARTICLE',
 };
 const staticPaths = [
   '',
   ...Object.values(PAGE_SLUGS),
   'collections',
-  'blogs',
   'policies',
   'contacts',
   'presse-medias',
@@ -96,8 +91,7 @@ export async function getSitemap({
         },
       });
       return (result.sitemap?.resources?.items ?? []).flatMap((resource) => {
-        const type = params.type === 'articles' ? 'blogs' : params.type;
-        const url = new URL(`${origin}/${locale}/${type}/${resource.handle}`);
+        const url = new URL(`${origin}/${locale}/${params.type}/${resource.handle}`);
         url.pathname = getCanonicalStorefrontPathname(url);
         // Application-owned equivalents are already present in the static sitemap.
         if (staticPaths.includes(url.pathname.replace(/^\/(fr|en)\/?/, '')))

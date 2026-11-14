@@ -295,6 +295,12 @@ try {
   ).text();
   assert.ok(index.includes('https://rudimenterre.com/fr/sitemap/static/1.xml'));
   assert.ok(!index.includes('preview.example'));
+  assert.ok(!/\/sitemap\/(blogs|articles)\//.test(index));
+  for (const type of ['blogs', 'articles'])
+    await assert.rejects(
+      getSitemap({storefront, request: sitemapRequest, params: {type, page: '1'}}),
+      (error) => error.status === 404,
+    );
   const products = await (
     await getSitemap({
       storefront,
@@ -343,6 +349,7 @@ try {
       assert.ok(staticXml.includes(`https://rudimenterre.fr/${locale}/${slug}</loc>`));
     assert.ok(!staticXml.includes(`/pages/${slug}`));
   }
+  assert.ok(!staticXml.includes('/blogs'));
   for (const slug of Object.values(PAGE_SLUGS))
     for (const locale of ['fr', 'en'])
       assert.ok(

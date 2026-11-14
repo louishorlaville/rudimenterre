@@ -13,6 +13,8 @@ export default {
   ): Promise<Response> {
     let response: Response;
     try {
+      if (/^\/(?:fr\/|en\/)?blogs(?:\/|\.data$|$)/i.test(new URL(request.url).pathname))
+        throw new Response('Gone', {status: 410});
       const redirect = getStorefrontRedirect(request);
       const resourcePath = /^\/(?:fr\/|en\/)?(?:products|collections|pages|blogs|policies)(?:\/|$)/i.test(
         new URL(request.url).pathname,

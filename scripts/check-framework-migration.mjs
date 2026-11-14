@@ -349,6 +349,13 @@ try {
     assert.equal(fastRedirect.headers.get('Location'), target);
   }
 
+  for (const path of ['/blogs', '/blogs/news', '/fr/blogs/news', '/en/blogs/news/old-article', '/en/blogs/news.data']) {
+    const removedBlog = await worker.fetch(new Request(`https://rudimenterre.com${path}`), {}, execution);
+    assert.equal(removedBlog.status, 410, 'Removed blogs must not require Shopify or redirect');
+    assert.equal(removedBlog.headers.get('Location'), null);
+    await removedBlog.text();
+  }
+
   const assets = readdirSync('dist/client/assets').filter((name) =>
     /^manifest-.*\.js$/.test(name),
   );
