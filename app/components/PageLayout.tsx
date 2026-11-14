@@ -45,6 +45,7 @@ export function PageLayout({
           isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
         />
+        <div className="site-header-space" aria-hidden="true" />
         <main id="main-content">{children}</main>
         <Footer
           footer={footer}
