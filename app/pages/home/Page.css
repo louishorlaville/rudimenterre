@@ -1502,24 +1502,25 @@ body:has(#main-content > .home) .site-header {
   margin: 0;
 }
 .home-newsletter-banner h2 {
-  font-size: clamp(1.45rem, 2.25vw, 2.35rem);
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: 0;
   text-transform: uppercase;
 }
 .home-newsletter-banner p {
-  font-size: clamp(1rem, 1.65vw, 1.7rem);
+  font-size: 1rem;
   font-weight: 300;
-  line-height: 1.25;
+  line-height: 1.5;
 }
 .home-newsletter-banner__cta {
   --button-hover-bg: var(--ink);
   --button-hover-color: var(--cream);
-  min-width: clamp(16rem, 22vw, 21rem);
+  min-width: 0;
+  width: fit-content;
   min-height: clamp(3.5rem, 5vw, 4.8rem);
-  justify-content: flex-start;
-  gap: clamp(1.5rem, 2.4vw, 2.5rem);
+  justify-content: center;
+  gap: .75rem;
   padding-inline: clamp(1.5rem, 2.5vw, 2.5rem);
   border: 2px solid var(--ink);
   background: var(--cream);
@@ -1939,18 +1940,12 @@ body:has(#main-content > .home) .site-header {
     padding: 3.75rem 1.25rem 2.5rem;
     text-align: center;
   }
-  .home-newsletter-banner h2 {
-    font-size: clamp(1.3rem, 5.8vw, 1.65rem);
-  }
   .home-newsletter-banner p {
     max-width: 22rem;
-    font-size: clamp(.98rem, 4.3vw, 1.12rem);
   }
   .home-newsletter-banner__cta {
-    min-width: min(19rem, 90vw);
     min-height: 3.6rem;
     justify-content: center;
-    gap: 1.5rem;
     padding-inline: 1.25rem;
     font-size: clamp(.95rem, 4.2vw, 1.08rem);
   }
