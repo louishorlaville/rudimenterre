@@ -9,7 +9,7 @@
 .contacts-content h1 { margin: 0; font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.05; }
 .contacts-intro { max-width: 44ch; margin: 1.5rem 0 2.5rem; font-size: 1.125rem; line-height: 1.65; }
 .contacts-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-.contacts-field { display: grid; gap: .625rem; }
+.contacts-field { display: flex; flex-direction: column; gap: .625rem; }
 .contacts-field label { font-size: 1rem; font-weight: 600; line-height: 1.5; }
 .contacts-field input, .contacts-field textarea { width: 100%; min-width: 0; padding: .875rem 1rem; border: 1px solid var(--ink); border-radius: 0; background: var(--white); color: var(--ink); font: inherit; font-size: 1rem; line-height: 1.5; }
 .contacts-field input { min-height: 3.25rem; }
