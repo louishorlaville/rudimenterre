@@ -25,28 +25,33 @@ export function Footer(_props: {
 
       <nav className="site-footer__nav" aria-label={fr ? 'Plan du site' : 'Sitemap'}>
         <div className="footer-column">
-          <p>{fr ? 'Découvrir' : 'Discover'}</p>
-          <Link to={`/${locale}/adoptez`}>{fr ? 'Le Cuicui' : 'Cuicui'}</Link>
-          <Link to={pagePath(locale, 'steam')}>{fr ? 'Comment ça marche' : 'How it works'}</Link>
-          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
-          <Link to={pagePath(locale, 'project')}>{fr ? 'Le projet' : 'The project'}</Link>
+          <p>{fr ? 'Le Cuicui' : 'Cuicui'}</p>
+          <a href="https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Decouvrir-le-Cuicui-2026.pdf?v=1794625779" target="_blank" rel="noopener noreferrer">{fr ? 'Le catalogue Cuicui' : 'Cuicui catalogue'}</a>
+          <a href="https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Carnet_PRATIQUE_2024-FR-c.pdf?v=1743953253" target="_blank" rel="noopener noreferrer">{fr ? 'Le carnet pratique' : 'Practical guide'}</a>
           <Link to={pagePath(locale, 'making')}>{fr ? 'Fabrication et entretien' : 'Making and care'}</Link>
+          <Link to={pagePath(locale, 'project')}>{fr ? 'Le projet' : 'The project'}</Link>
+        </div>
+
+        <div className="footer-column">
+          <p>{fr ? 'Comment ça marche' : 'How it works'}</p>
+          <Link to={pagePath(locale, 'steam')}>{fr ? 'Vapeur-étuvée' : 'Steam cooking'}</Link>
+          <Link to={pagePath(locale, 'thermal')}>{fr ? 'Inertie thermique' : 'Thermal cooking'}</Link>
+          <Link to={pagePath(locale, 'distillation')}>Distillation</Link>
         </div>
 
         <div className="footer-column">
           <p>{fr ? 'En cuisine' : 'In the kitchen'}</p>
-          <a href="https://www.instagram.com/rudimenterre/reels/">{fr ? 'Suivez-nous en cuisine' : 'Follow us into the kitchen'}</a>
-          <a href="https://www.blurb.ca/b/13059325-carnet-de-recettes-rudimenterre">{fr ? 'Le carnet de recettes Rudimenterre' : 'The Rudimenterre recipe book'}</a>
+          <Link to={pagePath(locale, 'garden')}>{fr ? 'Le potager' : 'Kitchen garden'}</Link>
           <Link to={pagePath(locale, 'creator')}>{fr ? 'La recette' : 'The recipe'}</Link>
-          <Link to={pagePath(locale, 'garden')}>{fr ? 'Le Potager' : 'Kitchen garden'}</Link>
+          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
+          <a href="https://www.instagram.com/rudimenterre/reels/">{fr ? 'Suivez-nous en cuisine' : 'Follow us into the kitchen'}</a>
         </div>
 
         <div className="footer-column footer-column--contact">
           <p>{fr ? 'Aide et contact' : 'Help and contact'}</p>
-          <Link to={`/${locale}/pages/contacts`}>{fr ? 'Contacts' : 'Contact'}</Link>
+          <Link to={`/${locale}/contacts`}>{fr ? 'Contacts' : 'Contact'}</Link>
           <Link to={pagePath(locale, 'shipping')}>{fr ? 'Tarifs, livraison et garanties' : 'Pricing, shipping and warranty'}</Link>
-          <Link to={`/${locale}/pages/presse-medias`}>{fr ? 'Presse médias' : 'Press and media'}</Link>
-          <Link to={`/${locale}#home-professional-services`}>{fr ? 'Pour les chefs du futur' : 'For the chefs of the future'}</Link>
+          <Link to={`/${locale}/presse-medias`}>{fr ? 'Presse médias' : 'Press and media'}</Link>
         </div>
       </nav>
 

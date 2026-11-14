@@ -163,7 +163,14 @@ try {
       '/en/products/cuicui-gourmet',
     ],
     ['/en/pages/projet/le-projet', '/en/projet-rudimenterre'],
-    ['/pages/contactez-nous', '/fr/pages/contacts'],
+    ['/pages/contactez-nous', '/fr/contacts'],
+    ...['contacts', 'presse-medias', 'newsletter'].flatMap((slug) => [
+      [`/pages/${slug}`, `/fr/${slug}`],
+      [`/fr/pages/${slug}?utm_source=test`, `/fr/${slug}?utm_source=test`],
+      [`/en/pages/${slug}`, `/en/${slug}`],
+      [`/${slug}`, `/fr/${slug}`],
+      [`/EN/${slug}/`, `/en/${slug}`],
+    ]),
     ['/collections/all', '/fr/adoptez'],
     [
       '/pages/tarifs-livraisons-et-garanties-des-serie-limitees',
@@ -321,7 +328,7 @@ try {
     'Redirected pages cannot leak into sitemaps',
   );
   assert.ok(
-    !legacyPageSitemap.includes('/pages/contacts'),
+    !legacyPageSitemap.includes('/contacts'),
     'Static canonical is not repeated in API sitemaps',
   );
   const staticXml = await (
@@ -331,6 +338,11 @@ try {
       params: {type: 'static', page: '1'},
     })
   ).text();
+  for (const slug of ['contacts', 'presse-medias', 'newsletter']) {
+    for (const locale of ['fr', 'en'])
+      assert.ok(staticXml.includes(`https://rudimenterre.fr/${locale}/${slug}</loc>`));
+    assert.ok(!staticXml.includes(`/pages/${slug}`));
+  }
   for (const slug of Object.values(PAGE_SLUGS))
     for (const locale of ['fr', 'en'])
       assert.ok(

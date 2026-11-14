@@ -50,7 +50,7 @@ function contactEmailHtml(name: string, email: string, message: string, press: b
 
 export async function action({request, context, params}: ActionFunctionArgs) {
   const fr = params.locale !== 'en';
-  const press = /\/pages\/presse-medias(?:\.data)?\/?$/.test(new URL(request.url).pathname);
+  const press = /\/presse-medias(?:\.data)?\/?$/.test(new URL(request.url).pathname);
   const invalid = fr
     ? 'Vérifiez votre adresse courriel et votre message (5 000 caractères maximum).'
     : 'Check your email address and message (5,000 characters maximum).';

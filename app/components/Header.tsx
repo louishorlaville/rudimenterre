@@ -65,6 +65,18 @@ export function HeaderMenu({
   const locale = localeFromPathname(pathname);
   const copy = UI_COPY[locale];
   const {close} = useAside();
+  const cuicuiLinks = [
+    {
+      label: locale === 'fr' ? 'Le catalogue Cuicui' : 'Cuicui catalogue',
+      to: 'https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Decouvrir-le-Cuicui-2026.pdf?v=1794625779',
+      external: true,
+    },
+    {
+      label: locale === 'fr' ? 'Le carnet pratique' : 'Practical guide',
+      to: 'https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Carnet_PRATIQUE_2024-FR-c.pdf?v=1743953253',
+      external: true,
+    },
+  ];
   const howItWorks = [
     {
       label: locale === 'fr' ? 'Vapeur-étuvée' : 'Steam cooking',
@@ -80,7 +92,7 @@ export function HeaderMenu({
     },
   ];
   const kitchenLinks = [
-    {label: locale === 'fr' ? 'Potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
+    {label: locale === 'fr' ? 'Le potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
     {label: locale === 'fr' ? 'Le Cuicui en vadrouille' : 'Cuicui on the road', to: pagePath(locale, 'vadrouille')},
   ];
@@ -89,13 +101,13 @@ export function HeaderMenu({
       className={`header-menu header-menu--${viewport}`}
       aria-label={copy.menu}
     >
-      <NavLink
-        onClick={close}
-        to={`/${locale}/products/cuicui-pragmatique`}
-        prefetch="intent"
-      >
-        {locale === 'fr' ? 'Le Cuicui' : 'Cuicui'}
-      </NavLink>
+      <HeaderSubmenu
+        label={locale === 'fr' ? 'Le Cuicui' : 'Cuicui'}
+        links={cuicuiLinks}
+        pathname={pathname}
+        onNavigate={close}
+        viewport={viewport}
+      />
       <HeaderSubmenu
         label={locale === 'fr' ? 'Comment ça marche' : 'How it works'}
         links={howItWorks}
@@ -153,11 +165,16 @@ function HeaderSubmenu({
   viewport,
 }: {
   label: string;
-  links: Array<{label: string; to: string}>;
+  links: Array<{label: string; to: string; external?: boolean}>;
   pathname: string;
   onNavigate: () => void;
   viewport: 'desktop' | 'mobile';
 }) {
+  function handleNavigate(event: SyntheticEvent<HTMLAnchorElement>) {
+    event.currentTarget.closest('details')?.removeAttribute('open');
+    onNavigate();
+  }
+
   return (
     <details
       className="header-documentation"
@@ -183,20 +200,30 @@ function HeaderSubmenu({
         <span aria-hidden="true" />
       </summary>
       <div className="header-documentation__menu">
-        {links.map((item) => (
-          <NavLink
-            className="header-documentation__link"
-            key={item.to}
-            onClick={(event) => {
-              event.currentTarget.closest('details')?.removeAttribute('open');
-              onNavigate();
-            }}
-            to={item.to}
-            prefetch="intent"
-          >
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
+        {links.map((item) =>
+          item.external ? (
+            <a
+              className="header-documentation__link"
+              key={item.to}
+              href={item.to}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleNavigate}
+            >
+              <span>{item.label}</span>
+            </a>
+          ) : (
+            <NavLink
+              className="header-documentation__link"
+              key={item.to}
+              onClick={handleNavigate}
+              to={item.to}
+              prefetch="intent"
+            >
+              <span>{item.label}</span>
+            </NavLink>
+          )
+        )}
       </div>
     </details>
   );
