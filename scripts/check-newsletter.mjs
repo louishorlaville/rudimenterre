@@ -15,7 +15,7 @@ async function submit(fields = {}, options = {}) {
   const form = new URLSearchParams({email: ' visitor@example.com ', ...fields});
   for (const value of options.interests ?? []) form.append('interests', value);
   const result = await action({
-    request: new Request('https://shop.example/fr/pages/newsletter', {
+    request: new Request('https://shop.example/fr/newsletter', {
       method: options.method ?? 'POST',
       headers: {Origin: options.origin ?? 'https://shop.example', 'oxygen-buyer-ip': '192.0.2.1'},
       ...(options.method === 'GET' ? {} : {body: form}),

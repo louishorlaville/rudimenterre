@@ -49,9 +49,9 @@ export function Footer(_props: {
 
         <div className="footer-column footer-column--contact">
           <p>{fr ? 'Aide et contact' : 'Help and contact'}</p>
-          <Link to={`/${locale}/pages/contacts`}>{fr ? 'Contacts' : 'Contact'}</Link>
+          <Link to={`/${locale}/contacts`}>{fr ? 'Contacts' : 'Contact'}</Link>
           <Link to={pagePath(locale, 'shipping')}>{fr ? 'Tarifs, livraison et garanties' : 'Pricing, shipping and warranty'}</Link>
-          <Link to={`/${locale}/pages/presse-medias`}>{fr ? 'Presse médias' : 'Press and media'}</Link>
+          <Link to={`/${locale}/presse-medias`}>{fr ? 'Presse médias' : 'Press and media'}</Link>
         </div>
       </nav>
 

@@ -24,9 +24,9 @@ const staticPaths = [
   'collections',
   'blogs',
   'policies',
-  'pages/contacts',
-  'pages/presse-medias',
-  'pages/newsletter',
+  'contacts',
+  'presse-medias',
+  'newsletter',
 ];
 const escape = (value: string) =>
   value

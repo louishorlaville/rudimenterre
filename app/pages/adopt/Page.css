@@ -221,6 +221,7 @@
 .adopt-detail--kit img {
   width: min(68%, 16rem);
   margin-top: clamp(-9rem, -10vw, -3rem);
+  transform: translateY(clamp(-2rem, -2vw, -1rem));
 }
 
 .adopt-detail h3,

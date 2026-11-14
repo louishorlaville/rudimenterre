@@ -37,7 +37,7 @@ async function submit(fields = {}, options = {}) {
   expectedAction = options.page?.startsWith('presse-medias') ? 'press' : 'contact';
   const locale = options.locale ?? 'fr';
   const result = await action({
-    request: new Request(`https://shop.example/${locale}/pages/${options.page ?? 'contacts'}`, {
+    request: new Request(`https://shop.example/${locale}/${options.legacy ? 'pages/' : ''}${options.page ?? 'contacts'}`, {
       method: 'POST',
       headers: {
         Origin: options.origin ?? 'https://shop.example',
@@ -99,6 +99,10 @@ try {
   assert.equal(redisCalls[0].body[3], ipKey, 'press and contact share the same abuse limits');
   await submit({}, {page: 'presse-medias.data', locale: 'en'});
   assert.equal(calls[0].body.subject, '[Site web] Presse médias');
+  await submit({}, {page: 'presse-medias', legacy: true});
+  assert.equal(calls[0].body.subject, '[Site web] Presse médias');
+  await submit({}, {legacy: true});
+  assert.equal(calls[0].body.subject, '[Site web] Nouveau message');
   await submit({}, {ip: '192.0.2.2'});
   assert.notEqual(redisCalls[0].body[3], ipKey);
   await submit({}, {ip: '2001:db8::1'});

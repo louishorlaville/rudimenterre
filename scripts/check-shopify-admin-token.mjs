@@ -63,7 +63,7 @@ try {
     }});
   };
   const result = await action({
-    request: new Request('https://shop.example/fr/pages/newsletter', {
+    request: new Request('https://shop.example/fr/newsletter', {
       method: 'POST', headers: {Origin: 'https://shop.example', 'oxygen-buyer-ip': '192.0.2.1'},
       body: new URLSearchParams({email: 'test@example.com'}),
     }), params: {locale: 'fr'}, context: {env},

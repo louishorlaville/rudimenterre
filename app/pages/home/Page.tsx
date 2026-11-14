@@ -1064,7 +1064,7 @@ export default function Homepage() {
         </p>
         <Link
           className="button button--light home-newsletter-banner__cta"
-          to={`/${locale}/pages/newsletter`}
+          to={`/${locale}/newsletter`}
         >
           <svg
             className="home-newsletter-banner__icon"

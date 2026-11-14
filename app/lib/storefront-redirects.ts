@@ -4,7 +4,10 @@ import {localeFromPathname} from './i18n';
 // Explicit equivalents from the previous storefront; unrelated removed pages stay 404.
 const legacyPages: Record<string, string> = {
   'pages/projet/le-projet': 'projet-rudimenterre',
-  'pages/contactez-nous': 'pages/contacts',
+  'pages/contactez-nous': 'contacts',
+  'pages/contacts': 'contacts',
+  'pages/presse-medias': 'presse-medias',
+  'pages/newsletter': 'newsletter',
   'pages/tarifs-livraisons-et-garanties-des-serie-limitees':
     'tarifs-livraison-garanties',
   'pages/documentation/documents': 'pages/documentations-rudimenterre',
@@ -23,6 +26,8 @@ export function getStorefrontRedirect(request: Request): Response | null {
   if (!path) destination = `/${locale}`;
   else if (path === 'collections/all') destination = pagePath(locale, 'adopt');
   else if (legacyPages[path]) destination = `/${locale}/${legacyPages[path]}`;
+  else if (['contacts', 'presse-medias', 'newsletter'].includes(path))
+    destination = `/${locale}/${path}`;
   else if (/^collections\/[^/]+\/products\/[^/]+$/.test(path))
     destination = `/${locale}/products/${path.split('/').at(-1)}`;
   else if (editorial) destination = pagePath(locale, editorial.id);
