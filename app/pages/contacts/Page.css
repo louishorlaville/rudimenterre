@@ -16,6 +16,13 @@
 .contacts-field textarea { resize: vertical; }
 .contacts-field--message, .contacts-form-hint, .contacts-feedback { grid-column: 1 / -1; }
 .contacts-form-hint { font-size: .875rem; line-height: 1.5; }
+.contacts-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; }
+.contacts-verification { min-width: 0; max-width: 28rem; }
+.contacts-verification-status { display: flex; align-items: center; gap: .5rem; margin: 0; font-size: .8125rem; line-height: 1.5; }
+.contacts-verification-check { flex: none; color: var(--ink); }
+.contacts-verification[data-state="error"] .contacts-verification-status { color: #923022; }
+.contacts-verification-retry { min-height: 2.75rem; padding: .5rem 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: .8125rem; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
+.contacts-verification-retry:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 .contacts-form .contacts-write { margin-top: 0; cursor: pointer; }
 .contacts-write:disabled { opacity: .6; cursor: wait; }
 .contacts-feedback:empty { display: none; }

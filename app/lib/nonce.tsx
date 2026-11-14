@@ -19,6 +19,6 @@ export function createContentSecurityPolicy({
     : '';
   return {
     nonce,
-    header: `base-uri 'self'; default-src 'self' 'nonce-${nonce}' https://cdn.shopify.com https://shopify.com; frame-ancestors 'none'; style-src 'self' 'unsafe-inline' https://cdn.shopify.com; connect-src 'self' https://cdn.shopify.com https://monorail-edge.shopifysvc.com ${origins.join(' ')}${devConnections}`,
+    header: `base-uri 'self'; default-src 'self' 'nonce-${nonce}' https://cdn.shopify.com https://shopify.com; frame-src 'self' https://cdn.shopify.com https://shopify.com https://challenges.cloudflare.com; frame-ancestors 'none'; style-src 'self' 'unsafe-inline' https://cdn.shopify.com; connect-src 'self' https://cdn.shopify.com https://monorail-edge.shopifysvc.com https://challenges.cloudflare.com ${origins.join(' ')}${devConnections}`,
   };
 }

@@ -89,7 +89,7 @@ export async function action({request, context, params}: ActionFunctionArgs) {
     return data({error: invalid}, {status: 400});
   }
 
-  const {RESEND_API_KEY, RESEND_FROM_EMAIL} = context.env;
+  const {RESEND_API_KEY, RESEND_FROM_EMAIL, PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY} = context.env;
   const failure = (status: number, detail: string) => {
     console.error('Contact form failed', {status, detail});
     return data({error: unavailable}, {status});
@@ -115,6 +115,35 @@ export async function action({request, context, params}: ActionFunctionArgs) {
       : 'Unknown error';
     console.error('Contact rate limiter failed', {reason: detail});
     return failure(503, `Limiteur : ${detail}`);
+  }
+
+  if (!PUBLIC_TURNSTILE_SITE_KEY || !TURNSTILE_SECRET_KEY) {
+    return failure(503, 'Bot verification configuration missing');
+  }
+  const verificationError = fr
+    ? 'La vérification anti-robot a échoué ou a expiré. Veuillez la recommencer avant de renvoyer votre message.'
+    : 'The bot verification failed or expired. Please complete it again before resending your message.';
+  const token = form.get('cf-turnstile-response');
+  if (typeof token !== 'string' || !token.trim() || token.length > 2048) {
+    return data({error: verificationError}, {status: 400});
+  }
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({secret: TURNSTILE_SECRET_KEY, response: token}),
+      signal: AbortSignal.timeout(5000),
+    });
+    const result = await response.json() as {success?: boolean; hostname?: string; action?: string};
+    if (!response.ok) return failure(503, 'Bot verification unavailable');
+    if (result.success !== true ||
+      result.hostname !== new URL(request.url).hostname ||
+      result.action !== (press ? 'press' : 'contact')) {
+      console.warn('Contact bot verification refused');
+      return data({error: verificationError}, {status: 400});
+    }
+  } catch {
+    return failure(503, 'Bot verification network or response error');
   }
 
   try {

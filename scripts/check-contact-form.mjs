@@ -8,12 +8,21 @@ const env = {
   RESEND_API_KEY: 'test-only-key', RESEND_FROM_EMAIL: 'Contact <contact@example.com>',
   UPSTASH_REDIS_REST_URL: 'https://redis.example.com', UPSTASH_REDIS_REST_TOKEN: 'redis-test-only',
   SESSION_SECRET: 'test-session-secret',
+  PUBLIC_TURNSTILE_SITE_KEY: 'test-site-key', TURNSTILE_SECRET_KEY: 'test-secret-key',
 };
 let calls = [];
 let redisCalls = [];
+let verificationCalls = [];
+let expectedAction = 'contact';
+let verificationReply = () => Response.json({success: true, hostname: 'shop.example', action: expectedAction});
 let redisReply = () => Response.json({result: 0});
 let reply = () => Response.json({id: 'test-message'});
 globalThis.fetch = async (url, options) => {
+  if (url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify') {
+    assert.equal(redisCalls.length, 1, 'reserve an attempt before checking the token');
+    verificationCalls.push({url, ...options, body: JSON.parse(options.body)});
+    return verificationReply();
+  }
   if (url === env.UPSTASH_REDIS_REST_URL + '/') {
     redisCalls.push({url, ...options, body: JSON.parse(options.body)});
     return redisReply();
@@ -24,6 +33,8 @@ globalThis.fetch = async (url, options) => {
 async function submit(fields = {}, options = {}) {
   calls = [];
   redisCalls = [];
+  verificationCalls = [];
+  expectedAction = options.page?.startsWith('presse-medias') ? 'press' : 'contact';
   const locale = options.locale ?? 'fr';
   const result = await action({
     request: new Request(`https://shop.example/${locale}/pages/${options.page ?? 'contacts'}`, {
@@ -33,7 +44,7 @@ async function submit(fields = {}, options = {}) {
         ...(options.ip === null ? {} : {'oxygen-buyer-ip': options.ip ?? '192.0.2.1'}),
         'X-Forwarded-For': '198.51.100.1',
       },
-      body: new URLSearchParams({email: 'visitor@example.com', message: 'Bonjour !', ...fields}),
+      body: new URLSearchParams({email: 'visitor@example.com', message: 'Bonjour !', 'cf-turnstile-response': 'test-token', ...fields}),
     }),
     params: {locale}, context: {env: options.env ?? env},
   });
@@ -44,6 +55,8 @@ async function submit(fields = {}, options = {}) {
 try {
   assert.equal((await submit()).success, true, 'name is optional');
   assert.equal(calls.length, 1);
+  assert.equal(verificationCalls.length, 1);
+  assert.deepEqual(verificationCalls[0].body, {secret: env.TURNSTILE_SECRET_KEY, response: 'test-token'});
   assert.equal(calls[0].url, 'https://api.resend.com/emails');
   assert.deepEqual(calls[0].body.to, ['info@rudimenterre.com']);
   assert.equal(calls[0].body.reply_to, 'visitor@example.com');
@@ -99,6 +112,7 @@ try {
     assert.equal(blocked.status, 429);
     assert.equal(blocked.headers['Retry-After'], String(retryAfter));
     assert.equal(calls.length, 0, 'throttled requests never reach Resend');
+    assert.equal(verificationCalls.length, 0, 'throttled requests never reach Cloudflare');
   }
   for (const providerReply of [
     () => Response.json({error: 'unavailable'}, {status: 503}),
@@ -148,13 +162,63 @@ try {
   const englishError = await submit({message: ''}, {locale: 'en'});
   assert.match(englishError.error, /Check your email/);
 
+  for (const token of ['', ' '.repeat(3), 'a'.repeat(2049)]) {
+    assert.equal((await submit({'cf-turnstile-response': token})).status, 400);
+    assert.equal(verificationCalls.length, 0);
+    assert.equal(calls.length, 0);
+  }
+  for (const key of ['PUBLIC_TURNSTILE_SITE_KEY', 'TURNSTILE_SECRET_KEY']) {
+    assert.equal((await submit({}, {env: {...env, [key]: ''}})).status, 503);
+    assert.equal(verificationCalls.length, 0);
+    assert.equal(calls.length, 0);
+  }
+  for (const result of [
+    {success: false, 'error-codes': ['invalid-input-response']},
+    {success: false, 'error-codes': ['timeout-or-duplicate']},
+    {success: true, hostname: 'attacker.example', action: 'contact'},
+    {success: true, hostname: 'shop.example', action: 'press'},
+    {success: 'true', hostname: 'shop.example', action: 'contact'},
+    {},
+  ]) {
+    verificationReply = () => Response.json(result);
+    assert.equal((await submit()).status, 400);
+    assert.equal(calls.length, 0, 'invalid tokens never reach Resend');
+  }
+  verificationReply = () => Response.json({success: true, hostname: 'shop.example', action: 'contact'});
+  assert.equal((await submit({}, {page: 'presse-medias'})).status, 400, 'contact tokens cannot authorize press');
+  assert.equal(calls.length, 0);
+  for (const failedReply of [
+    () => Response.json({}, {status: 503}),
+    () => new Response('not json'),
+    () => Response.json(null),
+    () => { throw new DOMException('Timeout', 'TimeoutError'); },
+    () => { throw new Error('Offline'); },
+  ]) {
+    verificationReply = failedReply;
+    assert.equal((await submit()).status, 503);
+    assert.equal(calls.length, 0);
+  }
+  verificationReply = () => Response.json({success: false});
+  assert.match((await submit({}, {locale: 'en'})).error, /bot verification failed/);
+  // Cloudflare consumes tokens; simulate the provider rejecting a replay.
+  let spent = false;
+  verificationReply = () => {
+    if (spent) return Response.json({success: false, 'error-codes': ['timeout-or-duplicate']});
+    spent = true;
+    return Response.json({success: true, hostname: 'shop.example', action: expectedAction});
+  };
+  assert.equal((await submit()).success, true);
+  assert.equal((await submit()).status, 400);
+  assert.equal(calls.length, 0);
+  verificationReply = () => Response.json({success: true, hostname: 'shop.example', action: expectedAction});
+
   reply = () => Response.json({message: 'invalid key'}, {status: 401});
   assert.equal((await submit()).status, 502);
   reply = () => Response.json({});
   assert.equal((await submit()).status, 502, 'missing provider ID cannot show success');
   reply = () => { throw new Error('Network unavailable'); };
   assert.equal((await submit()).status, 502);
-  console.log('Contact form checks passed (mocked Resend, no emails sent).');
+  console.log('Contact form checks passed (mocked Turnstile and Resend, no emails sent).');
 } finally {
   globalThis.fetch = originalFetch;
 }
