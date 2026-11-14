@@ -1,5 +1,7 @@
-import {useEffect, useRef} from 'react';
-import {useFetcher, useLocation, type MetaFunction} from 'react-router';
+import {useEffect, useRef, useState} from 'react';
+import {useFetcher, useLocation, useRouteLoaderData, type MetaFunction} from 'react-router';
+import type {RootLoader} from '~/root';
+import {Turnstile} from '~/components/Turnstile';
 import {localeFromPathname} from '~/lib/i18n';
 import styles from './Page.css?url';
 
@@ -20,10 +22,21 @@ export default function ContactsPage({press = false}: {press?: boolean}) {
   const fetcher = useFetcher<{success?: boolean; error?: string}>();
   const form = useRef<HTMLFormElement>(null);
   const sending = fetcher.state !== 'idle';
+  const root = useRouteLoaderData<RootLoader>('root');
+  const [token, setToken] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const wasSending = useRef(false);
 
   useEffect(() => {
+    if (sending) {
+      wasSending.current = true;
+      setToken('');
+    } else if (wasSending.current) {
+      wasSending.current = false;
+      setAttempt((value) => value + 1);
+    }
     if (fetcher.state === 'idle' && fetcher.data?.success) form.current?.reset();
-  }, [fetcher.state, fetcher.data]);
+  }, [fetcher.state, fetcher.data, sending]);
 
   return (
     <article className="contacts-page" aria-labelledby="contacts-title">
@@ -37,7 +50,10 @@ export default function ContactsPage({press = false}: {press?: boolean}) {
             ? 'Une question sur le Cuicui, votre commande ou nos ateliers ? Écrivez-nous, nous serons heureux d’échanger avec vous.'
             : 'Have a question about Cuicui, your order or our workshops? Write to us — we’d love to hear from you.'}
         </p>
-        <fetcher.Form className="contacts-form" method="post" ref={form}>
+        <fetcher.Form className="contacts-form" method="post" ref={form} onSubmit={(event) => {
+          if (!token || sending) event.preventDefault();
+        }}>
+          <input type="hidden" name="cf-turnstile-response" value={token} />
           <div className="contacts-field">
             <label htmlFor="contact-name">{fr ? 'Votre nom (facultatif)' : 'Your name (optional)'}</label>
             <input id="contact-name" name="name" autoComplete="name" maxLength={100} disabled={sending} />
@@ -58,11 +74,14 @@ export default function ContactsPage({press = false}: {press?: boolean}) {
             <input id="contact-website" name="website" tabIndex={-1} autoComplete="off" />
           </div>
           <p className="contacts-form-hint">{fr ? 'Votre courriel et votre message sont obligatoires.' : 'Your email address and message are required.'}</p>
-          <button className="button button--dark contacts-write" type="submit" disabled={sending} aria-busy={sending}>
-            {sending
-              ? (fr ? 'Envoi en cours…' : 'Sending…')
-              : (fr ? 'Envoyer le message' : 'Send message')}
-          </button>
+          <div className="contacts-actions">
+            <button className="button button--dark contacts-write" type="submit" disabled={sending || !token} aria-busy={sending}>
+              {sending
+                ? (fr ? 'Envoi en cours…' : 'Sending…')
+                : (fr ? 'Envoyer le message' : 'Send message')}
+            </button>
+            <Turnstile key={`${press}-${fr}-${attempt}`} siteKey={root?.turnstileSiteKey ?? ''} action={press ? 'press' : 'contact'} fr={fr} onToken={setToken} />
+          </div>
           <div className="contacts-feedback" aria-live="polite" aria-atomic="true">
             {!sending && fetcher.data?.success && <p className="contacts-success" role="status">{fr ? 'Merci ! Votre message a bien été envoyé.' : 'Thank you! Your message has been sent.'}</p>}
             {!sending && fetcher.data?.error && <p className="contacts-error" role="alert">{fetcher.data.error}</p>}

@@ -99,6 +99,44 @@ Run `node --env-file=tmp/.env.integration scripts/check-contact-redis.mjs` to ve
 script using isolated temporary keys, including concurrent requests and rolling
 hour expiry, without sending emails. The script attempts cleanup in `finally`; use the isolated-resource procedure in [verification](guides/verification.md).
 
+### Turnstile bot verification (contact and press)
+
+Both contact and press forms require Cloudflare Turnstile, in French and English.
+Create a **Managed** widget in the [Cloudflare dashboard](https://dash.cloudflare.com/)
+with pre-clearance disabled. Add every actual production hostname (including any
+used `www`, `.com` and `.fr` variants). Add staging hostnames to a separate widget.
+The component uses `appearance: interaction-only`: verification runs automatically,
+and the challenge only appears when interaction is needed.
+
+Set `PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Oxygen **before
+deploying this change**, and in local `.env` when testing. Only the public site key
+is returned by the root loader; the secret must never be exposed to the browser.
+Missing configuration blocks sending. Redeploy after setting production variables.
+
+The server reserves the existing Redis attempt first, then sends the token to
+Cloudflare Siteverify with a five-second timeout. It requires `success: true`, the
+request hostname, and the expected action (`contact` or `press`) before calling
+Resend. Cloudflare rejects expired and spent tokens. Rejected checks also consume
+an attempt; visitors may need to wait for the existing sending limit before retrying.
+Provider failures block sending. The UI keeps entered text on failure and renews
+verification after every submission. Without JavaScript or when the verification
+script is blocked, visitors can use the existing direct email link.
+
+Run `node scripts/check-contact-form.mjs` for mocked Cloudflare, Redis and Resend
+checks; no real messages are sent. Use Cloudflare's [test keys](https://developers.cloudflare.com/turnstile/troubleshooting/testing/)
+for isolated browser tests, mocking Siteverify with the local hostname and action
+when needed: hostname/action matching is never bypassed for testing. For an
+end-to-end local test, use a separate development widget allowing `localhost`.
+Never put test secrets in production. Verify contact and press in both languages,
+mobile width and keyboard navigation; check expiry, retry after a failed send,
+script blocking, and navigation between the forms.
+
+After deployment, submit one authorized real message and confirm its receipt.
+Monitor verification refusals/provider failures in Oxygen logs and successful vs
+failed validations in Turnstile Analytics. No message content, email addresses,
+tokens or Turnstile secrets are logged by verification. This protection reduces
+automated form spam; it does not filter mail sent directly to the inbox.
+
 ## Newsletter
 
 The bilingual newsletter form saves subscribers, marketing consent and interest tags

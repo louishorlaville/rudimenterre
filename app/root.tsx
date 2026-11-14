@@ -107,6 +107,7 @@ export async function loader(args: Route.LoaderArgs) {
     ...criticalData,
     cart: initialCart,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    turnstileSiteKey: env.PUBLIC_TURNSTILE_SITE_KEY ?? '',
     locale: localeFromPathname(new URL(args.request.url).pathname),
     shop: {
       shopId: criticalData.header.shop.id,

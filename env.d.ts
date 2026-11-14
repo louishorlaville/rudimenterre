@@ -21,6 +21,8 @@ declare global {
     SHOPIFY_ADMIN_CLIENT_SECRET?: string;
     RESEND_API_KEY?: string;
     RESEND_FROM_EMAIL?: string;
+    PUBLIC_TURNSTILE_SITE_KEY?: string;
+    TURNSTILE_SECRET_KEY?: string;
     UPSTASH_REDIS_REST_URL?: string;
     UPSTASH_REDIS_REST_TOKEN?: string;
   }
