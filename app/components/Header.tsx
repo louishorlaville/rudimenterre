@@ -92,7 +92,7 @@ export function HeaderMenu({
     },
   ];
   const kitchenLinks = [
-    {label: locale === 'fr' ? 'Potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
+    {label: locale === 'fr' ? 'Le potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
     {label: locale === 'fr' ? 'Le Cuicui en vadrouille' : 'Cuicui on the road', to: pagePath(locale, 'vadrouille')},
   ];

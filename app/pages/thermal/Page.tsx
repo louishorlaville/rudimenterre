@@ -124,7 +124,7 @@ export function ThermalPage({content, locale, heroImage}: {content: EditorialPag
         </div>
         <p className="thermal-energy">
           <img className="thermal-energy__arrow" src={image('arrow')} alt="" aria-hidden="true" loading="lazy" />
-          {fr ? <>J’utilise <strong>n’importe quelle source d’énergie**</strong> : gaz, feu, bois, électrique…</> : <>I can use <strong>any energy source**</strong>: gas, open fire, wood, electric…</>}
+          {fr ? <>J’utilise <strong>n’importe quelle source d’énergie**</strong> : gaz, feu, bois, électrique…</> : <>I can use <strong>all heat sources**</strong>: gas, open fire, wood, electric…</>}
         </p>
       </div>
     </section>
@@ -146,7 +146,7 @@ export function ThermalPage({content, locale, heroImage}: {content: EditorialPag
       <img className="thermal-notes__flame" src="/images/rudimenterre/thermal-flame.png" alt="" aria-hidden="true" loading="lazy" />
       <div className="thermal-notes__copy">
         <p><strong>67 °C*</strong><br />{fr ? <>La température interne feu éteint ne doit pas descendre sous <strong>60 °C</strong> pour être sécuritaire. Sous ce seuil, les bactéries peuvent proliférer rapidement, ce qui rend la préparation dangereuse à la consommation si le temps de maintien au chaud se prolonge.</> : <>The internal temperature after switching off the heat should not fall below <strong>60 °C</strong> to remain safe. Below this threshold, bacteria can multiply quickly, making food unsafe if it is kept warm for too long.</>}</p>
-        <p><strong>{fr ? 'N’IMPORTE QUELLE SOURCE D’ÉNERGIE**' : 'ANY ENERGY SOURCE**'}</strong><br />{fr ? 'Puisque la cuisson est indirecte, c’est la matière de la casserole complémentaire qui détermine la compatibilité avec la source de chaleur en contact direct.' : 'Because cooking is indirect, the material of the saucepan determines which direct heat sources it can be used with.'}</p>
+        <p><strong>{fr ? 'N’IMPORTE QUELLE SOURCE D’ÉNERGIE**' : 'ALL HEAT SOURCES**'}</strong><br />{fr ? 'Puisque la cuisson est indirecte, c’est la matière de la casserole complémentaire qui détermine la compatibilité avec la source de chaleur en contact direct.' : 'Because cooking is indirect, the material of the saucepan determines which direct heat sources it can be used with.'}</p>
       </div>
     </footer>
   </article>;

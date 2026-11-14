@@ -172,7 +172,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1;
 .footer-brand .brand { font-size: clamp(1.35rem, 2vw, 2rem); }
 .site-footer__nav {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(2.5rem, 5vw, 5.5rem);
   align-items: start;
 }

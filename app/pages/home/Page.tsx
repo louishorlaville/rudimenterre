@@ -37,7 +37,7 @@ export default function Homepage() {
   const iconBenefits = [
     {icon: '/images/rudimenterre/home-benefit-icon-1.png', title: fr ? 'max 95C doux' : 'max 95C gentle', detail: fr ? 'équilibré' : 'balanced'},
     {icon: '/images/rudimenterre/home-benefit-icon-2.png', title: fr ? 'multi cuisson modulables' : 'modular multi-cooking', detail: fr ? 'vapeur-étuvée\nbain-marie - four' : 'steam-stewing\nbain-marie - oven'},
-    {icon: '/images/rudimenterre/home-benefit-icon-3.png', title: fr ? 'cuisson indirecte :\ntous feux' : 'indirect cooking:\nevery hob', detail: fr ? 'Gaz - Bois - Vitro -\nInduction' : 'Gas - Wood - Ceramic -\nInduction'},
+    {icon: '/images/rudimenterre/home-benefit-icon-3.png', title: fr ? 'cuisson indirecte :\ntous feux' : 'indirect cooking:\nall heat sources', detail: fr ? 'Gaz - Bois - Vitro -\nInduction' : 'Gas - Wood - Ceramic -\nInduction'},
     {icon: '/images/rudimenterre/home-benefit-icon-4.png', title: fr ? 'avec ou sans\neau potable' : 'with or without\ndrinking water', detail: fr ? 'distille l’eau non potable' : 'distils non-drinking water'},
     {icon: '/images/rudimenterre/home-benefit-icon-5.png', title: fr ? '72C\naprès 50min' : '72C\nafter 50min', detail: fr ? 'feu éteint\nfin de cuisson passive' : 'heat off\npassive cooking finish'},
     {icon: '/images/rudimenterre/home-benefit-icon-6.png', title: fr ? 'inclusif\n1 seul feu' : 'inclusive\n1 heat source', detail: fr ? 'plusieurs régimes' : 'multiple diets'},
@@ -333,7 +333,7 @@ export default function Homepage() {
               <div className="home-hero__text">
                 <h1>{fr?'Le Cuicui':'Cuicui'}</h1>
                 <p className="home-hero__lead">{fr ? <>relais mobile<br />de cuissons saines et durables</> : <>a mobile relay<br />for healthy, sustainable cooking</>}</p>
-                <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons saines et durables.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible <strong>every hob</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
+                <p className="home-hero__details">{fr ? <>Modulable, robuste, polyvalent, distingué,<br /> déconnecté, compatible <strong>tous feux</strong>.<br /> Plus qu’une cocotte, le Cuicui est un relais<br /> de cuissons saines et durables.</> : <>Modular, robust, versatile, distinctive,<br /> technology-free and compatible with <strong>all heat sources</strong>.<br /> More than a casserole, Cuicui is a mobile relay<br /> for sustainable cooking.</>}</p>
                 {fr && <p className="script">Bienvenue dans la cuisine du futur</p>}
               </div>
               <Link className="button button--light home-hero__cta" to={productUrl}>{fr?'J’adopte un Cuicui':'Adopt a Cuicui'}</Link>
