@@ -1,15 +1,15 @@
-.home-discover { padding: clamp(40px, 5vw, 80px) var(--content-gutter); background: var(--paper); color: #454743; }
+.home-discover { --home-discover-award-bg: #e5e6e1; --home-discover-towel-bg: #7f8f7c; --home-discover-workshops-bg: #774828; padding: clamp(40px, 5vw, 80px) var(--content-gutter); background: var(--paper); color: #454743; }
 .home-discover__grid { max-width: 1120px; margin-inline: auto; }
 .home-discover__heading { display: flex; align-items: center; gap: 32px; margin-bottom: clamp(28px, 3vw, 42px); }
 .home-discover__heading::after { content: ''; height: 1px; flex: 1; background: #50534e; }
 .home-discover__heading h2 { margin: 0; font-size: clamp(18px, 1.65vw, 25px); line-height: 1.3; text-transform: uppercase; letter-spacing: .015em; }
 .home-discover__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; background: #50534e; }
 .home-discover__card { position: relative; z-index: 0; display: grid; grid-template-rows: minmax(0, 1fr) 3.3em 32px; gap: 12px; min-width: 0; aspect-ratio: .72; padding: clamp(18px, 2.3vw, 28px); color: #454743; font-size: clamp(16px, 1.55vw, 23px); text-decoration: none; transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s cubic-bezier(.22, 1, .36, 1), filter .3s ease, opacity .3s ease; }
-.home-discover__card--forest { background: #ed7c00; color: var(--ink); }
+.home-discover__card--forest { background: var(--home-discover-award-bg); color: var(--ink); }
 .home-discover__card--blue { background: #e8f4fa; }
 .home-discover__card--mint { background: #bfd3d0; }
-.home-discover__card--white { background: #f3f8f2; }
-.home-discover__card--sage { background: #9fb4b1; }
+.home-discover__card--white { background: var(--home-discover-towel-bg); color: var(--ink); }
+.home-discover__card--sage { background: var(--home-discover-workshops-bg); color: #f7f1dd; }
 .home-discover__card--charcoal { background: #4b534b; color: #f7f1dd; }
 .home-discover__illustration { min-height: 0; display: flex; align-items: center; justify-content: center; transition: transform .3s cubic-bezier(.22, 1, .36, 1); }
 .home-discover__illustration img { width: 82%; height: 82%; object-fit: contain; }
@@ -40,6 +40,8 @@
   .home-discover__card:is(:hover, :focus-visible) .home-discover__arrow { transform: translateX(8px); }
 }
 @media (min-width: 761px) {
+  /* Align the artwork bases, accounting for the Cuicui image's transparent bottom padding. */
+  .home-discover__card--forest .home-discover__illustration img { position: relative; top: 6%; }
   .home-discover { padding-block: 20px; }
   .home-discover__heading { margin-bottom: 18px; }
   .home-discover__grid { max-width: min(1040px, calc(max(480px, 100svh - var(--header-height) - 124px) * 1.4)); }
