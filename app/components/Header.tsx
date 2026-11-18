@@ -76,6 +76,8 @@ export function HeaderMenu({
       to: 'https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Carnet_PRATIQUE_2024-FR-c.pdf?v=1743953253',
       external: true,
     },
+    {label: locale === 'fr' ? 'Le Cuicui en vadrouille' : 'Cuicui on the road', to: pagePath(locale, 'vadrouille')},
+    {label: copy.project, to: pagePath(locale, 'project')},
   ];
   const howItWorks = [
     {
@@ -94,7 +96,6 @@ export function HeaderMenu({
   const kitchenLinks = [
     {label: locale === 'fr' ? 'Le potager' : 'Kitchen garden', to: pagePath(locale, 'garden')},
     {label: locale === 'fr' ? 'La recette' : 'The recipe', to: pagePath(locale, 'creator')},
-    {label: locale === 'fr' ? 'Le Cuicui en vadrouille' : 'Cuicui on the road', to: pagePath(locale, 'vadrouille')},
   ];
   return (
     <nav
@@ -122,13 +123,6 @@ export function HeaderMenu({
         onNavigate={close}
         viewport={viewport}
       />
-      <NavLink
-        onClick={close}
-        to={pagePath(locale, 'project')}
-        prefetch="intent"
-      >
-        {copy.project}
-      </NavLink>
       <NavLink
         className="button button--orange header-cta"
         onClick={close}

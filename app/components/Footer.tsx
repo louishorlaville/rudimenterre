@@ -29,6 +29,7 @@ export function Footer(_props: {
           <a href="https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Decouvrir-le-Cuicui-2026.pdf?v=1794625779" target="_blank" rel="noopener noreferrer">{fr ? 'Le catalogue Cuicui' : 'Cuicui catalogue'}</a>
           <a href="https://cdn.shopify.com/s/files/1/0276/4252/7833/files/Carnet_PRATIQUE_2024-FR-c.pdf?v=1743953253" target="_blank" rel="noopener noreferrer">{fr ? 'Le carnet pratique' : 'Practical guide'}</a>
           <Link to={pagePath(locale, 'making')}>{fr ? 'Fabrication et entretien' : 'Making and care'}</Link>
+          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
           <Link to={pagePath(locale, 'project')}>{fr ? 'Le projet' : 'The project'}</Link>
         </div>
 
@@ -43,7 +44,6 @@ export function Footer(_props: {
           <p>{fr ? 'En cuisine' : 'In the kitchen'}</p>
           <Link to={pagePath(locale, 'garden')}>{fr ? 'Le potager' : 'Kitchen garden'}</Link>
           <Link to={pagePath(locale, 'creator')}>{fr ? 'La recette' : 'The recipe'}</Link>
-          <Link to={pagePath(locale, 'vadrouille')}>{fr ? 'Le Cuicui en vadrouille' : 'Cuicui on the road'}</Link>
           <a href="https://www.instagram.com/rudimenterre/reels/">{fr ? 'Suivez-nous en cuisine' : 'Follow us into the kitchen'}</a>
         </div>
 
